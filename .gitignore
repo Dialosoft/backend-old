@@ -1,0 +1,113 @@
+# General
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.jpi
+*.log
+target/
+*.classpath
+*.project
+*.settings/
+bin/
+
+# Golang
+bin/
+obj/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.a
+
+# Go module files
+go.sum
+go.mod
+
+# Dependency directories
+vendor/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.ipr
+*.iml
+.idea_modules/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Eclipse
+.project
+.classpath
+.settings/
+# STS (Spring Tool Suite)
+.springBeans
+.spring
+*.sts4-data
+*.sts4-cache
+
+# VS Code
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Logs and temp files
+logs/
+*.log
+tmp/
+
+# Build directories
+out/
+build/
+
+# Spring Boot
+*.war
+*.ear
+*.jar
+
+# Generated files
+!src/main/resources/static/**/swagger-ui/**/swagger.yaml
+
+# Local environment
+.env
+.env.local
+.env.*.local
+.envrc
+
+# Maven
+.mvn/
+!**/src/main/**/.mvn/
+!**/src/test/**/.mvn/
+target/
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Gradle
+.gradle
+build/
+out/
+*.gradle
+!gradle-wrapper.jar
+!gradlew
+!gradlew.bat
+.wrapper/
