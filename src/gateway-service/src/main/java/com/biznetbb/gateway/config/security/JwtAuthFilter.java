@@ -59,6 +59,4 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
         return exchange.getResponse().setComplete();
     }
 
-
-
 }

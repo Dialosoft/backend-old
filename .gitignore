@@ -106,7 +106,6 @@ buildNumber.properties
 .gradle
 build/
 out/
-*.gradle
 !gradle-wrapper.jar
 !gradlew
 !gradlew.bat
