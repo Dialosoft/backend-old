@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth_service
+          uri: lb://auth
+          predicates:
+            - Path=/bizznetbb/auth/**
+        - id: other_service
+          uri: lb://OTHER-SERVICE
+          predicates:
+            - Path=/other/**
+          filters:
+            - JwtAuthFilter
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+
+server:
+  port: 8080
+  servlet:
+        context-path: /bizznetbb-api/
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.springframework.cloud.gateway: DEBUG
