@@ -41,6 +41,9 @@ public class UserEntity {
     private Boolean locked;
 
     @Column(nullable = false)
+    private Boolean disable;
+
+    @Column(nullable = false)
     private RoleEntity roleId; // roleEntity
 
     @Column(name = "created_at", nullable = false, updatable = false)
