@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.biznetbb.auth.persistence.response.ResponseBody;
 import com.biznetbb.auth.service.AuthService;
 import com.biznetbb.auth.service.dto.LoginDto;
 import com.biznetbb.auth.service.dto.RegisterDto;
@@ -19,7 +20,7 @@ public class AuthController {
     private final AuthService auth;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterDto registerDto){
+    public ResponseEntity<ResponseBody> register(@RequestBody RegisterDto registerDto){
         return auth.register(registerDto);
     }
 

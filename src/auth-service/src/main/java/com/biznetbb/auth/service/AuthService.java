@@ -2,6 +2,7 @@ package com.biznetbb.auth.service;
 
 import org.apache.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.biznetbb.auth.persistence.entity.UserEntity;
 import com.biznetbb.auth.persistence.repository.UserRepository;
+import com.biznetbb.auth.persistence.response.ResponseBody;
 import com.biznetbb.auth.service.dto.LoginDto;
 import com.biznetbb.auth.service.dto.RegisterDto;
 import com.biznetbb.auth.web.config.SecurityConfig;
@@ -27,10 +29,16 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     
-    public ResponseEntity<?> register(RegisterDto registerDto){
+    public ResponseEntity<ResponseBody> register(RegisterDto registerDto){
+        ResponseBody response = new ResponseBody();
+
         if(userRepository.findByUsername(registerDto.getUsername()) != null &&
             userRepository.findByEmail(registerDto.getEmail()) != null){
-            return new ResponseEntity<>("any of the parameters already exists", HttpStatus.CONFLICT);
+
+            response.setStatusCode(HttpStatus.CONFLICT.value());
+            response.setMessage("any of the parameters already exists");
+            response.setMetadata(null);
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
 
         UserEntity userEntity = new UserEntity();
@@ -40,13 +48,20 @@ public class AuthService {
         UserEntity newUser = userRepository.save(userEntity);
 
         if(newUser == null){
-            return new ResponseEntity<>("User could not be created", HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setMessage("user could not be created");
+            response.setMetadata(null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>("User " + newUser.getUuid() + " created sucessfully", HttpStatus.CREATED);
+        response.setStatusCode(HttpStatus.CREATED.value());
+        response.setMessage("User " + newUser.getUuid() + " created sucessfully");
+        response.setMetadata(null);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> login(LoginDto loginDto){
+    public ResponseEntity<ResponseBody> login(LoginDto loginDto){
+        ResponseBody response = new ResponseBody();
         UsernamePasswordAuthenticationToken login = new UsernamePasswordAuthenticationToken(
             loginDto.getUsername(),
             loginDto.getPassword()
@@ -55,9 +70,18 @@ public class AuthService {
             Authentication authentication = this.authenticationManager.authenticate(login);
             System.out.println(authentication.getPrincipal());
             String jwt = jwtUtil.create(loginDto.getUsername());
-            return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, jwt).build();
+
+            response.setStatusCode(HttpStatus.OK.value());
+            response.setMessage("authenticated successfully");
+            response.setMetadata(jwt);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+            
         } catch (BadCredentialsException e) {
-            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+            response.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+            response.setMessage("Unauthorized");
+            response.setMetadata(null);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
     }
 }
