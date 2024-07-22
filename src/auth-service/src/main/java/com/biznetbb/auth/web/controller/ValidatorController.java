@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.biznetbb.auth.persistence.response.ResponseBody;
 import com.biznetbb.auth.service.ValidateService;
 
 @RestController
@@ -16,7 +17,7 @@ public class ValidatorController {
     @Autowired
     private ValidateService validator;
 
-    public ResponseEntity<?> validate(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token){
+    public ResponseEntity<ResponseBody> validate(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token){
         return this.validator.validate(token);
     }
 }
