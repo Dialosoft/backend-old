@@ -1,11 +1,22 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/biznetbb/user-service/src/adapters/controllers"
+	"github.com/biznetbb/user-service/src/infraestructure/db"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	db, err := db.DBConnection()
+	if err != nil {
+		log.Fatalf("error initializing database: %v", err)
+	}
+
+	fmt.Println("Database connection successful", db)
+
 	router := gin.Default()
 
 	router.Use(gin.Logger())
