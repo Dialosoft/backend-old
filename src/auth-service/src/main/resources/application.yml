@@ -1,11 +1,17 @@
+
+app:
+    security:
+        jwt:
+            secret-key: biznetbb-key-123
+
 spring:
     application:
         name: auth
     profiles:
         active: dev
     datasource:
-        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/biznetbb-db}
-        username: ${SPRING_DATASOURCE_USERNAME:biznetbb}
+        url: jdbc:postgresql://${SPRING_DATASOURCE_URL:localhost:5432}/${SPRING_DATASOURCE_DB:biznetbb}
+        username: ${SPRING_DATASOURCE_USERNAME:biznetbb_user}
         password: ${SPRING_DATASOURCE_PASSWORD:admin}
         driver-class-name: org.postgresql.Driver
     jpa:
