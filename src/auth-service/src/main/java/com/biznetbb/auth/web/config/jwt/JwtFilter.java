@@ -2,7 +2,7 @@ package com.biznetbb.auth.web.config.jwt;
 
 import java.io.IOException;
 
-import org.apache.http.HttpHeaders;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -42,13 +42,13 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String jwt = authHeader.split(" ")[1].trim();
-        if(!this.jwtUtil.isValid(jwt)){
+        String accessJwtToken = authHeader.split(" ")[1].trim();
+        if(!this.jwtUtil.isValid(accessJwtToken)){
             filterChain.doFilter(request, response);
             return;
         }
         
-        String username = this.jwtUtil.getUsername(jwt);
+        String username = this.jwtUtil.getUsername(accessJwtToken);
         User user = (User)this.userDetailsService.loadUserByUsername(username);
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

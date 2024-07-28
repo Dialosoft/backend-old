@@ -1,12 +1,14 @@
 package com.biznetbb.auth.persistence.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-public class ResponseBody {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ResponseBody<T> {
     Integer statusCode;
     String message;
-    Object metadata;
+    T metadata;
 }
