@@ -1,6 +1,10 @@
 spring:
   application:
     name: gateway
+  docker:
+    compose:
+      enabled: true
+      file: ./docker-compose.yml
   cloud:
     gateway:
       routes:
@@ -25,10 +29,11 @@ spring:
               - DELETE
               - OPTIONS
 
+# Eureka - Registry Service
 eureka:
   client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://registry-service:8761/eureka/}
 
 server:
   port: 8080

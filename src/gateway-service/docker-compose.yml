@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      POSTGRES_DB: ${DB_NAME:-biznetbb}
+      POSTGRES_USER: ${DB_USER:-biznetbb_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-admin}
+    ports:
+      - "${DB_PORT:-5434}:5432"
+    networks:
+      - biznetbb-network
+    volumes:
+      - biznetbb-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-biznetbb_user}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  registry-service:
+    build:
+      context: ../registry-service
+    container_name: registry-service
+    image: biznetbb-registry-eureka:v1.0
+    ports:
+      - "8761:8761"
+    depends_on:
+      - database
+    networks:
+      - biznetbb-network
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Registry Service ready to start' && tail -f /dev/null"]
+
+  gateway-service:
+    build:
+      context: .
+    container_name: gateway-service
+    image: biznetbb-gateway:v1.0
+    ports:
+      - "8080:8080"
+    depends_on:
+      - registry-service
+    networks:
+      - biznetbb-network
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
+
+#  auth-service:
+#    build:
+#      context: ../auth-service
+#    container_name: auth-service
+#  image: biznetbb-auth-service:v1.0
+#    ports:
+#      - "8081:8081"
+#    depends_on:
+#      - registry-service
+#    networks:
+#      - biznetbb-network
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/biznetbb-db
+#      SPRING_DATASOURCE_USERNAME: biznetbb
+#      SPRING_DATASOURCE_PASSWORD: admin
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#    command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
+#
+
+volumes:
+  biznetbb-db-data:
+    name: biznetbb-db-data
+    driver: local
+
+networks:
+  biznetbb-network:
+    driver: bridge
