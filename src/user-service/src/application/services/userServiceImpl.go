@@ -42,5 +42,4 @@ func (s *userService) ChangeAvatar(userID uuid.UUID, avatar []byte) error {
 
 	user.Avatar = avatar
 	return s.userRepo.Update(user)
-
 }
