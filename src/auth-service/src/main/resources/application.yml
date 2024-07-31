@@ -1,34 +1,32 @@
-
 app:
-    security:
-        jwt:
-            secret-key: biznetbb-key-123
+  security:
+    jwt:
+      secret-key: biznetbb-key-123
 
 spring:
-    application:
-        name: auth
-    profiles:
-        active: dev
-    datasource:
-        url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5434}/${SPRING_DATASOURCE_DB:biznetbb}
-        username: ${SPRING_DATASOURCE_USERNAME:biznetbb_user}
-        password: ${SPRING_DATASOURCE_PASSWORD:admin}
-        driver-class-name: org.postgresql.Driver
-    jpa:
-        show-sql: true
-        hibernate:
-            ddl-auto: update
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.PostgreSQLDialect
+  application:
+    name: auth-microservice
+  datasource:
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5434}/${SPRING_DATASOURCE_DB:biznetbb}
+    username: ${SPRING_DATASOURCE_USERNAME:biznetbb_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  redis:
+    host: localhost
+    port: 6379
 
 server:
-    port: 8085
-    servlet:
-        context-path: /biznetbb-api/
+  port: 8081
 
 # Eureka - Registry Service
 eureka:
   client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://registry-service:8761/eureka/}
+    fetchRegistry: true
+    registryFetchIntervalSeconds: 5
