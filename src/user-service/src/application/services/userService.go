@@ -1,6 +1,8 @@
 package services
 
+import "github.com/google/uuid"
+
 type UserService interface {
-	ChangeEmail(userID string, newMail string) error
-	ChangeAvatar(userID string, avatar []byte) error
+	ChangeEmail(userID uuid.UUID, newMail string) error
+	ChangeAvatar(userID uuid.UUID, avatar []byte) error
 }

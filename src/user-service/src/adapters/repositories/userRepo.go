@@ -2,11 +2,12 @@ package repositories
 
 import (
 	"github.com/biznetbb/user-service/src/domain/entities"
+	"github.com/google/uuid"
 )
 
 type UserRepository interface {
-	FindByID(uuid string) (*entities.User, error)
+	FindByID(uuid uuid.UUID) (*entities.User, error)
 	FindByUsername(username string) (*entities.User, error)
 	Update(user *entities.User) error
-	Delete(uuid string) error
+	Delete(uuid uuid.UUID) error
 }

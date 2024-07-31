@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/biznetbb/user-service/src/adapters/controllers"
+	"github.com/biznetbb/user-service/src/adapters/repositories"
+	"github.com/biznetbb/user-service/src/adapters/router"
+	"github.com/biznetbb/user-service/src/application/services"
 	"github.com/biznetbb/user-service/src/infraestructure/db"
 	"github.com/gin-gonic/gin"
 )
@@ -17,18 +19,14 @@ func main() {
 
 	fmt.Println("Database connection successful", db)
 
-	router := gin.Default()
+	userRepo := repositories.NewUserRepository(db)
+	userService := services.NewUserService(userRepo)
+
+	r := router.NewRouter(userService)
+	router := r.SetupRoutes()
 
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	initializeRoutes(router)
-
 	router.Run(":8086")
-}
-
-func initializeRoutes(router *gin.Engine) {
-	userRoutes := router.Group("/biznetbb-api/user-service")
-
-	userRoutes.GET("/", controllers.Home)
 }

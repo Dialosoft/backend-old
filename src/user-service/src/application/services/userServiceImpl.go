@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/biznetbb/user-service/src/adapters/repositories"
+	"github.com/google/uuid"
 )
 
 type userService struct {
@@ -14,8 +15,8 @@ func NewUserService(userRepo repositories.UserRepository) UserService {
 	return &userService{userRepo: userRepo}
 }
 
-func (s *userService) ChangeEmail(userID string, newMail string) error {
-	if userID == "" || newMail == "" {
+func (s *userService) ChangeEmail(userID uuid.UUID, newMail string) error {
+	if userID == uuid.Nil || newMail == "" {
 		return errors.New("any of the parameters cannot be empty")
 	}
 
@@ -29,7 +30,7 @@ func (s *userService) ChangeEmail(userID string, newMail string) error {
 	return s.userRepo.Update(user)
 }
 
-func (s *userService) ChangeAvatar(userID string, avatar []byte) error {
+func (s *userService) ChangeAvatar(userID uuid.UUID, avatar []byte) error {
 	if len(avatar) == 0 {
 		return errors.New("avatar cannot be empty")
 	}

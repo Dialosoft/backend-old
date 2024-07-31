@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/biznetbb/user-service/src/domain/entities"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +20,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 // }
 
 // Find a user by the uuid
-func (r *userRepository) FindByID(uuid string) (*entities.User, error) {
+func (r *userRepository) FindByID(uuid uuid.UUID) (*entities.User, error) {
 	var user entities.User
 	if err := r.db.First(&user, uuid).Error; err != nil {
 		return nil, err
@@ -44,6 +45,6 @@ func (r *userRepository) Update(user *entities.User) error {
 }
 
 // Delete a user from the repository
-func (r *userRepository) Delete(uuid string) error {
+func (r *userRepository) Delete(uuid uuid.UUID) error {
 	return r.db.Delete(&entities.User{}, uuid).Error
 }
