@@ -85,7 +85,7 @@ In a Spring Boot microservices architecture, you typically have multiple configu
 
 - `application.yml`: The main configuration file with default settings.
 - `application-local.yml`: Configuration for local development environment.
-- `application-docker.yml`: Configuration for Docker environment.
+- `application-docker.yml`: Configuration for Docker environment. This one is only used in the container to adjust other configurations in a docker network environment.
 
 These files are usually located in the `src/main/resources` directory of each microservice.
 
