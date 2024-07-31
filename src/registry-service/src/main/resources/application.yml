@@ -2,12 +2,14 @@ server:
     port: 8761
 spring:
     application:
-        name: registry
+        name: registry-microservice
 
 eureka:
     instance:
         hostname: localhost
         prefer-ip-address: false
+    server:
+        waitTimeInMsWhenSyncEmpty: 0
     client:
         register-with-eureka: false
         fetch-registry: false
