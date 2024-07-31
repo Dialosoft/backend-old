@@ -15,10 +15,11 @@ services:
     volumes:
       - biznetbb-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-biznetbb_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-biznetbb_user} -d ${DB_NAME:-biznetbb}"]
       interval: 30s
       timeout: 10s
       retries: 5
+      start_period: 30s
 
   registry-service:
     build:
@@ -47,11 +48,14 @@ services:
     image: biznetbb-gateway:v1.0
     ports:
       - "8080:8080"
+      - "5005:5005"
     depends_on:
       - registry-service
     networks:
       - biznetbb-network
     environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_PROFILES_ACTIVE: docker
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
@@ -60,29 +64,33 @@ services:
       retries: 5
     command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
 
-#  auth-service:
-#    build:
-#      context: ../auth-service
-#    container_name: auth-service
-#  image: biznetbb-auth-service:v1.0
-#    ports:
-#      - "8081:8081"
-#    depends_on:
-#      - registry-service
-#    networks:
-#      - biznetbb-network
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/biznetbb-db
-#      SPRING_DATASOURCE_USERNAME: biznetbb
-#      SPRING_DATASOURCE_PASSWORD: admin
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-#    command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
-#
+  auth-service:
+    build:
+      context: ../auth-service
+    container_name: auth-service
+    image: biznetbb-auth-service:v1.0
+    ports:
+      - "8081:8081"
+      - "5006:5005"
+    depends_on:
+      - registry-service
+    networks:
+      - biznetbb-network
+    environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_HOST: database
+      SPRING_DATASOURCE_PORT: 5432
+      SPRING_DATASOURCE_DB: biznetbb
+      SPRING_DATASOURCE_USERNAME: biznetbb_user
+      SPRING_DATASOURCE_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
 
 volumes:
   biznetbb-db-data:
