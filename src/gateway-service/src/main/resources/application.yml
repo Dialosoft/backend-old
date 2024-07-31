@@ -1,46 +1,86 @@
+
 spring:
   application:
-    name: gateway
+    name: gateway-microservice
+  netty:
+    max-initial-line-length: 65536
+    max-header-size: 65536
+    max-chunk-size: 65536
   docker:
     compose:
       enabled: true
       file: ./docker-compose.yml
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      httpclient:
+        max-header-size: 65536
+#        connect-timeout: 20000    # socket connection timeout
+#        pool:
+#          max-connections: 1500   # max allowed active connections
+#          type: FIXED             # fixed pool of max connections
+#          metrics: true           # routing httpclient metrics
       routes:
+        - id: actuator_route
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/actuator/**
         - id: auth_service
-          uri: lb://auth
+          uri: lb://auth-microservice/
           predicates:
-            - Path=/bizznetbb/auth/**
-        - id: other_service
-          uri: lb://OTHER-SERVICE
-          predicates:
-            - Path=/other/**
+            - Path=/auth/**
+#            - Path=/biznetbb-api/auth/**
           filters:
-            - JwtAuthFilter
+            # TODO: this filter doesn't work - check
+#            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+#        - id: other_service
+#          uri: lb://OTHER-SERVICE
+#          predicates:
+#            - Path=/other/**
+#          filters:
+#            - JwtAuthFilter
       globalcors:
         corsConfigurations:
           '[/**]':
             allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
+            allowedMethods: "*"
+            allowedHeaders: "*"
 
 # Eureka - Registry Service
 eureka:
   client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://registry-service:8761/eureka/}
+    transport:
+      # Jersey HTTP client, which is the default transport client used by EurekaClient for HTTP communication
+      jersey:
+        # sets the maximum header size for Jersey, the HTTP client used by Eureka
+        max-header-size: 65536
 
 server:
   port: 8080
-  servlet:
-        context-path: /bizznetbb-api/
+  server:
+    max-http-request-header-size: 65536
+
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
     org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.netflix.eureka: DEBUG
+    reactor.netty: DEBUG
+    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
+
+management:
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
