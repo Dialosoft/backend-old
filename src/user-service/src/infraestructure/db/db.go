@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"sync"
-	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,7 +19,7 @@ func DBConnection() (*gorm.DB, error) {
 	dbOnce.Do(func() {
 		dsn := os.Getenv("DB_DSN")
 		if dsn == "" {
-			dsn = "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
+			dsn = "host=localhost user=biznet password=biznet dbname=biznet-test port=5432 sslmode=disable"
 		}
 
 		dbInstance, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -40,7 +39,7 @@ func DBConnection() (*gorm.DB, error) {
 
 		sqlDB.SetMaxIdleConns(10)
 		sqlDB.SetMaxOpenConns(100)
-		sqlDB.SetConnMaxLifetime(time.Hour)
+		// sqlDB.SetConnMaxLifetime(time.Hour)
 	})
 
 	return dbInstance, err
