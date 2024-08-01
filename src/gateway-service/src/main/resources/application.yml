@@ -2,6 +2,10 @@
 spring:
   application:
     name: gateway-microservice
+  devtools:
+    restart:
+      enabled: false
+
   netty:
     max-initial-line-length: 65536
     max-header-size: 65536
@@ -17,25 +21,19 @@ spring:
           enabled: true
           lowerCaseServiceId: true
       httpclient:
-        max-header-size: 65536
-#        connect-timeout: 20000    # socket connection timeout
-#        pool:
-#          max-connections: 1500   # max allowed active connections
-#          type: FIXED             # fixed pool of max connections
-#          metrics: true           # routing httpclient metrics
+        max-header-size: 65536 # max allowed size of header
       routes:
         - id: actuator_route
           uri: http://localhost:${server.port}
           predicates:
             - Path=/actuator/**
-        - id: auth_service
+        - id: auth_service_routes
           uri: lb://auth-microservice/
           predicates:
-            - Path=/auth/**
-#            - Path=/biznetbb-api/auth/**
+            - Path=/biznetbb-api/auth/**
           filters:
-            # TODO: this filter doesn't work - check
-#            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
 #        - id: other_service
 #          uri: lb://OTHER-SERVICE
 #          predicates:
