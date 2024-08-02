@@ -168,9 +168,61 @@ docker-compose down --rmi all
 
 ### Additional Configuration
 
-**auth-service** could require additional configuration, 
+#### auth-service
+It could require additional configuration, 
 such as environment variables, define them in a `.env` file located 
 in the root directory of **auth-service**. 
 
 An example `.env` file can be found in `example.env`.
 
+### Add a New Route for a New Microservice and Configure Roles
+
+To add a new route on the Gateway for a new microservice and configure the necessary roles, follow these steps:
+
+#### Definir la Ruta en application.yml
+
+Open the `src/gateway-service/application.yml` file and add a new entry in the `spring.cloud.gateway.routes` section. For example, for a microservice called `order-microservice`:
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: order_service_routes
+          uri: lb://order-microservice
+          predicates:
+            - Path=/biznetbb-api/order/**
+          filters:
+            - StripPrefix=1
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                requiredRoles: ROLE_USER, ROLE_ADMIN
+```
+
+In this example:
+
+- **id**: Unique identifier for the route.
+- **uri**: The URI of the microservice, in this case, order-microservice.
+- **predicates**: The condition that the request must meet to be directed to this microservice (in this case, any path that starts with /biznetbb-api/order/).
+- **filters**: Filters applied to the request before it is redirected.
+    - **StripPrefix=1**: Remove the '/biznetbb-api' prefix before sending the request to the microservice.
+    - **name: JwtAuthenticationFilter**: Apply the JWT authentication filter.
+    - **name: RoleBasedAuthorizationFilter**: Apply the role-based authorization filter.
+    - **args**: Arguments for the authorization filter.
+        - **requiredRoles**: Roles required to access the route. In this case, both ROLE_USER and ROLE_ADMIN have access.
+
+### Explanation of Open Routes:
+
+If you open the file `src/gateway-service/application.yml`, The `openApi Endpoints` property is defined under `app.security.jwt` to specify routes that do not require authentication:
+
+```yaml
+app:
+  security:
+    jwt:
+      secret-key: biznetbb-key-123
+  # Open non-secured endpoints for the gateway
+  openApiEndpoints:
+    - /actuator
+    - /biznetbb-api/auth/login
+    - /biznetbb-api/auth/register
+    - /biznetbb-api/auth/refresh-token
