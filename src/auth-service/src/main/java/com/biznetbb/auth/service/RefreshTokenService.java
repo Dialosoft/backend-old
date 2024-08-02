@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
@@ -20,12 +21,19 @@ public class RefreshTokenService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public RefreshToken createRefreshToken(String username) {
-
-        UserDetails userDetails = userSecurityService.loadUserByUsername(username);
-        String stringRefreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), userDetails.getAuthorities());
+    public RefreshToken getOrCreateRefreshTokenByUserName(String username) {
 
         UserEntity userEntity = userSecurityService.getUserByUserName(username);
+
+        return refreshTokenRepository.findByUserId(userEntity.getId())
+                .filter(this::isRefreshTokenValid)
+                .orElseGet(() -> createRefreshToken(userEntity));
+    }
+
+    private RefreshToken createRefreshToken(UserEntity userEntity) {
+
+        UserDetails userDetails = userSecurityService.loadUserByUsername(userEntity.getUsername());
+        String stringRefreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), userDetails.getAuthorities());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(userEntity)
@@ -39,12 +47,23 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByRefreshToken(token);
     }
 
-    public RefreshToken verifyRefreshTokenExpiration(RefreshToken refreshTokenEntity) {
-        if (!jwtUtil.isValid(refreshTokenEntity.getRefreshToken())) {
-            refreshTokenRepository.delete(refreshTokenEntity);
-            throw new RuntimeException(refreshTokenEntity.getRefreshToken() + " Refresh refreshTokenEntity is expired. Please make a new login..!");
+    public Optional<RefreshToken> findByUserId(UUID userId){
+        return refreshTokenRepository.findByUserId(userId);
+    }
+
+    public RefreshToken verifyRefreshTokenExpiration(RefreshToken refreshToken) {
+        if (!isRefreshTokenValid(refreshToken)) {
+            throw new RuntimeException(refreshToken.getRefreshToken() + " Refresh token is expired. Please login again.");
         }
-        return refreshTokenEntity;
+        return refreshToken;
+    }
+
+    private boolean isRefreshTokenValid(RefreshToken refreshToken) {
+        if (!jwtUtil.isValid(refreshToken.getRefreshToken())) {
+            refreshTokenRepository.delete(refreshToken);
+            return false;
+        }
+        return true;
     }
 
 }

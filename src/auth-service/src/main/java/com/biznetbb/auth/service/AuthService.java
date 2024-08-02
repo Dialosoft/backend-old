@@ -97,10 +97,10 @@ public class AuthService {
         try {
             Authentication authentication = this.authenticationManager.authenticate(login);
 
-            if(authentication.isAuthenticated()) {
+            if (authentication.isAuthenticated()) {
 
                 String accessToken = jwtUtil.generateAccessToken(loginDto.getUsername(), authentication.getAuthorities());
-                RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginDto.getUsername());
+                RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(loginDto.getUsername());
 
                 JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
                         .accessToken(accessToken)
@@ -140,7 +140,7 @@ public class AuthService {
 
                     String username = userInfo.getUsername();
                     UserDetails userDetails = userSecurityService.loadUserByUsername(username);
-                    String accessToken = jwtUtil.generateAccessToken(username,userDetails.getAuthorities());
+                    String accessToken = jwtUtil.generateAccessToken(username, userDetails.getAuthorities());
 
                     JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
                             .accessToken(accessToken)
