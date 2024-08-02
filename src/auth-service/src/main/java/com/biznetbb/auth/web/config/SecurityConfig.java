@@ -36,7 +36,7 @@ public class SecurityConfig {
                 request
                     .requestMatchers("/auth/**").permitAll()
                     .anyRequest()
-                    .denyAll();
+                    .authenticated();
             })
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
