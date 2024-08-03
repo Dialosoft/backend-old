@@ -6,12 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type userRepository struct {
+type userRepositoryImpl struct {
 	db *gorm.DB
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepository{db: db}
+	return &userRepositoryImpl{db: db}
 }
 
 // Create a new user in the database
@@ -20,7 +20,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 // }
 
 // Find a user by the uuid
-func (r *userRepository) FindByID(uuid uuid.UUID) (*entities.User, error) {
+func (r *userRepositoryImpl) FindByID(uuid uuid.UUID) (*entities.User, error) {
 	var user entities.User
 	if err := r.db.First(&user, uuid).Error; err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (r *userRepository) FindByID(uuid uuid.UUID) (*entities.User, error) {
 }
 
 // Find a user by the username
-func (r *userRepository) FindByUsername(username string) (*entities.User, error) {
+func (r *userRepositoryImpl) FindByUsername(username string) (*entities.User, error) {
 	var user entities.User
 	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
@@ -40,11 +40,11 @@ func (r *userRepository) FindByUsername(username string) (*entities.User, error)
 }
 
 // Update a user from the repository
-func (r *userRepository) Update(user *entities.User) error {
+func (r *userRepositoryImpl) Update(user *entities.User) error {
 	return r.db.Save(user).Error
 }
 
 // Delete a user from the repository
-func (r *userRepository) Delete(uuid uuid.UUID) error {
+func (r *userRepositoryImpl) Delete(uuid uuid.UUID) error {
 	return r.db.Delete(&entities.User{}, uuid).Error
 }

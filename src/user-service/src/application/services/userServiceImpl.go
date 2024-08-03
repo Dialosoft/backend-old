@@ -7,15 +7,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type userService struct {
+type userServiceImpl struct {
 	userRepo repositories.UserRepository
 }
 
 func NewUserService(userRepo repositories.UserRepository) UserService {
-	return &userService{userRepo: userRepo}
+	return &userServiceImpl{userRepo: userRepo}
 }
 
-func (s *userService) ChangeEmail(userID uuid.UUID, newMail string) error {
+func (s *userServiceImpl) ChangeEmail(userID uuid.UUID, newMail string) error {
 	if userID == uuid.Nil || newMail == "" {
 		return errors.New("any of the parameters cannot be empty")
 	}
@@ -30,7 +30,7 @@ func (s *userService) ChangeEmail(userID uuid.UUID, newMail string) error {
 	return s.userRepo.Update(user)
 }
 
-func (s *userService) ChangeAvatar(userID uuid.UUID, avatar []byte) error {
+func (s *userServiceImpl) ChangeAvatar(userID uuid.UUID, avatar []byte) error {
 	if len(avatar) == 0 {
 		return errors.New("avatar cannot be empty")
 	}
