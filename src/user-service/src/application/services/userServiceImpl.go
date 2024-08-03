@@ -1,11 +1,12 @@
 package services
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
+	_ "image/png"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -36,12 +37,9 @@ func (s *userServiceImpl) ChangeEmail(userID uuid.UUID, newMail string) error {
 	return s.userRepo.Update(user)
 }
 
-func (s *userServiceImpl) ChangeAvatar(userID uuid.UUID, avatar []byte) error {
-	if len(avatar) == 0 {
-		return errors.New("avatar cannot be empty")
-	}
+func (s *userServiceImpl) ChangeAvatar(userID uuid.UUID, avatar io.Reader) error {
 
-	filePath := filepath.Join("avatars", fmt.Sprintf("%s.png", userID))
+	filePath := filepath.Join("avatars", fmt.Sprintf("%s.jpg", userID))
 	err := saveCompressedAvatarToFile(filePath, avatar)
 	if err != nil {
 		return err
@@ -50,9 +48,10 @@ func (s *userServiceImpl) ChangeAvatar(userID uuid.UUID, avatar []byte) error {
 	return nil
 }
 
-func saveCompressedAvatarToFile(filePath string, avatar []byte) error {
-	img, _, err := image.Decode(bytes.NewReader(avatar))
+func saveCompressedAvatarToFile(filePath string, avatar io.Reader) error {
+	img, _, err := image.Decode(avatar)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -63,7 +62,7 @@ func saveCompressedAvatarToFile(filePath string, avatar []byte) error {
 	defer outFile.Close()
 
 	var opt jpeg.Options
-	opt.Quality = 80
+	opt.Quality = 50
 	err = jpeg.Encode(outFile, img, &opt)
 	if err != nil {
 		return err
