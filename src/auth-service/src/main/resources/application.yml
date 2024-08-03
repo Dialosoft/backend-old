@@ -1,7 +1,7 @@
 app:
   security:
     jwt:
-      secret-key: biznetbb-key-123
+      secret-key: ${JWT_SECRET_KEY}
 
 spring:
   application:
