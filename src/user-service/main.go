@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/biznetbb/user-service/src/adapters/repositories"
 	"github.com/biznetbb/user-service/src/adapters/router"
@@ -18,6 +19,11 @@ func main() {
 	}
 
 	fmt.Println("Database connection successful", db)
+
+	err = os.MkdirAll("avatars", os.ModePerm)
+	if err != nil {
+		fmt.Printf("error creating avatars directory: %v\n", err)
+	}
 
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)
