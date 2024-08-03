@@ -5,9 +5,9 @@ services:
     image: postgres:latest
     container_name: database
     environment:
-      POSTGRES_DB: ${DB_NAME:-biznetbb}
-      POSTGRES_USER: ${DB_USER:-biznetbb_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-admin}
+      POSTGRES_DB: ${DATASOURCE_DB}
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
     ports:
       - "${DB_PORT:-5434}:5432"
     networks:
@@ -23,7 +23,7 @@ services:
 
   registry-service:
     build:
-      context: ../registry-service
+      context: src/registry-service
     container_name: registry-service
     image: biznetbb-registry-eureka:v1.0
     ports:
@@ -43,7 +43,7 @@ services:
 
   gateway-service:
     build:
-      context: .
+      context: src/gateway-service
     container_name: gateway-service
     image: biznetbb-gateway:v1.0
     ports:
@@ -56,6 +56,7 @@ services:
     environment:
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
@@ -66,7 +67,7 @@ services:
 
   auth-service:
     build:
-      context: ../auth-service
+      context: src/auth-service
     container_name: auth-service
     image: biznetbb-auth-service:v1.0
     ports:
@@ -79,11 +80,12 @@ services:
     environment:
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_HOST: database
-      SPRING_DATASOURCE_PORT: 5432
-      SPRING_DATASOURCE_DB: biznetbb
-      SPRING_DATASOURCE_USERNAME: biznetbb_user
-      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_DATASOURCE_HOST: ${DATASOURCE_HOST}
+      SPRING_DATASOURCE_PORT: ${DATASOURCE_PORT}
+      SPRING_DATASOURCE_DB: ${DATASOURCE_DB}
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
@@ -91,6 +93,32 @@ services:
       timeout: 10s
       retries: 5
     command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
+
+#  USER-service:
+#    build:
+#      context: src/user-service
+#    container_name: user-service
+#    image: biznetbb-user-service:v1.0
+#    ports:
+#      - "8086:8086"
+#      - "5007:5005"
+#    depends_on:
+#      - registry-service
+#    networks:
+#      - biznetbb-network
+#    environment:
+#      DATASOURCE_HOST: database
+#      DATASOURCE_PORT: 5432
+#      DATASOURCE_DB: biznetbb
+#      DATASOURCE_USERNAME: biznetbb_user
+#      DATASOURCE_PASSWORD: admin
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#    command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
 
 volumes:
   biznetbb-db-data:

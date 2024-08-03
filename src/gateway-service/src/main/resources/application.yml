@@ -19,10 +19,10 @@ spring:
     max-initial-line-length: 65536
     max-header-size: 65536
     max-chunk-size: 65536
-  docker:
-    compose:
-      enabled: true
-      file: ./docker-compose.yml
+#  docker:
+#    compose:
+#      enabled: true
+#      file: ./docker-compose.yml
   cloud:
     gateway:
       discovery:
