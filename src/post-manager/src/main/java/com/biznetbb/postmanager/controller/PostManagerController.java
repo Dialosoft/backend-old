@@ -13,8 +13,8 @@ public class PostManagerController {
     private final PostManagerService service; // all injections of dependencies must be with constructor
 
     @PostMapping("create-post")
-    public void createPost() {
-        service.CreateNewPost();
+    public void createPost(@RequestBody PostManagerRequest request) {
+        service.CreateNewPost(request);
     }
 
     @DeleteMapping("delete-post/{id}")

@@ -10,11 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name="post-table")
+@Table(name="comments-table")
 @Entity
-public class PostEntity {
-     Long postId;
-     String content;
-     Byte multimedia;
-     CommentsEntity Comments;
+public class CommentsEntity {
 }

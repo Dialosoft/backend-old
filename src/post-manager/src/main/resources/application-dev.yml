@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: post-manager
+  datasource:
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5433/db} # Preconfigured for postgres 5433, change it for your needs
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:admin} # Example default database password
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
