@@ -60,3 +60,8 @@ dependencyManagement {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+test.doFirst {
+	systemProperty 'spring.profiles.active', 'test'
+	activeProfiles = 'test'
+}
