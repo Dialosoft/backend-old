@@ -4,12 +4,14 @@ services:
   database:
     image: postgres:latest
     container_name: database
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DATASOURCE_DB}
       POSTGRES_USER: ${DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
     ports:
-      - "${DB_PORT:-5434}:5432"
+      - "5432:${DATASOURCE_PORT}"
     networks:
       - biznetbb-network
     volumes:
@@ -26,6 +28,8 @@ services:
       context: src/registry-service
     container_name: registry-service
     image: biznetbb-registry-eureka:v1.0
+    env_file:
+      - .env
     ports:
       - "8761:8761"
     depends_on:
@@ -53,6 +57,8 @@ services:
       - registry-service
     networks:
       - biznetbb-network
+    env_file:
+      - .env
     environment:
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_PROFILES_ACTIVE: docker
@@ -77,6 +83,8 @@ services:
       - registry-service
     networks:
       - biznetbb-network
+    env_file:
+      - .env
     environment:
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_PROFILES_ACTIVE: docker
@@ -94,7 +102,7 @@ services:
       retries: 5
     command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
 
-#  USER-service:
+#  user-service:
 #    build:
 #      context: src/user-service
 #    container_name: user-service
@@ -106,6 +114,8 @@ services:
 #      - registry-service
 #    networks:
 #      - biznetbb-network
+#    env_file:
+#      - .env
 #    environment:
 #      DATASOURCE_HOST: database
 #      DATASOURCE_PORT: 5432
