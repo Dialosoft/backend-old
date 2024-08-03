@@ -17,11 +17,16 @@ func NewRouter(userService services.UserService) *Router {
 func (r *Router) SetupRoutes() *gin.Engine {
 	router := gin.Default()
 
-	router.POST("change-email", r.handleChangeEmail)
+	router.PUT("/change-email", r.handleChangeEmail)
+	router.PUT("/change-avatar", r.handleChangeAvatar)
 
 	return router
 }
 
 func (r *Router) handleChangeEmail(c *gin.Context) {
 	controllers.ChangeEmailController(c, r.UserService)
+}
+
+func (r *Router) handleChangeAvatar(c *gin.Context) {
+	controllers.ChangeUserAvatarController(c, r.UserService)
 }
