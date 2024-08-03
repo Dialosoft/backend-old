@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/biznetbb/user-service/src/adapters/controllers"
 	"github.com/biznetbb/user-service/src/application/services"
+	"github.com/biznetbb/user-service/src/infraestructure/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,8 +18,15 @@ func NewRouter(userService services.UserService) *Router {
 func (r *Router) SetupRoutes() *gin.Engine {
 	router := gin.Default()
 
-	router.PUT("/change-email", r.handleChangeEmail)
-	router.PUT("/change-avatar", r.handleChangeAvatar)
+	userService := router.Group("/biznetbb-api/user-service")
+
+	// Middleware
+	userService.Use(middlewares.AuthServiceMiddleware)
+
+	// Routes
+	userService.Static("/avatars", "./avatars")
+	userService.PUT("/change-email", r.handleChangeEmail)
+	userService.PUT("/change-avatar", r.handleChangeAvatar)
 
 	return router
 }
