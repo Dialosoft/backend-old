@@ -32,9 +32,6 @@ obj/
 *.out
 *.a
 
-# Go module files
-go.sum
-go.mod
 
 # Dependency directories
 vendor/
