@@ -7,8 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseBody<T> {
-    Integer statusCode;
-    String message;
-    T metadata;
+public class JwtResponseDTO {
+
+    private String accessToken;
+    private String refreshToken;
 }

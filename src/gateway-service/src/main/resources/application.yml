@@ -1,41 +1,110 @@
+app:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+  # Open non-secured endpoints for the gateway
+  openApiEndpoints:
+    - /actuator
+    - /biznetbb-api/auth/login
+    - /biznetbb-api/auth/register
+    - /biznetbb-api/auth/refresh-token
 spring:
   application:
-    name: gateway
+    name: gateway-microservice
+  devtools:
+    restart:
+      enabled: false
+
+  netty:
+    max-initial-line-length: 65536
+    max-header-size: 65536
+    max-chunk-size: 65536
+  docker:
+    compose:
+      enabled: true
+      file: ./docker-compose.yml
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      httpclient:
+        max-header-size: 65536 # max allowed size of header
       routes:
-        - id: auth_service
-          uri: lb://auth
+        - id: actuator_route
+          uri: http://localhost:${server.port}
           predicates:
-            - Path=/bizznetbb/auth/**
-        - id: other_service
-          uri: lb://OTHER-SERVICE
+            - Path=/actuator/**
+        - id: no_auth_service_routes
+          uri: lb://auth-microservice/
           predicates:
-            - Path=/other/**
+            - Path=/biznetbb-api/hello-world
           filters:
-            - JwtAuthFilter
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                  requiredRoles: ROLE_USER
+        - id: auth_service_routes
+          uri: lb://auth-microservice/
+          predicates:
+            - Path=/biznetbb-api/auth/**
+          filters:
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+        # * Other service template
+#        - id: other_service_routes
+#          uri: lb://other-microservice/
+#          predicates:
+#            - Path=/biznetbb-api/other/**
+#          filters:
+#            - AddRequestHeader=X-Request-Service, auth-microservice
+#            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+#            - name: JwtAuthenticationFilter
+#            - name: RoleBasedAuthorizationFilter
+#              args:
+#                requiredRoles: ROLE_USER # You can omit this, by default is ROLE_USER
       globalcors:
         corsConfigurations:
           '[/**]':
             allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
+            allowedMethods: "*"
+            allowedHeaders: "*"
 
+# Eureka - Registry Service
 eureka:
   client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    transport:
+      # Jersey HTTP client, which is the default transport client used by EurekaClient for HTTP communication
+      jersey:
+        # sets the maximum header size for Jersey, the HTTP client used by Eureka
+        max-header-size: 65536
 
 server:
   port: 8080
-  servlet:
-        context-path: /bizznetbb-api/
+  server:
+    max-http-request-header-size: 65536
+
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
     org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.netflix.eureka: DEBUG
+    reactor.netty: DEBUG
+    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
+
+management:
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always

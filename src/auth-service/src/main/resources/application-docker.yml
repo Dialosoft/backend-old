@@ -1,0 +1,17 @@
+
+
+eureka:
+  instance:
+    instanceId: ${spring.application.name}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://registry-service:8761/eureka/}
+
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#    hostname: host.docker.internal
+#  client:
+#    serviceUrl:
+#      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://host.docker.internal:8761/eureka/}
+#

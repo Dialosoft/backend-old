@@ -1,5 +1,6 @@
 package com.biznetbb.auth.service;
 
+import com.biznetbb.auth.service.utils.RoleType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,32 +15,44 @@ import com.biznetbb.auth.persistence.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class UserSecurityService implements UserDetailsService{
 
     private final UserRepository userRepository;
 
+    public UserEntity getUserByUserName(String userName) {
+        Optional<UserEntity> userEntityOp = this.userRepository.findByUsername(userName);
+        if(userEntityOp.isEmpty()){
+            throw new UsernameNotFoundException("User " + userName + " not found");
+        }
+        return userEntityOp.get();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = this.userRepository.findByUsername(username);
-        if(userEntity == null){
-            throw new UsernameNotFoundException("User " + username + " not found");
-        }
 
-        RoleEntity roleEntity = userEntity.getRoleId();
-        String role = (roleEntity != null && roleEntity.getName() != null) ? roleEntity.getName().toLowerCase() : "user";
+        UserEntity userEntity = getUserByUserName(username);
+
+        Set<RoleEntity> roles = userEntity.getRoles();
+        Set<GrantedAuthority> authorities = roles.stream()
+                .map(role -> generateGrantedAuthority(role.getRoleType()))
+                .collect(Collectors.toSet());
 
         return User.builder()
             .username(userEntity.getUsername())
             .password(userEntity.getPassword())
-            .authorities(this.grantedAuthority(role))
+            .authorities(authorities)
             .accountLocked(userEntity.getLocked())
             .disabled(userEntity.getDisable())
             .build();
     }
 
-    private GrantedAuthority grantedAuthority(String role){
-        return new SimpleGrantedAuthority("ROLE_" + role);
+    private GrantedAuthority generateGrantedAuthority(RoleType roleType){
+        return new SimpleGrantedAuthority(roleType.getRoleName());
     }
 }

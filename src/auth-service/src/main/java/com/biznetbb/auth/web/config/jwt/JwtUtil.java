@@ -1,43 +1,81 @@
 package com.biznetbb.auth.web.config.jwt;
 
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.stereotype.Component;
-
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
-    private static String SECRET_KEY = "biznetbb-key-123";
 
-    private final static Algorithm ALGORITHM = Algorithm.HMAC256(SECRET_KEY);
+    @Value("${app.security.jwt.secret-key}")
+    private String secretKey;
 
-    public String create(String username){
-        return JWT.create()
-            .withSubject(username)
-            .withIssuer("auth-service")
-            .withIssuedAt(new Date())
-            .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
-            .sign(ALGORITHM);
+    @Value("${spring.application.name}")
+    private String issuer;
+
+    private Algorithm algorithmWithSecret;
+
+    @PostConstruct
+    public void init() {
+        this.algorithmWithSecret = Algorithm.HMAC256(secretKey);
     }
 
-    public boolean isValid(String jwt){
+    public String generateAccessToken(String username, Collection<? extends GrantedAuthority> authorities) {
+        return createToken(username,
+                authorities.stream().map(GrantedAuthority::getAuthority).toList(),
+                TimeUnit.SECONDS.toMillis(120));
+    }
+
+    public String generateRefreshToken(String username, Collection<? extends GrantedAuthority> authorities) {
+        return createToken(username,
+                authorities.stream().map(GrantedAuthority::getAuthority).toList(),
+                TimeUnit.SECONDS.toMillis(180));
+    }
+
+    public String createToken(String username, List<String> roles, long expiredTime) {
+        // helps to identify token together with username
+        String uuid = UUID.randomUUID().toString();
+
+        return JWT.create()
+                .withJWTId(uuid)
+                .withSubject(username)
+                .withArrayClaim("role", roles.toArray(new String[0]))
+                .withIssuer(String.format("%s-service", issuer))
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + expiredTime))
+                .sign(algorithmWithSecret);
+    }
+
+    public boolean isValid(String jwt) {
         try {
-            JWT.require(ALGORITHM)
-                .build()
-                .verify(jwt);
+            JWTVerifier verifier = JWT.require(algorithmWithSecret)
+                    .withIssuer(String.format("%s-service", issuer))
+                    .build();
+
+            verifier.verify(jwt);
+
             return true;
         } catch (JWTVerificationException e) {
             return false;
         }
     }
 
-    public String getUsername(String jwt){
-        return JWT.require(ALGORITHM)
-            .build()
-            .verify(jwt).getSubject();
+    public String getUsername(String jwt) {
+        return JWT.require(algorithmWithSecret)
+                .build()
+                .verify(jwt).getSubject();
     }
 }

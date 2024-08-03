@@ -1,31 +1,28 @@
 package com.biznetbb.auth.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.biznetbb.auth.service.utils.RoleType;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "roles")
-@NoArgsConstructor
 @Getter
 @Setter
+@RequiredArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RoleEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
-    private UUID uuid;
+    private UUID id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50, unique = true)
-    private String name;
+    private RoleType roleType;
 
     @Column(nullable = false)
     private Boolean adminRole;
