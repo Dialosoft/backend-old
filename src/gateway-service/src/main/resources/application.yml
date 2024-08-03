@@ -46,7 +46,7 @@ spring:
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:
-                  requiredRoles: ROLE_USER # You can omit this, by default is ROLE_USER
+                  requiredRoles: ROLE_USER
         - id: auth_service_routes
           uri: lb://auth-microservice/
           predicates:
@@ -60,10 +60,12 @@ spring:
 #          predicates:
 #            - Path=/biznetbb-api/other/**
 #          filters:
-#            - JwtAuthFilter
+#            - AddRequestHeader=X-Request-Service, auth-microservice
+#            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+#            - name: JwtAuthenticationFilter
 #            - name: RoleBasedAuthorizationFilter
 #              args:
-#                requiredRoles: ROLE_ADMIN
+#                requiredRoles: ROLE_USER # You can omit this, by default is ROLE_USER
       globalcors:
         corsConfigurations:
           '[/**]':
