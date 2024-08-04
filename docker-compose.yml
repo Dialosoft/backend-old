@@ -102,33 +102,33 @@ services:
       retries: 5
     command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
 
-#  user-service:
-#    build:
-#      context: src/user-service
-#    container_name: user-service
-#    image: biznetbb-user-service:v1.0
-#    ports:
-#      - "8086:8086"
-#      - "5007:5005"
-#    depends_on:
-#      - registry-service
-#    networks:
-#      - biznetbb-network
-#    env_file:
-#      - .env
-#    environment:
-#      DATASOURCE_HOST: database
-#      DATASOURCE_PORT: 5432
-#      DATASOURCE_DB: biznetbb
-#      DATASOURCE_USERNAME: biznetbb_user
-#      DATASOURCE_PASSWORD: admin
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-#    command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
+  user-service:
+   build:
+     context: src/user-service
+   container_name: user-service
+   image: biznetbb-user-service:v1.0
+   ports:
+     - "8086:8086"
+     - "5007:5005"
+   depends_on:
+     - registry-service
+   networks:
+     - biznetbb-network
+   env_file:
+     - .env
+   environment:
+     DATASOURCE_HOST: database
+     DATASOURCE_PORT: 5432
+     DATASOURCE_DB: biznetbb
+     DATASOURCE_USERNAME: biznetbb_user
+     DATASOURCE_PASSWORD: admin
+     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+  #  healthcheck:
+  #    test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+  #    interval: 30s
+  #    timeout: 10s
+  #    retries: 5
+  #  command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
 
 volumes:
   biznetbb-db-data:
