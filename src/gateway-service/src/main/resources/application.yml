@@ -54,6 +54,17 @@ spring:
           filters:
             - AddRequestHeader=X-Request-Service, auth-microservice
             - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+        - id: user_service
+          uri: lb://user-microservice/
+          predicates:
+            - Path=/biznetbb-api/user-service/**
+          filters:
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                requiredRoles: ROLE_USER
         # * Other service template
 #        - id: other_service_routes
 #          uri: lb://other-microservice/
