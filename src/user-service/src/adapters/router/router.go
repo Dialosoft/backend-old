@@ -3,7 +3,6 @@ package router
 import (
 	"github.com/biznetbb/user-service/src/adapters/controllers"
 	"github.com/biznetbb/user-service/src/application/services"
-	"github.com/biznetbb/user-service/src/infraestructure/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,9 +18,6 @@ func (r *Router) SetupRoutes() *gin.Engine {
 	router := gin.Default()
 
 	userService := router.Group("/biznetbb-api/user-service")
-
-	// Middleware
-	userService.Use(middlewares.AuthServiceMiddleware)
 
 	// Routes
 	userService.Static("/avatars", "./avatars")

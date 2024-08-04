@@ -14,6 +14,12 @@ import (
 )
 
 func main() {
+	EUREKAURL := "http://registry-service:8761/eureka" //os.Getenv("EUREKA_CLIENT_SERVICEURL_DEFAULTZONE")
+	appName := "user-service"
+	hostname := "localhost"
+	ipAdrr := "172.19.0.3"
+	port := 8086
+
 	db, err := db.DBConnection()
 	if err != nil {
 		log.Fatalf("error initializing database: %v", err)
@@ -26,7 +32,17 @@ func main() {
 		fmt.Printf("error creating avatars directory: %v\n", err)
 	}
 
-	registry.InitEurekaClient()
+	client := registry.NewEurekaClient(EUREKAURL, appName, hostname, ipAdrr, port)
+
+	if err := client.Register(); err != nil {
+		log.Fatalf("Failed to register service: %v", err)
+	}
+
+	defer func() {
+		if err := client.Deregister(); err != nil {
+			log.Printf("Failed do deregister service: %v", err)
+		}
+	}()
 
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)

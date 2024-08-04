@@ -3,50 +3,59 @@ package registry
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/hudl/fargo"
 )
 
-var eurekaConnection *fargo.EurekaConnection
-
-func InitEurekaClient() {
-	eurekaConnection = &fargo.EurekaConnection{
-		ServiceUrls: []string{
-			"http://registry-service:8761/eureka",
-		},
-		UseJson: true,
-	}
-
-	instance := fargo.Instance{
-		HostName:       "localhost",
-		Port:           8086,
-		App:            "user-service",
-		IPAddr:         "127.0.0.1",
-		DataCenterInfo: fargo.DataCenterInfo{Name: fargo.MyOwn},
-	}
-
-	err := eurekaConnection.RegisterInstance(&instance)
-	if err != nil {
-		log.Fatalf("Error registering service with Eureka: %v", err)
-	}
-
-	go func() {
-		for {
-			eurekaConnection.HeartBeatInstance(&instance)
-			time.Sleep(30 * time.Second)
-		}
-	}()
+type EurekaClient struct {
+	Conn     *fargo.EurekaConnection
+	Instance *fargo.Instance
 }
 
-func GetServiceUrl(appName string) (string, error) {
-	app, err := eurekaConnection.GetApp(appName)
+func NewEurekaClient(eurekaURL, appname, hostname, ipAddr string, port int) *EurekaClient {
+	conn := fargo.NewConn(eurekaURL)
+	instance := &fargo.Instance{
+		HostName:         hostname,
+		App:              appname,
+		IPAddr:           ipAddr,
+		VipAddress:       appname,
+		SecureVipAddress: appname,
+		Port:             port,
+		DataCenterInfo:   fargo.DataCenterInfo{Name: "MyOwn"},
+	}
+
+	return &EurekaClient{Conn: &conn, Instance: instance}
+}
+
+func (client *EurekaClient) Register() error {
+	err := client.Conn.RegisterInstance(client.Instance)
+	if err != nil {
+		log.Printf("Error registering Service with eureka: %v", err)
+		return err
+	}
+	log.Println("Service registered successfully with eureka")
+	return nil
+}
+
+func (client *EurekaClient) Deregister() error {
+	err := client.Conn.DeregisterInstance(client.Instance)
+	if err != nil {
+		log.Printf("Error deregistering service from eureka: %v", err)
+		return err
+	}
+
+	log.Println("Service deregistered successfully from eureka")
+	return nil
+}
+
+func (client *EurekaClient) GetServiceURL(appname string) (string, error) {
+	app, err := client.Conn.GetApp(appname)
 	if err != nil {
 		return "", err
 	}
 
 	if len(app.Instances) == 0 {
-		return "", fmt.Errorf("no instances found for app: %s", appName)
+		return "", fmt.Errorf("no instances found for app %s", err)
 	}
 
 	instance := app.Instances[0]

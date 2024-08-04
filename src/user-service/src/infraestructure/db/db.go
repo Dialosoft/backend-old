@@ -24,6 +24,12 @@ func DBConnection() (*gorm.DB, error) {
 		DATASOURCE_USERNAME := os.Getenv("DATASOURCE_USERNAME")
 		DATASOURCE_PASSWORD := os.Getenv("DATASOURCE_PASSWORD")
 
+		if DATASOURCE_HOST == "" || DATASOURCE_PORT == "" || DATASOURCE_DB == "" ||
+			DATASOURCE_USERNAME == "" || DATASOURCE_PASSWORD == "" {
+			log.Printf("none of the datasource parameters can be empty")
+			return
+		}
+
 		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", DATASOURCE_HOST, DATASOURCE_USERNAME, DATASOURCE_PASSWORD, DATASOURCE_DB, DATASOURCE_PORT)
 
 		dbInstance, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
