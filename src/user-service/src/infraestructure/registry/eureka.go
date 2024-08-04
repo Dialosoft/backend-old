@@ -2,51 +2,111 @@ package registry
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hudl/fargo"
 )
 
-var eurekaConnection *fargo.EurekaConnection
-
-func InitEurekaClient() {
-	eurekaConnection = &fargo.EurekaConnection{
-		ServiceUrls: []string{
-			"http://registry-service:8761/eureka",
-		},
-		UseJson: true,
-	}
-
-	instance := fargo.Instance{
-		HostName:       "localhost",
-		Port:           8086,
-		App:            "user-service",
-		IPAddr:         "127.0.0.1",
-		DataCenterInfo: fargo.DataCenterInfo{Name: fargo.MyOwn},
-	}
-
-	err := eurekaConnection.RegisterInstance(&instance)
-	if err != nil {
-		log.Fatalf("Error registering service with Eureka: %v", err)
-	}
-
-	go func() {
-		for {
-			eurekaConnection.HeartBeatInstance(&instance)
-			time.Sleep(30 * time.Second)
-		}
-	}()
+type EurekaClient struct {
+	Conn     *fargo.EurekaConnection
+	Instance *fargo.Instance
 }
 
-func GetServiceUrl(appName string) (string, error) {
-	app, err := eurekaConnection.GetApp(appName)
+func NewEurekaClient(eurekaURL, appname, hostname, ipAddr string, port int) *EurekaClient {
+	conn := fargo.NewConn(eurekaURL)
+	instanceID := hostname + ":" + appname + ":" + strconv.Itoa(port)
+	instance := &fargo.Instance{
+		InstanceId:       instanceID,
+		HostName:         hostname,
+		App:              strings.ToUpper(appname),
+		IPAddr:           ipAddr,
+		VipAddress:       appname,
+		SecureVipAddress: appname,
+		Status:           fargo.UP,
+		Port:             port,
+		DataCenterInfo:   fargo.DataCenterInfo{Name: "MyOwn"},
+		LeaseInfo: fargo.LeaseInfo{
+			DurationInSecs:        90,
+			RenewalIntervalInSecs: 30,
+		},
+	}
+	log.Println(instanceID)
+
+	return &EurekaClient{Conn: &conn, Instance: instance}
+}
+
+func (client *EurekaClient) Register() error {
+	err := client.Conn.RegisterInstance(client.Instance)
+	if err != nil {
+		log.Printf("Error registering service with eureka: %v", err)
+		return err
+	}
+	log.Println("Service registered successfully with eureka")
+
+	go client.startHeartbeat()
+
+	return nil
+}
+
+func (client *EurekaClient) Deregister() error {
+	err := client.Conn.DeregisterInstance(client.Instance)
+	if err != nil {
+		log.Printf("Error deregistering service from eureka: %v", err)
+		return err
+	}
+
+	log.Println("Service deregistered successfully from eureka")
+	return nil
+}
+
+func (client *EurekaClient) startHeartbeat() {
+	ticker := time.NewTicker(time.Second * 30)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		client.renewInstance()
+	}
+}
+
+func (client *EurekaClient) renewInstance() {
+	url := fmt.Sprintf("%s/apps/%s/%s", client.Conn.ServiceUrls[0], client.Instance.App, client.Instance.InstanceId)
+	req, err := http.NewRequest(http.MethodPut, url, nil)
+	if err != nil {
+		log.Printf("Error creating renewal request: %v", err)
+		return
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Printf("Error sending renewal request: %v", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		bodyString := string(bodyBytes)
+		log.Printf("Failed to renew instance: status code %d", resp.StatusCode)
+		log.Printf("response body: %s", bodyString)
+		log.Print("url: " + url)
+	} else {
+		log.Println("Instance renewed with eureka")
+	}
+}
+
+func (client *EurekaClient) GetServiceURL(appname string) (string, error) {
+	app, err := client.Conn.GetApp(appname)
 	if err != nil {
 		return "", err
 	}
 
 	if len(app.Instances) == 0 {
-		return "", fmt.Errorf("no instances found for app: %s", appName)
+		return "", fmt.Errorf("no instances found for app %s", appname)
 	}
 
 	instance := app.Instances[0]

@@ -36,13 +36,13 @@ public class JwtUtil {
     public String generateAccessToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return createToken(username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
-                TimeUnit.SECONDS.toMillis(120));
+                TimeUnit.MINUTES.toMillis(5));
     }
 
     public String generateRefreshToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return createToken(username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
-                TimeUnit.SECONDS.toMillis(180));
+                TimeUnit.MINUTES.toMillis(5));
     }
 
     public String createToken(String username, List<String> roles, long expiredTime) {
