@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-@Repository
-public interface PostManagerRepository extends JpaRepository<PostEntity, Long> {
+public interface PostManagerRepository extends JpaRepository<PostEntity, UUID> {
     // remeber using optinal for the methods of this repository
 }

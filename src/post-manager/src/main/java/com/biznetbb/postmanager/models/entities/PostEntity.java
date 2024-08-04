@@ -1,11 +1,12 @@
 package com.biznetbb.postmanager.models.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,8 +14,16 @@ import lombok.experimental.FieldDefaults;
 @Table(name="post-table")
 @Entity
 public class PostEntity {
-     Long postId;
+     @Id
+     @Column(nullable = false, updatable = false)
+     @GeneratedValue(strategy = GenerationType.UUID)
+     UUID id;
+     @Column(nullable = false,unique = true)
+     String username;
+     @Column(nullable = false, length = 30, unique = true)
      String content;
-     Byte multimedia;
-     CommentsEntity Comments;
+     @Column()
+     byte[] multimedia;
+
+   //  CommentsEntity Comments;
 }

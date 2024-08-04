@@ -1,6 +1,7 @@
 package com.biznetbb.postmanager.controller;
 
 import com.biznetbb.postmanager.models.web.request.PostManagerRequest;
+import com.biznetbb.postmanager.models.web.response.PostManagerResponse;
 import com.biznetbb.postmanager.services.PostManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,16 +25,16 @@ public class PostManagerController {
 
     @PutMapping("modify-post")
     public void modifyPost(@RequestBody PostManagerRequest request) {
-        service.ModifiedPost();
+        service.ModifiedPost(request);
     }
 
     @GetMapping("get-post/{id}")
-    public void getSinglePost(@RequestParam String id) {
-        service.GetPost();
+    public PostManagerResponse getSinglePost(@PathVariable String id) {
+       return service.GetPost(id);
     }
 
     @GetMapping("get-post-from-id/{id}")
-    public void getAllPostFromUser(@RequestParam String id) {
+    public void getAllPostFromUser(@RequestParam Long id) {
         service.GetMultiPost();
     }
 

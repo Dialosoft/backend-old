@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name="comments-table")
-@Entity
+//@Table(name="comments-table")
+//@Entity
 public class CommentsEntity {
 }
