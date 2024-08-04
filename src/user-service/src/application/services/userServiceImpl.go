@@ -2,6 +2,13 @@ package services
 
 import (
 	"errors"
+	"fmt"
+	"image"
+	"image/jpeg"
+	_ "image/png"
+	"io"
+	"os"
+	"path/filepath"
 
 	"github.com/biznetbb/user-service/src/adapters/repositories"
 	"github.com/google/uuid"
@@ -30,16 +37,36 @@ func (s *userServiceImpl) ChangeEmail(userID uuid.UUID, newMail string) error {
 	return s.userRepo.Update(user)
 }
 
-func (s *userServiceImpl) ChangeAvatar(userID uuid.UUID, avatar []byte) error {
-	if len(avatar) == 0 {
-		return errors.New("avatar cannot be empty")
-	}
+func (s *userServiceImpl) ChangeAvatar(userID uuid.UUID, avatar io.Reader) error {
 
-	user, err := s.userRepo.FindByID(userID)
+	filePath := filepath.Join("avatars", fmt.Sprintf("%s.jpg", userID))
+	err := saveCompressedAvatarToFile(filePath, avatar)
 	if err != nil {
 		return err
 	}
 
-	user.Avatar = avatar
-	return s.userRepo.Update(user)
+	return nil
+}
+
+func saveCompressedAvatarToFile(filePath string, avatar io.Reader) error {
+	img, _, err := image.Decode(avatar)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	outFile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+
+	var opt jpeg.Options
+	opt.Quality = 50
+	err = jpeg.Encode(outFile, img, &opt)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

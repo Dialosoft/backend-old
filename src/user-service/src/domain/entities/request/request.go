@@ -6,6 +6,6 @@ type Email struct {
 }
 
 type Avatar struct {
-	UserId      string `json:"userId"`
-	AvatarBytes []byte `json:"avatarBytes"`
+	UserId string `json:"userID"`
+	Avatar []byte `json:"avatar"`
 }

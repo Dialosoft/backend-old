@@ -32,20 +32,27 @@ func ChangeEmailController(c *gin.Context, userService services.UserService) {
 }
 
 func ChangeUserAvatarController(c *gin.Context, userService services.UserService) {
-	var req request.Avatar
 
-	if err := c.Bind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	userID := c.PostForm("userID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "userId cannot be empty"})
 		return
 	}
 
-	userID, err := uuid.Parse(req.UserId)
+	avatar, _, err := c.Request.FormFile("avatar")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "image is required"})
+		return
+	}
+	defer avatar.Close()
+
+	uuid, err := uuid.Parse(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "userId is invalid"})
 		return
 	}
 
-	if err := userService.ChangeAvatar(userID, req.AvatarBytes); err != nil {
+	if err := userService.ChangeAvatar(uuid, avatar); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
