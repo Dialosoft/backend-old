@@ -1,5 +1,4 @@
-package com.biznetbb.postmanager.models;
-
+package com.biznetbb.postmanager.models.web.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +8,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Comments {
+public class CreateCommentRequest {
     String username;
+    String postId;
     String content;
 }

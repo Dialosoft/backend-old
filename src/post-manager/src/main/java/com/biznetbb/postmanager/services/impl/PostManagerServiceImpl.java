@@ -1,5 +1,6 @@
 package com.biznetbb.postmanager.services.impl;
 
+import com.biznetbb.postmanager.mapper.CommentsMapper;
 import com.biznetbb.postmanager.mapper.PostManagerMapper;
 import com.biznetbb.postmanager.models.entities.PostEntity;
 import com.biznetbb.postmanager.models.web.request.PostManagerRequest;
@@ -20,6 +21,7 @@ public class PostManagerServiceImpl implements PostManagerService {
 
     private final PostManagerMapper mapper;
     private  final PostManagerRepository postManagerRepository;
+    private final CommentsMapper commentsMapper;
     @Override
     public void CreateNewPost(PostManagerRequest request) {
 
@@ -41,7 +43,7 @@ public class PostManagerServiceImpl implements PostManagerService {
         if (entity.isPresent()){
             //entity.setComments(request.getComments());
             entity.get().setContent(request.getContent());
-          //  entity.get().setMultimedia(request.getImage());
+            //entity.get().setMultimedia(request.getImage());
             postManagerRepository.save(entity.get());
         }
     }
@@ -50,10 +52,11 @@ public class PostManagerServiceImpl implements PostManagerService {
     public PostManagerResponse GetPost(String id) {
         Optional<PostEntity> entity = postManagerRepository.findById(UUID.fromString(id));
         if (entity.isPresent()){
-            PostManagerResponse response = new PostManagerResponse();
+            PostManagerResponse response;
             response = mapper.toResponse(entity.get());
+            response.setComments(commentsMapper.toCommentList(entity.get().getComments()));
             response.setImage(Base64.getEncoder().encodeToString(entity.get().getMultimedia()));
- //          response.setImage(Arrays.toString(entity.get().getMultimedia()));
+
            return response;
         }
       return null;
