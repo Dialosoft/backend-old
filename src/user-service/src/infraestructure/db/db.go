@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -17,10 +18,13 @@ func DBConnection() (*gorm.DB, error) {
 	var err error
 
 	dbOnce.Do(func() {
-		dsn := os.Getenv("DB_DSN")
-		if dsn == "" {
-			dsn = "host=localhost user=biznet password=biznet dbname=biznet-test port=5432 sslmode=disable"
-		}
+		DATASOURCE_HOST := os.Getenv("DATASOURCE_HOST")
+		DATASOURCE_PORT := os.Getenv("DATASOURCE_PORT")
+		DATASOURCE_DB := os.Getenv("DATASOURCE_DB")
+		DATASOURCE_USERNAME := os.Getenv("DATASOURCE_USERNAME")
+		DATASOURCE_PASSWORD := os.Getenv("DATASOURCE_PASSWORD")
+
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", DATASOURCE_HOST, DATASOURCE_USERNAME, DATASOURCE_PASSWORD, DATASOURCE_DB, DATASOURCE_PORT)
 
 		dbInstance, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Info),
