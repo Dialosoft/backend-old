@@ -39,12 +39,6 @@ func main() {
 		log.Fatalf("Failed to register service: %v", err)
 	}
 
-	defer func() {
-		if err := client.Deregister(); err != nil {
-			log.Printf("Failed do deregister service: %v", err)
-		}
-	}()
-
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)
 

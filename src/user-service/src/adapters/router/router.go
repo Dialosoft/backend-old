@@ -17,7 +17,7 @@ func NewRouter(userService services.UserService) *Router {
 func (r *Router) SetupRoutes() *gin.Engine {
 	router := gin.Default()
 
-	userService := router.Group("/biznetbb-api/user-service")
+	userService := router.Group("/user-service")
 
 	// Routes
 	userService.Static("/avatars", "./avatars")
