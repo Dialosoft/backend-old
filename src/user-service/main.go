@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"os"
 
 	"github.com/biznetbb/user-service/src/adapters/repositories"
@@ -15,9 +16,9 @@ import (
 
 func main() {
 	EUREKAURL := "http://registry-service:8761/eureka" //os.Getenv("EUREKA_CLIENT_SERVICEURL_DEFAULTZONE")
-	appName := "user-service"
-	hostname := "localhost"
-	ipAdrr := "172.19.0.3"
+	appName := "user-microservice"
+	hostname := "user-microservice"
+	ipAddr := getoutBoundIp().String()
 	port := 8086
 
 	db, err := db.DBConnection()
@@ -32,7 +33,7 @@ func main() {
 		fmt.Printf("error creating avatars directory: %v\n", err)
 	}
 
-	client := registry.NewEurekaClient(EUREKAURL, appName, hostname, ipAdrr, port)
+	client := registry.NewEurekaClient(EUREKAURL, appName, hostname, ipAddr, port)
 
 	if err := client.Register(); err != nil {
 		log.Fatalf("Failed to register service: %v", err)
@@ -54,4 +55,15 @@ func main() {
 	router.Use(gin.Recovery())
 
 	router.Run(":8086")
+}
+
+func getoutBoundIp() net.IP {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP
 }
