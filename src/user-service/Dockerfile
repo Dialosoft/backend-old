@@ -18,8 +18,6 @@ WORKDIR /root/
 
 COPY --from=builder /app/bin/user-service .
 
-ENV DB_DSN="host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
-
 EXPOSE 8086
 
 CMD ["./user-service"]
