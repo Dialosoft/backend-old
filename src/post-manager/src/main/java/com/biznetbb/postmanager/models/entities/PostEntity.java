@@ -20,9 +20,9 @@ public class PostEntity {
      @Column(nullable = false, updatable = false)
      @GeneratedValue(strategy = GenerationType.UUID)
      UUID id;
-     @Column(nullable = false,unique = true)
+     @Column()
      String username;
-     @Column(nullable = false, unique = true)
+     @Column()
      String content;
      @Column()
      byte[] multimedia;

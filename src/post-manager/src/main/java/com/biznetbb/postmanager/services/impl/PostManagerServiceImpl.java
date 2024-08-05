@@ -10,15 +10,13 @@ import com.biznetbb.postmanager.services.PostManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class PostManagerServiceImpl implements PostManagerService {
 
+    //TODO terminar toda la gestion
     private final PostManagerMapper mapper;
     private  final PostManagerRepository postManagerRepository;
     private final CommentsMapper commentsMapper;
@@ -27,23 +25,20 @@ public class PostManagerServiceImpl implements PostManagerService {
 
         if (request != null){
             PostEntity entity = mapper.toEntity(request);
-            entity.setMultimedia(Base64.getDecoder().decode(request.getImage()));
             postManagerRepository.save(entity);
         }
     }
 
     @Override
-    public void DeletePost() {
-
+    public void DeletePost(String id) {
+        postManagerRepository.deleteById(UUID.fromString(id));
     }
 
     @Override
     public void ModifiedPost(PostManagerRequest request) {
-        Optional<PostEntity> entity = postManagerRepository.findById(request.getId());
+        Optional<PostEntity> entity = postManagerRepository.findById(UUID.fromString(request.getId()));
         if (entity.isPresent()){
-            //entity.setComments(request.getComments());
-            entity.get().setContent(request.getContent());
-            //entity.get().setMultimedia(request.getImage());
+            entity = Optional.ofNullable(mapper.toEntity(request));
             postManagerRepository.save(entity.get());
         }
     }
@@ -55,15 +50,14 @@ public class PostManagerServiceImpl implements PostManagerService {
             PostManagerResponse response;
             response = mapper.toResponse(entity.get());
             response.setComments(commentsMapper.toCommentList(entity.get().getComments()));
-            response.setImage(Base64.getEncoder().encodeToString(entity.get().getMultimedia()));
-
            return response;
         }
       return null;
     }
 
     @Override
-    public void GetMultiPost() {
-
+    public List<PostManagerResponse> GetMultiPost(String username) {
+        Optional<List<PostEntity>> entities = postManagerRepository.findByUsername(username);
+        return entities.map(mapper::toResponseList).orElse(null);
     }
 }

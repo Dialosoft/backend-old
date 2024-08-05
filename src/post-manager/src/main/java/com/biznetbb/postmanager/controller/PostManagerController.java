@@ -6,6 +6,8 @@ import com.biznetbb.postmanager.services.PostManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController()
 @RequestMapping("api/v1/post-manager/")
 @RequiredArgsConstructor
@@ -19,8 +21,9 @@ public class PostManagerController {
     }
 
     @DeleteMapping("delete-post/{id}")
-    public void deletePost(@RequestParam String id) {
-        service.DeletePost();
+    public void deletePost(@PathVariable String id) {
+        //todo managment the exc
+        service.DeletePost(id);
     }
 
     @PutMapping("modify-post")
@@ -33,9 +36,9 @@ public class PostManagerController {
        return service.GetPost(id);
     }
 
-    @GetMapping("get-post-from-id/{id}")
-    public void getAllPostFromUser(@RequestParam Long id) {
-        service.GetMultiPost();
+    @GetMapping("get-post-from-id")
+    public List<PostManagerResponse> getAllPostFromUser(@RequestParam String username) {
+       return service.GetMultiPost(username);
     }
 
 

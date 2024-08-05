@@ -18,6 +18,7 @@ public class InteractionPostServiceImpl implements InteractionsPostService {
     private final CommentsRepository commentsRepository;
     private final PostManagerRepository postManagerRepository;
     private final CommentsMapper commentsMapper;
+    // todo terminar gestion de comerntarios
     @Override
     public void createComment(CreateCommentRequest request) {
 

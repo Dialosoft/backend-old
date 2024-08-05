@@ -2,7 +2,7 @@ spring:
   application:
     name: post-manager
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/test} # Preconfigured for postgres 5433, change it for your needs
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/test-application} # Preconfigured for postgres 5433, change it for your needs
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:root} # Example default database password
   jpa:

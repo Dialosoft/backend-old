@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PostManagerRequest {
-    UUID id;
+    String id;
     String username;
     String content;
     String image;
