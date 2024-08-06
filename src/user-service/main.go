@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"github.com/biznetbb/user-service/src/adapters/repositories"
 	"github.com/biznetbb/user-service/src/adapters/router"
@@ -35,8 +36,13 @@ func main() {
 
 	client := registry.NewEurekaClient(EUREKAURL, appName, hostname, ipAddr, port)
 
-	if err := client.Register(); err != nil {
-		log.Fatalf("Failed to register service: %v", err)
+	for {
+		if err := client.Register(); err != nil {
+			log.Printf("Failed to register service: %v", err)
+			time.Sleep(5 * time.Second)
+		} else {
+			break
+		}
 	}
 
 	userRepo := repositories.NewUserRepository(db)
