@@ -60,7 +60,7 @@ spring:
         - id: user_test_service_route
           uri: lb://user-microservice/
           predicates:
-            - Path=/biznetbb-api/user/test
+            - Path=/biznetbb-api/user-service/test
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
@@ -68,7 +68,7 @@ spring:
         - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
-            - Path=/biznetbb-api/user/**
+            - Path=/biznetbb-api/user-service/**
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
