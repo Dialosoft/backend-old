@@ -8,7 +8,10 @@ app:
     - /biznetbb-api/auth/login
     - /biznetbb-api/auth/register
     - /biznetbb-api/auth/refresh-token
+    - /biznetbb-api/user/test
 spring:
+  main:
+    web-application-type: reactive
   application:
     name: gateway-microservice
   devtools:
@@ -36,7 +39,7 @@ spring:
           uri: http://localhost:${server.port}
           predicates:
             - Path=/actuator/**
-        - id: no_auth_service_routes
+        - id: auth_service_hello_world_route
           uri: lb://auth-microservice/
           predicates:
             - Path=/biznetbb-api/hello-world
@@ -54,13 +57,22 @@ spring:
           filters:
             - AddRequestHeader=X-Request-Service, auth-microservice
             - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
-        - id: user_service
+        - id: user_test_service_route
+          uri: lb://user-microservice/
+          predicates:
+            - Path=/biznetbb-api/user/test
+          filters:
+            - AddRequestHeader=X-Request-Service, user-microservice
+            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - name: NonSpringServicesRoutingFilter # For non-spring-boot services
+        - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
             - Path=/biznetbb-api/user/**
           filters:
-            - AddRequestHeader=X-Request-Service, auth-microservice
+            - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - name: NonSpringServicesRoutingFilter
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:

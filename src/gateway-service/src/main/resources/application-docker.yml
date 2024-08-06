@@ -4,6 +4,7 @@
 eureka:
   instance:
     instanceId: ${spring.application.name}:${server.port}
+#    preferIpAddress: true
   client:
     serviceUrl:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://registry-service:8761/eureka/}
