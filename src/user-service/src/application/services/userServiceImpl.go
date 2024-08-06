@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/biznetbb/user-service/src/adapters/repositories"
+	"github.com/Dialosoft/user-service/src/adapters/repositories"
 	"github.com/google/uuid"
 )
 

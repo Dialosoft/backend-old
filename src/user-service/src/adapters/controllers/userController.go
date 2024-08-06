@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/biznetbb/user-service/src/application/services"
-	"github.com/biznetbb/user-service/src/domain/entities/request"
+	"github.com/Dialosoft/user-service/src/application/services"
+	"github.com/Dialosoft/user-service/src/domain/entities/request"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

@@ -7,11 +7,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/biznetbb/user-service/src/adapters/repositories"
-	"github.com/biznetbb/user-service/src/adapters/router"
-	"github.com/biznetbb/user-service/src/application/services"
-	"github.com/biznetbb/user-service/src/infraestructure/db"
-	"github.com/biznetbb/user-service/src/infraestructure/registry"
+	"github.com/Dialosoft/user-service/src/adapters/repositories"
+	"github.com/Dialosoft/user-service/src/adapters/router"
+	"github.com/Dialosoft/user-service/src/application/services"
+	"github.com/Dialosoft/user-service/src/infraestructure/db"
+	"github.com/Dialosoft/user-service/src/infraestructure/registry"
 	"github.com/gin-gonic/gin"
 )
 
