@@ -1,6 +1,23 @@
 # Build step
 FROM gradle:8.8.0-jdk21-alpine AS build
 RUN gradle --version && java -version
+
+
+# Install necessary packages and configure certificates
+RUN apk add --no-cache ca-certificates && \
+    update-ca-certificates
+
+WORKDIR /app
+
+# Configure TLS certificates and protocols
+RUN mkdir -p /etc/ssl/certs/java && \
+    ln -sf /opt/java/openjdk/lib/security/cacerts /etc/ssl/certs/java/cacerts && \
+    keytool -list -keystore /etc/ssl/certs/java/cacerts -storepass changeit > /dev/null
+
+# Add ca-certificates to java VM args
+ENV JAVA_OPTS="-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStorePassword=changeit -Dhttps.protocols=TLSv1.2,TLSv1.3"
+
+
 WORKDIR /app
 # Copy only Gradle configuration files first
 COPY build.gradle gradle.properties settings.gradle ./

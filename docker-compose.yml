@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: ${DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
     ports:
-      - "5432:${DATASOURCE_PORT}"
+      - "${DATASOURCE_PORT_LOCAL}:5432"
     networks:
       - biznetbb-network
     volumes:
@@ -55,6 +55,7 @@ services:
       - "5005:5005"
     depends_on:
       - registry-service
+      - user-service
     networks:
       - biznetbb-network
     env_file:
@@ -80,6 +81,7 @@ services:
       - "8081:8081"
       - "5006:5005"
     depends_on:
+      - database
       - registry-service
     networks:
       - biznetbb-network
@@ -88,11 +90,11 @@ services:
     environment:
       JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_HOST: ${DATASOURCE_HOST}
-      SPRING_DATASOURCE_PORT: ${DATASOURCE_PORT}
-      SPRING_DATASOURCE_DB: ${DATASOURCE_DB}
-      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      DATASOURCE_HOST: ${DATASOURCE_HOST}
+      DATASOURCE_PORT: 5432
+      DATASOURCE_DB: ${DATASOURCE_DB}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
     healthcheck:
