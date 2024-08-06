@@ -19,7 +19,7 @@ type EurekaClient struct {
 
 func NewEurekaClient(eurekaURL, appname, hostname, ipAddr string, port int) *EurekaClient {
 	conn := fargo.NewConn(eurekaURL)
-	instanceID := hostname + ":" + strings.ToLower(appname) + ":" + strconv.Itoa(port)
+	instanceID := strings.ToLower(appname) + ":" + strconv.Itoa(port)
 	instance := &fargo.Instance{
 		InstanceId:       instanceID,
 		HostName:         hostname,
