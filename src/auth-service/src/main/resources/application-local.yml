@@ -1,0 +1,14 @@
+
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:${DATASOURCE_PORT}/${DATASOURCE_DB}
+
+eureka:
+  instance:
+#    prefer-ip-address: true
+    # IP address with which this service will register on the Eureka server will be "localhost"
+#    ip-address: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

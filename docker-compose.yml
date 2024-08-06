@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:latest
+    container_name: database
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DATASOURCE_DB}
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
+    ports:
+      - "${DATASOURCE_PORT_LOCAL}:5432"
+    networks:
+      - biznetbb-network
+    volumes:
+      - biznetbb-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-biznetbb_user} -d ${DB_NAME:-biznetbb}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  registry-service:
+    build:
+      context: src/registry-service
+    container_name: registry-service
+    image: biznetbb-registry-eureka:v1.0
+    env_file:
+      - .env
+    ports:
+      - "8761:8761"
+    depends_on:
+      - database
+    networks:
+      - biznetbb-network
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Registry Service ready to start' && tail -f /dev/null"]
+
+  gateway-service:
+    build:
+      context: src/gateway-service
+    container_name: gateway-service
+    image: biznetbb-gateway:v1.0
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    depends_on:
+      - registry-service
+      - user-service
+    networks:
+      - biznetbb-network
+    env_file:
+      - .env
+    environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
+
+  auth-service:
+    build:
+      context: src/auth-service
+    container_name: auth-service
+    image: biznetbb-auth-service:v1.0
+    ports:
+      - "8081:8081"
+      - "5006:5005"
+    depends_on:
+      - database
+      - registry-service
+    networks:
+      - biznetbb-network
+    env_file:
+      - .env
+    environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_PROFILES_ACTIVE: docker
+      DATASOURCE_HOST: ${DATASOURCE_HOST}
+      DATASOURCE_PORT: 5432
+      DATASOURCE_DB: ${DATASOURCE_DB}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
+
+  user-service:
+   build:
+     context: src/user-service
+   container_name: user-service
+   image: biznetbb-user-service:v1.0
+   ports:
+     - "8086:8086"
+     - "5007:5005"
+   depends_on:
+     - registry-service
+   networks:
+     - biznetbb-network
+   env_file:
+     - .env
+   environment:
+     DATASOURCE_HOST: database
+     DATASOURCE_PORT: 5432
+     DATASOURCE_DB: biznetbb
+     DATASOURCE_USERNAME: biznetbb_user
+     DATASOURCE_PASSWORD: admin
+     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+  #  healthcheck:
+  #    test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+  #    interval: 30s
+  #    timeout: 10s
+  #    retries: 5
+  #  command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
+
+volumes:
+  biznetbb-db-data:
+    name: biznetbb-db-data
+    driver: local
+
+networks:
+  biznetbb-network:
+    driver: bridge
