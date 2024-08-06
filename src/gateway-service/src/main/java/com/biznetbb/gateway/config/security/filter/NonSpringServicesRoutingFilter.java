@@ -6,6 +6,8 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.cloud.netflix.eureka.EurekaServiceInstance;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -29,22 +31,29 @@ public class NonSpringServicesRoutingFilter extends AbstractGatewayFilterFactory
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            String serviceName = "user-microservice"; // or extract from request if dynamic
+            // TODO: add dynamic service name from external properties
+            String serviceName = "user-microservice";
 
             String baseUrl = getGatewayBaseUrl(serviceName);
             WebClient webClient = webClientBuilder.baseUrl(baseUrl).build();
 
-            return webClient.get()
+            // Create a dynamic request based on the original HTTP method
+            Mono<Void> responseMono = webClient
+                    .method(request.getMethod())
                     .uri(request.getURI().getPath())
+                    .headers(httpHeaders -> httpHeaders.addAll(request.getHeaders()))
+                    .body(BodyInserters.fromDataBuffers(request.getBody()))
                     .exchangeToMono(clientResponse -> {
                         exchange.getResponse().setStatusCode(clientResponse.statusCode());
-                        return clientResponse.bodyToMono(String.class)
-                                .flatMap(body -> {
-                                    exchange.getResponse().getHeaders().addAll(clientResponse.headers().asHttpHeaders());
-                                    return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                                            .bufferFactory().wrap(body.getBytes())));
-                                });
+                        exchange.getResponse().getHeaders().addAll(clientResponse.headers().asHttpHeaders());
+
+                        return clientResponse.bodyToMono(byte[].class)
+                                .defaultIfEmpty(new byte[0])
+                                .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
+                                        .bufferFactory().wrap(body))));
                     });
+
+            return responseMono.then(chain.filter(exchange));
         };
     }
 
