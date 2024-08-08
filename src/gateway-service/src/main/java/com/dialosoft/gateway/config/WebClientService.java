@@ -1,4 +1,4 @@
-package com.biznetbb.gateway.config;
+package com.dialosoft.gateway.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.client.discovery.DiscoveryClient;

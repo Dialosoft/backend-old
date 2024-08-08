@@ -1,10 +1,10 @@
-package com.biznetbb.gateway.config.security.filter;
+package com.dialosoft.gateway.config.security.filter;
 
-import com.biznetbb.gateway.config.security.util.JwtUtils;
-import com.biznetbb.gateway.config.security.dto.RoleDTO;
-import com.biznetbb.gateway.config.security.util.AuthUtils;
-import com.biznetbb.gateway.config.security.util.RoleType;
-import com.biznetbb.gateway.config.security.util.RouterValidator;
+import com.dialosoft.gateway.config.security.util.JwtUtils;
+import com.dialosoft.gateway.config.security.dto.RoleDTO;
+import com.dialosoft.gateway.config.security.util.AuthUtils;
+import com.dialosoft.gateway.config.security.util.RoleType;
+import com.dialosoft.gateway.config.security.util.RouterValidator;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;

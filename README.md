@@ -190,7 +190,7 @@ spring:
         - id: order_service_routes
           uri: lb://order-microservice
           predicates:
-            - Path=/biznetbb-api/order/**
+            - Path=/dialosoft-api/order/**
           filters:
             - StripPrefix=1
             - name: JwtAuthenticationFilter
@@ -203,9 +203,9 @@ In this example:
 
 - **id**: Unique identifier for the route.
 - **uri**: The URI of the microservice, in this case, order-microservice.
-- **predicates**: The condition that the request must meet to be directed to this microservice (in this case, any path that starts with /biznetbb-api/order/).
+- **predicates**: The condition that the request must meet to be directed to this microservice (in this case, any path that starts with /dialosoft-api/order/).
 - **filters**: Filters applied to the request before it is redirected.
-    - **StripPrefix=1**: Remove the '/biznetbb-api' prefix before sending the request to the microservice.
+    - **StripPrefix=1**: Remove the '/dialosoft-api' prefix before sending the request to the microservice.
     - **name: JwtAuthenticationFilter**: Apply the JWT authentication filter.
     - **name: RoleBasedAuthorizationFilter**: Apply the role-based authorization filter.
     - **args**: Arguments for the authorization filter.
@@ -223,6 +223,6 @@ app:
   # Open non-secured endpoints for the gateway
   openApiEndpoints:
     - /actuator
-    - /biznetbb-api/auth/login
-    - /biznetbb-api/auth/register
-    - /biznetbb-api/auth/refresh-token
+    - /dialosoft-api/auth/login
+    - /dialosoft-api/auth/register
+    - /dialosoft-api/auth/refresh-token

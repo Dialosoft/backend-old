@@ -1,6 +1,6 @@
-package com.biznetbb.gateway.config.security.util;
+package com.dialosoft.gateway.config.security.util;
 
-import com.biznetbb.gateway.config.security.dto.RoleDTO;
+import com.dialosoft.gateway.config.security.dto.RoleDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;

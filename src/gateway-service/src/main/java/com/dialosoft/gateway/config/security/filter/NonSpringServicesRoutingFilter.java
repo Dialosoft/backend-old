@@ -1,4 +1,4 @@
-package com.biznetbb.gateway.config.security.filter;
+package com.dialosoft.gateway.config.security.filter;
 
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -7,7 +7,6 @@ import org.springframework.cloud.netflix.eureka.EurekaServiceInstance;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 

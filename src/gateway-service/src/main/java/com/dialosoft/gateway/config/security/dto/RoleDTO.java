@@ -1,4 +1,4 @@
-package com.biznetbb.gateway.config.security.dto;
+package com.dialosoft.gateway.config.security.dto;
 
 import lombok.*;
 

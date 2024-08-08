@@ -1,4 +1,4 @@
-package com.biznetbb.gateway.config.security.util;
+package com.dialosoft.gateway.config.security.util;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;

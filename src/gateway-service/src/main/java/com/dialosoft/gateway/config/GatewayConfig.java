@@ -1,6 +1,6 @@
-package com.biznetbb.gateway.config;
+package com.dialosoft.gateway.config;
 
-import com.biznetbb.gateway.config.security.filter.NonSpringServicesRoutingFilter;
+import com.dialosoft.gateway.config.security.filter.NonSpringServicesRoutingFilter;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

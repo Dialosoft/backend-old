@@ -1,4 +1,4 @@
-package com.biznetbb.gateway.config.security.util;
+package com.dialosoft.gateway.config.security.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
