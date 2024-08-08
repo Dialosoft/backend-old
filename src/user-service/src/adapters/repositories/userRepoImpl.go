@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/biznetbb/user-service/src/domain/entities"
+	"github.com/Dialosoft/user-service/src/domain/entities"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -13,11 +13,6 @@ type userRepositoryImpl struct {
 func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepositoryImpl{db: db}
 }
-
-// Create a new user in the database
-// func (r *userRepository) Create(user *entities.User) error {
-// 	return r.db.Create(user).Error
-// }
 
 // Find a user by the uuid
 func (r *userRepositoryImpl) FindByID(uuid uuid.UUID) (*entities.User, error) {

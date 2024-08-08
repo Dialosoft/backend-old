@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"github.com/biznetbb/user-service/src/adapters/controllers"
-	"github.com/biznetbb/user-service/src/application/services"
+	"github.com/Dialosoft/user-service/src/adapters/controllers"
+	"github.com/Dialosoft/user-service/src/application/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +19,7 @@ func NewRouter(userService services.UserService) *Router {
 func (r *Router) SetupRoutes() *gin.Engine {
 	router := gin.Default()
 
-	userService := router.Group("/user")
+	userService := router.Group("/user-service")
 
 	// Routes
 	userService.Static("/avatars", "./avatars")
