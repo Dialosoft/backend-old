@@ -13,11 +13,11 @@ services:
     ports:
       - "${DATASOURCE_PORT_LOCAL}:5432"
     networks:
-      - biznetbb-network
+      - dialosoft-network
     volumes:
-      - biznetbb-db-data:/var/lib/postgresql/data
+      - dialosoft-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-biznetbb_user} -d ${DB_NAME:-biznetbb}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dialosoft_user} -d ${DB_NAME:-dialosoft}"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -27,7 +27,7 @@ services:
     build:
       context: src/registry-service
     container_name: registry-service
-    image: biznetbb-registry-eureka:v1.0
+    image: dialosoft-registry-eureka:v1.0
     env_file:
       - .env
     ports:
@@ -35,7 +35,7 @@ services:
     depends_on:
       - database
     networks:
-      - biznetbb-network
+      - dialosoft-network
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
     healthcheck:
@@ -49,7 +49,7 @@ services:
     build:
       context: src/gateway-service
     container_name: gateway-service
-    image: biznetbb-gateway:v1.0
+    image: dialosoft-gateway:v1.0
     ports:
       - "8080:8080"
       - "5005:5005"
@@ -57,7 +57,7 @@ services:
       - registry-service
       - user-service
     networks:
-      - biznetbb-network
+      - dialosoft-network
     env_file:
       - .env
     environment:
@@ -76,7 +76,7 @@ services:
     build:
       context: src/auth-service
     container_name: auth-service
-    image: biznetbb-auth-service:v1.0
+    image: dialosoft-auth-service:v1.0
     ports:
       - "8081:8081"
       - "5006:5005"
@@ -84,7 +84,7 @@ services:
       - database
       - registry-service
     networks:
-      - biznetbb-network
+      - dialosoft-network
     env_file:
       - .env
     environment:
@@ -108,22 +108,22 @@ services:
    build:
      context: src/user-service
    container_name: user-service
-   image: biznetbb-user-service:v1.0
+   image: dialosoft-user-service:v1.0
    ports:
      - "8086:8086"
      - "5007:5005"
    depends_on:
      - registry-service
    networks:
-     - biznetbb-network
+     - dialosoft-network
    env_file:
      - .env
    environment:
-     DATASOURCE_HOST: database
+     DATASOURCE_HOST: ${DATASOURCE_HOST}
      DATASOURCE_PORT: 5432
-     DATASOURCE_DB: biznetbb
-     DATASOURCE_USERNAME: biznetbb_user
-     DATASOURCE_PASSWORD: admin
+     DATASOURCE_DB: ${DATASOURCE_DB}
+     DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+     DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
   #  healthcheck:
   #    test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
@@ -133,10 +133,10 @@ services:
   #  command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
 
 volumes:
-  biznetbb-db-data:
-    name: biznetbb-db-data
+  dialosoft-db-data:
+    name: dialosoft-db-data
     driver: local
 
 networks:
-  biznetbb-network:
+  dialosoft-network:
     driver: bridge
