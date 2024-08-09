@@ -60,7 +60,7 @@ spring:
         - id: user_test_service_route
           uri: lb://user-microservice/
           predicates:
-            - Path=/dialosoft-api/user/test
+            - Path=/dialosoft-api/user-service/test
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1
@@ -68,7 +68,7 @@ spring:
         - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
-            - Path=/dialosoft-api/user/**
+            - Path=/dialosoft-api/user-service/**
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1
