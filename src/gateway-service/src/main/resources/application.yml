@@ -5,10 +5,10 @@ app:
   # Open non-secured endpoints for the gateway
   openApiEndpoints:
     - /actuator
-    - /biznetbb-api/auth/login
-    - /biznetbb-api/auth/register
-    - /biznetbb-api/auth/refresh-token
-    - /biznetbb-api/user/test
+    - /dialosoft-api/auth/login
+    - /dialosoft-api/auth/register
+    - /dialosoft-api/auth/refresh-token
+    - /dialosoft-api/user/test
 spring:
   main:
     web-application-type: reactive
@@ -42,10 +42,10 @@ spring:
         - id: auth_service_hello_world_route
           uri: lb://auth-microservice/
           predicates:
-            - Path=/biznetbb-api/hello-world
+            - Path=/dialosoft-api/hello-world
           filters:
             - AddRequestHeader=X-Request-Service, auth-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1 # remove '/dialosoft-api' before send request to the down service
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:
@@ -53,25 +53,25 @@ spring:
         - id: auth_service_routes
           uri: lb://auth-microservice/
           predicates:
-            - Path=/biznetbb-api/auth/**
+            - Path=/dialosoft-api/auth/**
           filters:
             - AddRequestHeader=X-Request-Service, auth-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1
         - id: user_test_service_route
           uri: lb://user-microservice/
           predicates:
-            - Path=/biznetbb-api/user-service/test
+            - Path=/dialosoft-api/user-service/test
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1
             - name: NonSpringServicesRoutingFilter # For non-spring-boot services
         - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
-            - Path=/biznetbb-api/user-service/**
+            - Path=/dialosoft-api/user-service/**
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1
             - name: NonSpringServicesRoutingFilter
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
@@ -81,10 +81,10 @@ spring:
 #        - id: other_service_routes
 #          uri: lb://other-microservice/
 #          predicates:
-#            - Path=/biznetbb-api/other/**
+#            - Path=/dialosoft-api/other/**
 #          filters:
 #            - AddRequestHeader=X-Request-Service, auth-microservice
-#            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+#            - StripPrefix=1 # remove '/dialosoft-api' before send request to auth-service
 #            - name: JwtAuthenticationFilter
 #            - name: RoleBasedAuthorizationFilter
 #              args:
