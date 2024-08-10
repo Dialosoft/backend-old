@@ -14,7 +14,7 @@ spring:
   application:
     name: auth-microservice
   datasource:
-    url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT_LOCAL}/${DATASOURCE_DB}
+    url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DB}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
