@@ -45,33 +45,6 @@ services:
       retries: 5
     command: ["sh", "-c", "echo 'Registry Service ready to start' && tail -f /dev/null"]
 
-  gateway-service:
-    build:
-      context: src/gateway-service
-    container_name: gateway-service
-    image: dialosoft-gateway:v1.0
-    ports:
-      - "8080:8080"
-      - "5005:5005"
-    depends_on:
-      - registry-service
-      - user-service
-    networks:
-      - dialosoft-network
-    env_file:
-      - .env
-    environment:
-      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-      SPRING_PROFILES_ACTIVE: docker
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
-
   auth-service:
     build:
       context: src/auth-service
@@ -131,6 +104,35 @@ services:
 #      timeout: 10s
 #      retries: 5
 #    command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
+
+
+  gateway-service:
+    build:
+      context: src/gateway-service
+    container_name: gateway-service
+    image: dialosoft-gateway:v1.0
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    depends_on:
+      - registry-service
+      - user-service
+      - auth-service
+    networks:
+      - dialosoft-network
+    env_file:
+      - .env
+    environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
 
 volumes:
   dialosoft-db-data:

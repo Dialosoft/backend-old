@@ -159,7 +159,6 @@ springdoc:
       - url: /v3/api-docs
         name: API Gateway Service Swagger
         primaryName: API Gateway Service
-        belongServiceName: gateway-microservice
       - url: /auth-service/v3/api-docs
         name: Auth Service Swagger
         primaryName: Auth Service Swagger

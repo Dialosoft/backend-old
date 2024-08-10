@@ -4,49 +4,41 @@ import com.dialosoft.gateway.config.openapi.util.SwaggerProperties;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 
+import java.util.Objects;
+
 @Configuration
 @Data
 public class SwaggerRoutesConfig {
 
     @Value("${spring.application.name}")
-    private String gatewayMicroserviceName;
+    private String gatewayServiceName;
     @Autowired
     private SwaggerProperties swaggerProperties;
-    @Autowired
-    private DiscoveryClient discoveryClient;
 
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         RouteLocatorBuilder.Builder routes = builder.routes();
 
-        swaggerProperties.getUrls().forEach(swaggerUrl -> {
+        swaggerProperties.getUrls().stream()
+                .filter(swaggerUrlConfig -> Objects.nonNull(swaggerUrlConfig.getBelongServiceName()))
+                .filter(swaggerUrlConfig -> !swaggerUrlConfig.getBelongServiceName().equals(gatewayServiceName))
+                .forEach(swaggerUrlConfig -> {
+                    String pathOpenApiService = swaggerUrlConfig.getUrl();
+                    String baseUriService = "lb://" + swaggerUrlConfig.getBelongServiceName();
+                    routes.route(r -> r.path(pathOpenApiService)
+                            .and()
+                            .method(HttpMethod.GET)
+                            .uri(baseUriService));
+                });
 
-            String belongServiceName = swaggerUrl.getBelongServiceName();
-            if (!belongServiceName.equalsIgnoreCase(gatewayMicroserviceName)) {
-
-            String serviceUriFromDiscovery = getServiceUriFromDiscovery(belongServiceName);
-            routes.route(r -> r.path(swaggerUrl.getUrl())
-                    .and()
-                    .method(HttpMethod.GET)
-                    .uri(serviceUriFromDiscovery));
-            }
-        });
 
         return routes.build();
     }
 
-    private String getServiceUriFromDiscovery(String serviceId) {
-
-        return discoveryClient.getInstances(serviceId).stream()
-                .findFirst()
-                .map(serviceInstance -> "lb://" + serviceInstance.getServiceId())
-                .orElseThrow(() -> new RuntimeException("Service not found to generate swagger: " + serviceId));
-    }
 }
