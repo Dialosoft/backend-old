@@ -16,7 +16,7 @@ public class CorsConfig {
         
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8671")); // need eureka url
-        configuration.setAllowedMethods(Arrays.asList("POST", "DELETE", "PUT"));
+        configuration.setAllowedMethods(Arrays.asList("POST", "DELETE", "PUT", "GET"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -15,3 +15,8 @@ eureka:
 #    serviceUrl:
 #      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://host.docker.internal:8761/eureka/}
 #
+
+openapi:
+  service:
+    # Indicate gateway-service url to enable openapi from there
+    url: http://gateway-service:8080
