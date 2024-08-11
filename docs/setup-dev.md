@@ -269,8 +269,22 @@ you need to add the following entry in the `urls` property:
         belongServiceName: order-microservice
 ```
 
-At the same time, you need obvisouly to configure openApi and swagger-ui in the `order-microservice`.
-Due to the idea is to have microservices with different languages, this configuration
-will depend on the language of the microservice.
+At the same time, you need obviously to configure openApi and swagger-ui in the microservice.
+For instance in a supposed `order-microservice`. If this one is written in Java, you need to add the following configuration:
+
+```yaml
+# SWAGGER
+springdoc:
+  api-docs:
+    enabled: true
+    path: /auth-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /auth-service/swagger-ui.html
+```
+
+This configuration will let us indicate the path for OpenApi and Swagger-ui, 
+which will be used in the gateway swagger-ui. But this configuration will
+depend on how is done in each other languages.
 
 **It's important that microservice must have been registered in the discovery service first.**
