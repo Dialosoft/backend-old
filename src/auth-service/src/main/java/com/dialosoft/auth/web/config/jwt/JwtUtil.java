@@ -59,6 +59,22 @@ public class JwtUtil {
                 .sign(algorithmWithSecret);
     }
 
+    public Long getExpirationInSeconds(String jwt) {
+        try {
+            Date expiresAt = JWT.require(algorithmWithSecret)
+                    .build()
+                    .verify(jwt)
+                    .getExpiresAt();
+
+            long currentTimeMillis = System.currentTimeMillis();
+            long expiresInMillis = expiresAt.getTime() - currentTimeMillis;
+
+            return TimeUnit.MILLISECONDS.toSeconds(expiresInMillis);
+        } catch (JWTVerificationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean isValid(String jwt) {
         try {
             JWTVerifier verifier = JWT.require(algorithmWithSecret)

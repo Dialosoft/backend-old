@@ -1,6 +1,9 @@
 package com.dialosoft.auth.web.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -12,6 +15,15 @@ import java.util.List;
 
 @OpenAPIDefinition
 @Configuration
+@SecuritySchemes({
+        @SecurityScheme(
+                name = "bearerAuth",
+                type = SecuritySchemeType.HTTP,
+                scheme = "bearer",
+                bearerFormat = "JWT",
+                description = "Provide the JWT token to authenticate"
+        )
+})
 public class OpenApiConfig {
     @Bean
     public OpenAPI userOpenAPI(
