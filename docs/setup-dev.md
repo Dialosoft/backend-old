@@ -211,7 +211,7 @@ In this example:
     - **args**: Arguments for the authorization filter.
         - **requiredRoles**: Roles required to access the route. In this case, both ROLE_USER and ROLE_ADMIN have access.
 
-### Explanation of Open Routes:
+### Explication of Open Routes:
 
 If you open the file `src/gateway-service/application.yml`, The `openApi Endpoints` property is defined under `app.security.jwt` to specify routes that do not require authentication:
 
@@ -226,3 +226,65 @@ app:
     - /dialosoft-api/auth/login
     - /dialosoft-api/auth/register
     - /dialosoft-api/auth/refresh-token
+```
+
+### Explication of Swagger Routes from Gateway Service:
+
+If you open the file `src/gateway-service/application.yml` and goes to swagger section props beginning with `swagger-ui`,
+you will see the following configuration:
+
+```yaml
+# SWAGGER
+springdoc:
+  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    # Add microservices api-docs urls to expose them in swagger-ui
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service Swagger
+        primaryName: API Gateway Service
+      - url: /auth-service/v3/api-docs
+        name: Auth Service Swagger
+        primaryName: Auth Service Swagger
+        belongServiceName: auth-microservice
+```
+In `urls` property, you can indicate the path of the api-docs/swagger-ui and the name 
+of the microservice that will be exposed in the gateway swagger-ui. At the same time,
+you can indicate the registered service name of the microservice through `belongServiceName` that will be used to
+generate the swagger-ui.
+So to add a new route in the gateway swagger-ui, you need to add a new entry in the `urls` property.
+
+For example, if you want to add a new route for a supposed `order-microservice` in the gateway swagger-ui,
+you need to add the following entry in the `urls` property:
+
+```yaml
+      - url: /order-microservice/v3/api-docs
+        name: Order Microservice Swagger
+        primaryName: Order Microservice
+        belongServiceName: order-microservice
+```
+
+At the same time, you need obviously to configure openApi and swagger-ui in the microservice.
+For instance in a supposed `order-microservice`. If this one is written in Java, you need to add the following configuration:
+
+```yaml
+# SWAGGER
+springdoc:
+  api-docs:
+    enabled: true
+    path: /auth-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /auth-service/swagger-ui.html
+```
+
+This configuration will let us indicate the path for OpenApi and Swagger-ui, 
+which will be used in the gateway swagger-ui. But this configuration will
+depend on how is done in each other languages.
+
+**It's important that microservice must have been registered in the discovery service first.**

@@ -1,5 +1,6 @@
 package com.dialosoft.gateway.config.security.filter;
 
+import lombok.Data;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -22,18 +23,17 @@ public class NonSpringServicesRoutingFilter extends AbstractGatewayFilterFactory
         this.webClientBuilder = webClientBuilder;
     }
 
+    @Data
     public static class Config {
-        // Config properties if needed
+        private String belongServiceName;
     }
 
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            // TODO: add dynamic service name from external properties
-            String serviceName = "user-microservice";
 
-            String baseUrl = getGatewayBaseUrl(serviceName);
+            String baseUrl = getGatewayBaseUrl(config.getBelongServiceName());
             WebClient webClient = webClientBuilder.baseUrl(baseUrl).build();
 
             // Create a dynamic request based on the original HTTP method

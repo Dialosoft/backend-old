@@ -1,3 +1,5 @@
+
+# APP configuration
 app:
   security:
     jwt:
@@ -9,6 +11,9 @@ app:
     - /dialosoft-api/auth/register
     - /dialosoft-api/auth/refresh-token
     - /dialosoft-api/user/test
+
+
+# SPRING configuration
 spring:
   main:
     web-application-type: reactive
@@ -65,6 +70,8 @@ spring:
             - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1
             - name: NonSpringServicesRoutingFilter # For non-spring-boot services
+              args:
+                belongServiceName: user-microservice
         - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
@@ -73,6 +80,8 @@ spring:
             - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1
             - name: NonSpringServicesRoutingFilter
+              args:
+                belongServiceName: user-microservice
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:
@@ -96,7 +105,7 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
 
-# Eureka - Registry Service
+# Eureka client conf - Registry Service
 eureka:
   client:
     transport:
@@ -105,20 +114,24 @@ eureka:
         # sets the maximum header size for Jersey, the HTTP client used by Eureka
         max-header-size: 65536
 
+# SERVER configuration
 server:
   port: 8080
   server:
     max-http-request-header-size: 65536
 
+# LOGGING
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
+    org.springframework.servlet: DEBUG
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.netflix.eureka: DEBUG
     reactor.netty: DEBUG
     org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
 
+# ACTUATOR
 management:
   security:
     enabled: false
@@ -131,3 +144,22 @@ management:
       enabled: true
     health:
       show-details: always
+
+# SWAGGER
+springdoc:
+  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    # Add microservices api-docs urls to expose them in swagger-ui
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service Swagger
+        primaryName: API Gateway Service
+      - url: /auth-service/v3/api-docs
+        name: Auth Service Swagger
+        primaryName: Auth Service Swagger
+        belongServiceName: auth-microservice
