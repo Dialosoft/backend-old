@@ -12,6 +12,7 @@ import com.dialosoft.auth.service.dto.RefreshTokenDto;
 import com.dialosoft.auth.service.dto.RegisterDto;
 import com.dialosoft.auth.service.utils.RoleType;
 import com.dialosoft.auth.web.config.SecurityConfig;
+import com.dialosoft.auth.web.config.error.exception.CustomTemplateException;
 import com.dialosoft.auth.web.config.jwt.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -45,13 +46,7 @@ public class AuthService {
 
         if (userEntityOp.isPresent()) {
 
-            ResponseBody<?> response = ResponseBody.builder()
-                    .statusCode(HttpStatus.CONFLICT.value())
-                    .message("any of the parameters already exists")
-                    .metadata(null)
-                    .build();
-
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            throw new CustomTemplateException("any of the parameters already exists", "Username or email already exists", null, HttpStatus.CONFLICT);
         }
 
         UserEntity newUser;
@@ -69,13 +64,8 @@ public class AuthService {
 
             newUser = userRepository.save(userEntity);
         } catch (Exception e) {
-            ResponseBody response = ResponseBody.builder()
-                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .message("An error occurred while creating the user")
-                    .metadata(null)
-                    .build();
 
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            throw new CustomTemplateException("An error occurred while creating the user", "Internal Server Error", e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         ResponseBody<?> response = ResponseBody.builder()
