@@ -23,6 +23,19 @@ services:
       retries: 5
       start_period: 30s
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "${REDIS_PORT_LOCAL}:6379"
+    networks:
+      - dialosoft-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   registry-service:
     build:
       context: src/registry-service
@@ -70,6 +83,8 @@ services:
       DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+      REDIS_HOST: redis
+      REDIS_PORT_LOCAL: ${REDIS_PORT_LOCAL}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 30s
@@ -127,6 +142,8 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+      REDIS_HOST: redis
+      REDIS_PORT_LOCAL: ${REDIS_PORT_LOCAL}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
