@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.dialosoft.gateway.config.redis.TokenBlacklistService;
 import com.dialosoft.gateway.config.security.dto.RoleDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class JwtUtils {
     private String issuer;
 
     private Algorithm algorithmWithSecret;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @PostConstruct
     public void init() {
@@ -46,6 +48,12 @@ public class JwtUtils {
 
     public boolean isValid(String jwt) {
         try {
+
+            // Check if the token is blacklisted first
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                return false;
+            }
+
             JWTVerifier verifier = JWT.require(algorithmWithSecret).build();
 
             verifier.verify(jwt);

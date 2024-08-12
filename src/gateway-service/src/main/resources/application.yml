@@ -22,7 +22,9 @@ spring:
   devtools:
     restart:
       enabled: false
-
+  redis:
+    host: localhost
+    port: ${REDIS_PORT_LOCAL:6379}
   netty:
     max-initial-line-length: 65536
     max-header-size: 65536

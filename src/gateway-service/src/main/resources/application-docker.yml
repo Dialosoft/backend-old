@@ -1,6 +1,11 @@
 
 # * OVERRIDE PROPS to use
 
+spring:
+  redis:
+    host: redis
+    port: 6379
+
 eureka:
   instance:
     instanceId: ${spring.application.name}:${server.port}
