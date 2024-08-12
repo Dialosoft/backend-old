@@ -27,7 +27,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   redis:
     host: localhost
-    port: 6379
+    port: ${REDIS_PORT_LOCAL:6379}
 
 server:
   port: 8081

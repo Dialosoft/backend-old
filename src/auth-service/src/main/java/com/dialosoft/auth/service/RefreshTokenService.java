@@ -66,4 +66,9 @@ public class RefreshTokenService {
         return true;
     }
 
+    public void deleteRefreshTokenByToken(String token) {
+        refreshTokenRepository.findByRefreshToken(token)
+                .ifPresent(refreshTokenRepository::delete);
+    }
+
 }

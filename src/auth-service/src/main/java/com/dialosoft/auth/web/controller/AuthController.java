@@ -14,10 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -61,4 +59,11 @@ public class AuthController {
     public ResponseEntity<ResponseBody<JwtResponseDTO>> refreshtoken(@Valid @RequestBody RefreshTokenDto request) {
         return authService.refreshTokens(request);
     }
+
+    @GetMapping("/logout")
+    public ResponseEntity<ResponseBody<?>> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader.substring(7);
+        return authService.logout(token);
+    }
+
 }

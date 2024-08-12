@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.dialosoft.auth.service.TokenBlacklistService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ public class JwtUtil {
     private String issuer;
 
     private Algorithm algorithmWithSecret;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @PostConstruct
     public void init() {
@@ -77,6 +79,12 @@ public class JwtUtil {
 
     public boolean isValid(String jwt) {
         try {
+
+            // Check if the token is blacklisted first
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                return false;
+            }
+
             JWTVerifier verifier = JWT.require(algorithmWithSecret)
                     .withIssuer(String.format("%s-service", issuer))
                     .build();

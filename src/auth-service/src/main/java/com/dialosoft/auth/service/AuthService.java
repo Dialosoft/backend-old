@@ -36,6 +36,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final UserSecurityService userSecurityService;
     private final RefreshTokenService refreshTokenService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final SecurityConfig securityConfig;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
@@ -113,13 +114,7 @@ public class AuthService {
 
         } catch (BadCredentialsException e) {
 
-            ResponseBody<?> response = ResponseBody.builder()
-                    .statusCode(HttpStatus.UNAUTHORIZED.value())
-                    .message("Unauthorized")
-                    .metadata(null)
-                    .build();
-
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            throw new CustomTemplateException("Invalid credentials", "Unauthorized", e, HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -150,4 +145,27 @@ public class AuthService {
                 })
                 .orElseThrow(() -> new RuntimeException(String.format("Refresh token: '%s' was not found in our system", refreshTokenDto.getRefreshToken())));
     }
+
+    public ResponseEntity<ResponseBody<?>> logout(String accessToken) {
+        // Get the token user
+        String username = jwtUtil.getUsername(accessToken);
+
+        // Find the refresh token associated with the user
+        RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(username);
+
+        // Save both tokens in the Redis blacklist
+        tokenBlacklistService.addToBlacklist(accessToken, jwtUtil.getExpirationInSeconds(accessToken));
+
+        // Delete the refresh token from the database
+        refreshTokenService.deleteRefreshTokenByToken(refreshToken.getRefreshToken());
+
+        ResponseBody<?> response = ResponseBody.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Logout successfully")
+                .metadata(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }
