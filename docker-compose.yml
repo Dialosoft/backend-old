@@ -26,10 +26,16 @@ services:
   redis:
     image: redis:latest
     container_name: redis
+    env_file:
+      - .env
+    environment:
+      REDIS_PORT: 6379
     ports:
       - "${REDIS_PORT_LOCAL}:6379"
     networks:
       - dialosoft-network
+    volumes:
+      - dialosoft-redis-data:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 30s
@@ -154,6 +160,9 @@ services:
 volumes:
   dialosoft-db-data:
     name: dialosoft-db-data
+    driver: local
+  dialosoft-redis-data:
+    name: dialosoft-redis-data
     driver: local
 
 networks:
