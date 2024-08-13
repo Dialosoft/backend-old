@@ -2,6 +2,8 @@ app:
   security:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
+      access-token-expiration: 10
+      refresh-token-expiration: 60
 
 logging:
   level:
@@ -9,6 +11,7 @@ logging:
       springframework:
         web: DEBUG
         servlet: DEBUG
+        data.redis: DEBUG
 
 spring:
   application:
@@ -25,9 +28,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  redis:
-    host: localhost
-    port: ${REDIS_PORT_LOCAL:6379}
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT_LOCAL:6379}
 
 server:
   port: 8081

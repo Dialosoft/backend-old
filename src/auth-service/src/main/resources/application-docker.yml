@@ -1,9 +1,10 @@
 
 
 spring:
-  redis:
-    host: redis
-    port: 6379
+  data:
+    redis:
+      host: redis
+      port: 6379
 
 eureka:
   instance:

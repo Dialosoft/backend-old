@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -60,9 +61,25 @@ public class AuthController {
         return authService.refreshTokens(request);
     }
 
+    @Operation(
+            summary = "Logs out the user by invalidating the JWT token",
+            description = "This endpoint logs out the user by invalidating the provided JWT token.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logout successful",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseBody.class))),
+            @ApiResponse(responseCode = "400", description = "Bad Request - The token is missing or invalid",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Access is denied",
+                    content = @Content)
+    })
     @GetMapping("/logout")
     public ResponseEntity<ResponseBody<?>> logout(@RequestHeader("Authorization") String authorizationHeader) {
-        String token = authorizationHeader.substring(7);
+        String token = authorizationHeader.substring(7); // Extract the token from the Authorization header
         return authService.logout(token);
     }
 

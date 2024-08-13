@@ -27,6 +27,12 @@ public class JwtUtil {
     @Value("${spring.application.name}")
     private String issuer;
 
+    @Value("${app.security.jwt.access-token-expiration}")
+    private Long accessTokenExpiration;
+
+    @Value("${app.security.jwt.refresh-token-expiration}")
+    private Long refreshTokenExpiration;
+
     private Algorithm algorithmWithSecret;
     private final TokenBlacklistService tokenBlacklistService;
 
@@ -38,13 +44,13 @@ public class JwtUtil {
     public String generateAccessToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return createToken(username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
-                TimeUnit.MINUTES.toMillis(5));
+                TimeUnit.MINUTES.toMillis(accessTokenExpiration));
     }
 
     public String generateRefreshToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return createToken(username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
-                TimeUnit.MINUTES.toMillis(5));
+                TimeUnit.MINUTES.toMillis(refreshTokenExpiration));
     }
 
     public String createToken(String username, List<String> roles, long expiredTime) {
