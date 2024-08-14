@@ -12,6 +12,7 @@ import com.dialosoft.auth.service.dto.RefreshTokenDto;
 import com.dialosoft.auth.service.dto.RegisterDto;
 import com.dialosoft.auth.service.utils.RoleType;
 import com.dialosoft.auth.web.config.SecurityConfig;
+import com.dialosoft.auth.web.config.error.exception.CustomTemplateException;
 import com.dialosoft.auth.web.config.jwt.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final UserSecurityService userSecurityService;
     private final RefreshTokenService refreshTokenService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final SecurityConfig securityConfig;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
@@ -45,13 +47,7 @@ public class AuthService {
 
         if (userEntityOp.isPresent()) {
 
-            ResponseBody<?> response = ResponseBody.builder()
-                    .statusCode(HttpStatus.CONFLICT.value())
-                    .message("any of the parameters already exists")
-                    .metadata(null)
-                    .build();
-
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            throw new CustomTemplateException("any of the parameters already exists", "Username or email already exists", null, HttpStatus.CONFLICT);
         }
 
         UserEntity newUser;
@@ -69,13 +65,8 @@ public class AuthService {
 
             newUser = userRepository.save(userEntity);
         } catch (Exception e) {
-            ResponseBody response = ResponseBody.builder()
-                    .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .message("An error occurred while creating the user")
-                    .metadata(null)
-                    .build();
 
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            throw new CustomTemplateException("An error occurred while creating the user", "Internal Server Error", e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         ResponseBody<?> response = ResponseBody.builder()
@@ -100,10 +91,12 @@ public class AuthService {
             if (authentication.isAuthenticated()) {
 
                 String accessToken = jwtUtil.generateAccessToken(loginDto.getUsername(), authentication.getAuthorities());
+                Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
                 RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(loginDto.getUsername());
 
                 JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
                         .accessToken(accessToken)
+                        .accessTokenExpiresInSeconds(accessTokenExpiresInSeconds)
                         .refreshToken(refreshToken.getRefreshToken())
                         .build();
 
@@ -121,13 +114,7 @@ public class AuthService {
 
         } catch (BadCredentialsException e) {
 
-            ResponseBody<?> response = ResponseBody.builder()
-                    .statusCode(HttpStatus.UNAUTHORIZED.value())
-                    .message("Unauthorized")
-                    .metadata(null)
-                    .build();
-
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            throw new CustomTemplateException("Invalid credentials", "Unauthorized", e, HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -141,9 +128,11 @@ public class AuthService {
                     String username = userInfo.getUsername();
                     UserDetails userDetails = userSecurityService.loadUserByUsername(username);
                     String accessToken = jwtUtil.generateAccessToken(username, userDetails.getAuthorities());
+                    Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
 
                     JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
                             .accessToken(accessToken)
+                            .accessTokenExpiresInSeconds(accessTokenExpiresInSeconds)
                             .refreshToken(refreshTokenDto.getRefreshToken()).build();
 
                     ResponseBody<JwtResponseDTO> response = ResponseBody.<JwtResponseDTO>builder()
@@ -156,4 +145,27 @@ public class AuthService {
                 })
                 .orElseThrow(() -> new RuntimeException(String.format("Refresh token: '%s' was not found in our system", refreshTokenDto.getRefreshToken())));
     }
+
+    public ResponseEntity<ResponseBody<?>> logout(String accessToken) {
+        // Get the token user
+        String username = jwtUtil.getUsername(accessToken);
+
+        // Find the refresh token associated with the user
+        RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(username);
+
+        // Save both tokens in the Redis blacklist
+        tokenBlacklistService.addToBlacklist(accessToken, jwtUtil.getExpirationInSeconds(accessToken));
+
+        // Delete the refresh token from the database
+        refreshTokenService.deleteRefreshTokenByToken(refreshToken.getRefreshToken());
+
+        ResponseBody<?> response = ResponseBody.builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Logout successfully")
+                .metadata(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

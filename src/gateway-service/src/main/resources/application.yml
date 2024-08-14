@@ -22,7 +22,10 @@ spring:
   devtools:
     restart:
       enabled: false
-
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT_LOCAL:6379}
   netty:
     max-initial-line-length: 65536
     max-header-size: 65536
@@ -130,6 +133,7 @@ logging:
     org.springframework.cloud.netflix.eureka: DEBUG
     reactor.netty: DEBUG
     org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
+    org.springframework.data.redis: DEBUG
 
 # ACTUATOR
 management:
