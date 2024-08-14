@@ -1,0 +1,12 @@
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+      # Configure the wait time between reboots
+      poll-interval: 1000
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

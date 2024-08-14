@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:latest
+    container_name: database
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DATASOURCE_DB}
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
+    ports:
+      - "${DATASOURCE_PORT_LOCAL}:${DATASOURCE_PORT}"
+    networks:
+      - dialosoft-network
+    volumes:
+      - dialosoft-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dialosoft_user} -d ${DB_NAME:-dialosoft}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  registry-service:
+    build:
+      context: src/registry-service
+    container_name: registry-service
+    image: dialosoft-registry-eureka:v1.0
+    env_file:
+      - .env
+    ports:
+      - "8761:8761"
+    depends_on:
+      - database
+    networks:
+      - dialosoft-network
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Registry Service ready to start' && tail -f /dev/null"]
+
+  auth-service:
+    build:
+      context: src/auth-service
+    container_name: auth-service
+    image: dialosoft-auth-service:v1.0
+    ports:
+      - "8081:8081"
+      - "5006:5005"
+    depends_on:
+      - database
+      - registry-service
+    networks:
+      - dialosoft-network
+    env_file:
+      - .env
+    environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_PROFILES_ACTIVE: docker
+      DATASOURCE_HOST: ${DATASOURCE_HOST}
+      DATASOURCE_PORT: ${DATASOURCE_PORT}
+      DATASOURCE_DB: ${DATASOURCE_DB}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
+
+  user-service:
+   build:
+     context: src/user-service
+   container_name: user-service
+   image: dialosoft-user-service:v1.0
+   ports:
+     - "8086:8086"
+     - "5007:5005"
+   depends_on:
+     - registry-service
+   networks:
+     - dialosoft-network
+   env_file:
+     - .env
+   environment:
+     DATASOURCE_HOST: ${DATASOURCE_HOST}
+     DATASOURCE_PORT: 5432
+     DATASOURCE_DB: ${DATASOURCE_DB}
+     DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+     DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#    command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
+
+
+  gateway-service:
+    build:
+      context: src/gateway-service
+    container_name: gateway-service
+    image: dialosoft-gateway:v1.0
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    depends_on:
+      - registry-service
+      - user-service
+      - auth-service
+    networks:
+      - dialosoft-network
+    env_file:
+      - .env
+    environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
+
+volumes:
+  dialosoft-db-data:
+    name: dialosoft-db-data
+    driver: local
+
+networks:
+  dialosoft-network:
+    driver: bridge

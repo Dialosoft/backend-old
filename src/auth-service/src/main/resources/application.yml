@@ -1,0 +1,55 @@
+app:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        servlet: DEBUG
+
+spring:
+  application:
+    name: auth-microservice
+  datasource:
+    url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DB}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  redis:
+    host: localhost
+    port: 6379
+
+server:
+  port: 8081
+
+# Eureka client config - Registry Service
+eureka:
+  client:
+    fetchRegistry: true
+    registryFetchIntervalSeconds: 5
+
+
+# OPENAPI
+openapi:
+  service:
+    title: auth-microservice documentation
+    version: 1.0.0
+
+# SWAGGER
+springdoc:
+  api-docs:
+    enabled: true
+    path: /auth-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /auth-service/swagger-ui.html
