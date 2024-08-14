@@ -8,6 +8,7 @@ import (
 	"github.com/Dialosoft/user-service/src/domain/entities/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func GetUserInfo(c *gin.Context, userService services.UserService) {
@@ -20,9 +21,28 @@ func GetUserInfo(c *gin.Context, userService services.UserService) {
 		res.Message = "BAD REQUEST"
 		res.Data = nil
 		c.JSON(http.StatusBadRequest, res)
+		return
 	}
 
-	userService.GetUser(username)
+	user, err := userService.GetUser(username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			res.StatusCode = http.StatusNotFound
+			res.Message = "NOT FOUND"
+			res.Data = nil
+			c.JSON(http.StatusNotFound, res)
+		} else {
+			res.StatusCode = http.StatusInternalServerError
+			res.Message = err.Error()
+			res.Data = nil
+			c.JSON(http.StatusInternalServerError, res)
+		}
+		return
+	}
+
+	user.Password = ""
+
+	c.JSON(http.StatusOK, &user)
 }
 
 func ChangeEmailController(c *gin.Context, userService services.UserService) {
@@ -47,10 +67,17 @@ func ChangeEmailController(c *gin.Context, userService services.UserService) {
 	}
 
 	if err := userService.ChangeEmail(userID, req.NewEmail); err != nil {
-		res.StatusCode = http.StatusInternalServerError
-		res.Message = err.Error()
-		res.Data = nil
-		c.JSON(http.StatusInternalServerError, res)
+		if err == gorm.ErrRecordNotFound {
+			res.StatusCode = http.StatusNotFound
+			res.Message = "NOT FOUND"
+			res.Data = nil
+			c.JSON(http.StatusNotFound, res)
+		} else {
+			res.StatusCode = http.StatusInternalServerError
+			res.Message = err.Error()
+			res.Data = nil
+			c.JSON(http.StatusInternalServerError, res)
+		}
 		return
 	}
 

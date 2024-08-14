@@ -13,6 +13,7 @@ import (
 	"github.com/Dialosoft/user-service/src/adapters/repositories"
 	"github.com/Dialosoft/user-service/src/domain/entities"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type userServiceImpl struct {
@@ -30,7 +31,11 @@ func (s *userServiceImpl) GetUser(username string) (*entities.User, error) {
 
 	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
-		return nil, err
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("user not found")
+		} else {
+			return nil, err
+		}
 	}
 
 	return user, nil
@@ -43,7 +48,11 @@ func (s *userServiceImpl) ChangeEmail(userID uuid.UUID, newMail string) error {
 
 	user, err := s.userRepo.FindByID(userID)
 	if err != nil {
-		return err
+		if err == gorm.ErrRecordNotFound {
+			return errors.New("user not found")
+		} else {
+			return err
+		}
 	}
 
 	user.Email = newMail
