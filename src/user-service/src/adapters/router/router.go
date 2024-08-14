@@ -25,6 +25,7 @@ func (r *Router) SetupRoutes() *gin.Engine {
 	userService.Static("/avatars", "./avatars")
 	userService.PUT("/change-email", r.handleChangeEmail)
 	userService.PUT("/change-avatar", r.handleChangeAvatar)
+	userService.GET("/get-info/{username}")
 
 	userService.GET("/test", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "hello!"})

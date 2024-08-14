@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/Dialosoft/user-service/src/adapters/repositories"
+	"github.com/Dialosoft/user-service/src/domain/entities"
 	"github.com/google/uuid"
 )
 
@@ -20,6 +21,19 @@ type userServiceImpl struct {
 
 func NewUserService(userRepo repositories.UserRepository) UserService {
 	return &userServiceImpl{userRepo: userRepo}
+}
+
+func (s *userServiceImpl) GetUser(username string) (*entities.User, error) {
+	if username == "" {
+		return nil, errors.New("any of the parameters cannot be empty")
+	}
+
+	user, err := s.userRepo.FindByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *userServiceImpl) ChangeEmail(userID uuid.UUID, newMail string) error {

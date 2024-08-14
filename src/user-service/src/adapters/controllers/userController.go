@@ -10,6 +10,21 @@ import (
 	"github.com/google/uuid"
 )
 
+func GetUserInfo(c *gin.Context, userService services.UserService) {
+	var token string
+	var res response.Standard
+
+	token = c.GetHeader("Authorization")
+	if token == "" {
+		res.StatusCode = http.StatusBadRequest
+		res.Message = "BAD REQUEST"
+		res.Data = nil
+		c.JSON(http.StatusBadRequest, res)
+	}
+
+	userService.GetUser()
+}
+
 func ChangeEmailController(c *gin.Context, userService services.UserService) {
 	var req request.Email
 	var res response.Standard
