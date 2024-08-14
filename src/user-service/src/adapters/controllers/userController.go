@@ -11,18 +11,18 @@ import (
 )
 
 func GetUserInfo(c *gin.Context, userService services.UserService) {
-	var token string
+	var username string
 	var res response.Standard
 
-	token = c.GetHeader("Authorization")
-	if token == "" {
+	username = c.GetHeader("X-Auth-Username")
+	if username == "" {
 		res.StatusCode = http.StatusBadRequest
 		res.Message = "BAD REQUEST"
 		res.Data = nil
 		c.JSON(http.StatusBadRequest, res)
 	}
 
-	userService.GetUser()
+	userService.GetUser(username)
 }
 
 func ChangeEmailController(c *gin.Context, userService services.UserService) {
