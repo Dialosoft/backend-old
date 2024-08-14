@@ -32,20 +32,6 @@ public class JwtUtils {
         this.algorithmWithSecret = Algorithm.HMAC256(secretKey);
     }
 
-    public String createToken(String username, List<String> roles, long expiredTime) {
-        // helps to identify token together with username
-        String uuid = UUID.randomUUID().toString();
-
-        return JWT.create()
-                .withJWTId(uuid)
-                .withSubject(username)
-                .withArrayClaim("role", roles.toArray(new String[0]))
-                .withIssuer(String.format("%s-service", issuer))
-                .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withExpiresAt(new Date(System.currentTimeMillis() + expiredTime))
-                .sign(algorithmWithSecret);
-    }
-
     public boolean isValid(String jwt) {
         try {
 
@@ -68,6 +54,14 @@ public class JwtUtils {
         return JWT.require(algorithmWithSecret)
                 .build()
                 .verify(jwt).getSubject();
+    }
+
+    public String getUserId(String jwt) {
+        return JWT.require(algorithmWithSecret)
+                .build()
+                .verify(jwt)
+                .getClaim("userId")
+                .asString();
     }
 
     public List<String> getRolesAsString(String jwt) {

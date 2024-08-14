@@ -30,6 +30,7 @@ public class AuthUtils {
         exchange.getRequest().mutate()
                 .header("roles", String.join(",", roles))
                 .header("X-Auth-Username", jwtUtils.getUsername(token))
+                .header("X-Auth-UserId", jwtUtils.getUserId(token))
                 .build();
     }
 

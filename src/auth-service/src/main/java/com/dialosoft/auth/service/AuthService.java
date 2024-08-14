@@ -90,7 +90,9 @@ public class AuthService {
 
             if (authentication.isAuthenticated()) {
 
-                String accessToken = jwtUtil.generateAccessToken(loginDto.getUsername(), authentication.getAuthorities());
+                UserEntity userEntity = userSecurityService.getUserByUserName(loginDto.getUsername());
+
+                String accessToken = jwtUtil.generateAccessToken(userEntity.getId(), loginDto.getUsername(), authentication.getAuthorities());
                 Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
                 RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(loginDto.getUsername());
 
@@ -125,9 +127,8 @@ public class AuthService {
                 .map(RefreshToken::getUser)
                 .map(userInfo -> {
 
-                    String username = userInfo.getUsername();
-                    UserDetails userDetails = userSecurityService.loadUserByUsername(username);
-                    String accessToken = jwtUtil.generateAccessToken(username, userDetails.getAuthorities());
+                    UserDetails userDetails = userSecurityService.loadUserByUsername(userInfo.getUsername());
+                    String accessToken = jwtUtil.generateAccessToken(userInfo.getId(), userInfo.getUsername(), userDetails.getAuthorities());
                     Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
 
                     JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
