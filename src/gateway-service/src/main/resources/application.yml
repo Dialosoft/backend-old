@@ -1,3 +1,5 @@
+
+# APP configuration
 app:
   security:
     jwt:
@@ -5,10 +7,13 @@ app:
   # Open non-secured endpoints for the gateway
   openApiEndpoints:
     - /actuator
-    - /biznetbb-api/auth/login
-    - /biznetbb-api/auth/register
-    - /biznetbb-api/auth/refresh-token
-    - /biznetbb-api/user/test
+    - /dialosoft-api/auth/login
+    - /dialosoft-api/auth/register
+    - /dialosoft-api/auth/refresh-token
+    - /dialosoft-api/user/test
+
+
+# SPRING configuration
 spring:
   main:
     web-application-type: reactive
@@ -17,7 +22,10 @@ spring:
   devtools:
     restart:
       enabled: false
-
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT_LOCAL:6379}
   netty:
     max-initial-line-length: 65536
     max-header-size: 65536
@@ -42,10 +50,10 @@ spring:
         - id: auth_service_hello_world_route
           uri: lb://auth-microservice/
           predicates:
-            - Path=/biznetbb-api/hello-world
+            - Path=/dialosoft-api/hello-world
           filters:
             - AddRequestHeader=X-Request-Service, auth-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1 # remove '/dialosoft-api' before send request to the down service
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:
@@ -53,26 +61,30 @@ spring:
         - id: auth_service_routes
           uri: lb://auth-microservice/
           predicates:
-            - Path=/biznetbb-api/auth/**
+            - Path=/dialosoft-api/auth/**
           filters:
             - AddRequestHeader=X-Request-Service, auth-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1
         - id: user_test_service_route
           uri: lb://user-microservice/
           predicates:
-            - Path=/biznetbb-api/user-service/test
+            - Path=/dialosoft-api/user-service/test
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1
             - name: NonSpringServicesRoutingFilter # For non-spring-boot services
+              args:
+                belongServiceName: user-microservice
         - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
-            - Path=/biznetbb-api/user-service/**
+            - Path=/dialosoft-api/user-service/**
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+            - StripPrefix=1
             - name: NonSpringServicesRoutingFilter
+              args:
+                belongServiceName: user-microservice
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:
@@ -81,10 +93,10 @@ spring:
 #        - id: other_service_routes
 #          uri: lb://other-microservice/
 #          predicates:
-#            - Path=/biznetbb-api/other/**
+#            - Path=/dialosoft-api/other/**
 #          filters:
 #            - AddRequestHeader=X-Request-Service, auth-microservice
-#            - StripPrefix=1 # remove '/biznetbb-api' before send request to auth-service
+#            - StripPrefix=1 # remove '/dialosoft-api' before send request to auth-service
 #            - name: JwtAuthenticationFilter
 #            - name: RoleBasedAuthorizationFilter
 #              args:
@@ -96,7 +108,7 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
 
-# Eureka - Registry Service
+# Eureka client conf - Registry Service
 eureka:
   client:
     transport:
@@ -105,20 +117,25 @@ eureka:
         # sets the maximum header size for Jersey, the HTTP client used by Eureka
         max-header-size: 65536
 
+# SERVER configuration
 server:
   port: 8080
   server:
     max-http-request-header-size: 65536
 
+# LOGGING
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
+    org.springframework.servlet: DEBUG
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.netflix.eureka: DEBUG
     reactor.netty: DEBUG
     org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
+    org.springframework.data.redis: DEBUG
 
+# ACTUATOR
 management:
   security:
     enabled: false
@@ -131,3 +148,22 @@ management:
       enabled: true
     health:
       show-details: always
+
+# SWAGGER
+springdoc:
+  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    # Add microservices api-docs urls to expose them in swagger-ui
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service Swagger
+        primaryName: API Gateway Service
+      - url: /auth-service/v3/api-docs
+        name: Auth Service Swagger
+        primaryName: Auth Service Swagger
+        belongServiceName: auth-microservice

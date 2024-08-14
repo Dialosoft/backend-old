@@ -2,6 +2,16 @@ app:
   security:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
+      access-token-expiration: 10
+      refresh-token-expiration: 60
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        servlet: DEBUG
+        data.redis: DEBUG
 
 spring:
   application:
@@ -18,15 +28,32 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  redis:
-    host: localhost
-    port: 6379
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT_LOCAL:6379}
 
 server:
   port: 8081
 
-# Eureka - Registry Service
+# Eureka client config - Registry Service
 eureka:
   client:
     fetchRegistry: true
     registryFetchIntervalSeconds: 5
+
+
+# OPENAPI
+openapi:
+  service:
+    title: auth-microservice documentation
+    version: 1.0.0
+
+# SWAGGER
+springdoc:
+  api-docs:
+    enabled: true
+    path: /auth-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /auth-service/swagger-ui.html
