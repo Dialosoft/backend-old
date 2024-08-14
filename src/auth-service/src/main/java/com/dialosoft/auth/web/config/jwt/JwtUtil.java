@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.dialosoft.auth.service.TokenBlacklistService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,14 @@ public class JwtUtil {
     @Value("${spring.application.name}")
     private String issuer;
 
+    @Value("${app.security.jwt.access-token-expiration}")
+    private Long accessTokenExpiration;
+
+    @Value("${app.security.jwt.refresh-token-expiration}")
+    private Long refreshTokenExpiration;
+
     private Algorithm algorithmWithSecret;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @PostConstruct
     public void init() {
@@ -36,13 +44,13 @@ public class JwtUtil {
     public String generateAccessToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return createToken(username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
-                TimeUnit.MINUTES.toMillis(5));
+                TimeUnit.MINUTES.toMillis(accessTokenExpiration));
     }
 
     public String generateRefreshToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return createToken(username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
-                TimeUnit.MINUTES.toMillis(5));
+                TimeUnit.MINUTES.toMillis(refreshTokenExpiration));
     }
 
     public String createToken(String username, List<String> roles, long expiredTime) {
@@ -59,8 +67,30 @@ public class JwtUtil {
                 .sign(algorithmWithSecret);
     }
 
+    public Long getExpirationInSeconds(String jwt) {
+        try {
+            Date expiresAt = JWT.require(algorithmWithSecret)
+                    .build()
+                    .verify(jwt)
+                    .getExpiresAt();
+
+            long currentTimeMillis = System.currentTimeMillis();
+            long expiresInMillis = expiresAt.getTime() - currentTimeMillis;
+
+            return TimeUnit.MILLISECONDS.toSeconds(expiresInMillis);
+        } catch (JWTVerificationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean isValid(String jwt) {
         try {
+
+            // Check if the token is blacklisted first
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                return false;
+            }
+
             JWTVerifier verifier = JWT.require(algorithmWithSecret)
                     .withIssuer(String.format("%s-service", issuer))
                     .build();
