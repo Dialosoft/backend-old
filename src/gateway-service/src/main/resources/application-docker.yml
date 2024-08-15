@@ -1,0 +1,16 @@
+
+# * OVERRIDE PROPS to use
+
+spring:
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+eureka:
+  instance:
+    instanceId: ${spring.application.name}:${server.port}
+#    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://registry-service:8761/eureka/}

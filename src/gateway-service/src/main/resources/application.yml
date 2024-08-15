@@ -1,41 +1,169 @@
+
+# APP configuration
+app:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+  # Open non-secured endpoints for the gateway
+  openApiEndpoints:
+    - /actuator
+    - /dialosoft-api/auth/login
+    - /dialosoft-api/auth/register
+    - /dialosoft-api/auth/refresh-token
+    - /dialosoft-api/user/test
+
+
+# SPRING configuration
 spring:
+  main:
+    web-application-type: reactive
   application:
-    name: gateway
+    name: gateway-microservice
+  devtools:
+    restart:
+      enabled: false
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT_LOCAL:6379}
+  netty:
+    max-initial-line-length: 65536
+    max-header-size: 65536
+    max-chunk-size: 65536
+#  docker:
+#    compose:
+#      enabled: true
+#      file: ./docker-compose.yml
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      httpclient:
+        max-header-size: 65536 # max allowed size of header
       routes:
-        - id: auth_service
-          uri: lb://auth
+        - id: actuator_route
+          uri: http://localhost:${server.port}
           predicates:
-            - Path=/bizznetbb/auth/**
-        - id: other_service
-          uri: lb://OTHER-SERVICE
+            - Path=/actuator/**
+        - id: auth_service_hello_world_route
+          uri: lb://auth-microservice/
           predicates:
-            - Path=/other/**
+            - Path=/dialosoft-api/hello-world
           filters:
-            - JwtAuthFilter
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1 # remove '/dialosoft-api' before send request to the down service
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                  requiredRoles: ROLE_USER
+        - id: auth_service_routes
+          uri: lb://auth-microservice/
+          predicates:
+            - Path=/dialosoft-api/auth/**
+          filters:
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1
+        - id: user_test_service_route
+          uri: lb://user-microservice/
+          predicates:
+            - Path=/dialosoft-api/user-service/test
+          filters:
+            - AddRequestHeader=X-Request-Service, user-microservice
+            - StripPrefix=1
+            - name: NonSpringServicesRoutingFilter # For non-spring-boot services
+              args:
+                belongServiceName: user-microservice
+        - id: user_service_routes
+          uri: lb://user-microservice/
+          predicates:
+            - Path=/dialosoft-api/user-service/**
+          filters:
+            - AddRequestHeader=X-Request-Service, user-microservice
+            - StripPrefix=1
+            - name: NonSpringServicesRoutingFilter
+              args:
+                belongServiceName: user-microservice
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                requiredRoles: ROLE_USER
+        # * Other service template
+#        - id: other_service_routes
+#          uri: lb://other-microservice/
+#          predicates:
+#            - Path=/dialosoft-api/other/**
+#          filters:
+#            - AddRequestHeader=X-Request-Service, auth-microservice
+#            - StripPrefix=1 # remove '/dialosoft-api' before send request to auth-service
+#            - name: JwtAuthenticationFilter
+#            - name: RoleBasedAuthorizationFilter
+#              args:
+#                requiredRoles: ROLE_USER # You can omit this, by default is ROLE_USER
       globalcors:
         corsConfigurations:
           '[/**]':
             allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
+            allowedMethods: "*"
+            allowedHeaders: "*"
 
+# Eureka client conf - Registry Service
 eureka:
   client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    transport:
+      # Jersey HTTP client, which is the default transport client used by EurekaClient for HTTP communication
+      jersey:
+        # sets the maximum header size for Jersey, the HTTP client used by Eureka
+        max-header-size: 65536
 
+# SERVER configuration
 server:
   port: 8080
-  servlet:
-        context-path: /bizznetbb-api/
+  server:
+    max-http-request-header-size: 65536
+
+# LOGGING
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
+    org.springframework.servlet: DEBUG
     org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.netflix.eureka: DEBUG
+    reactor.netty: DEBUG
+    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
+    org.springframework.data.redis: DEBUG
+
+# ACTUATOR
+management:
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
+
+# SWAGGER
+springdoc:
+  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    # Add microservices api-docs urls to expose them in swagger-ui
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service Swagger
+        primaryName: API Gateway Service
+      - url: /auth-service/v3/api-docs
+        name: Auth Service Swagger
+        primaryName: Auth Service Swagger
+        belongServiceName: auth-microservice
