@@ -1,8 +1,8 @@
 package com.dialosoft.postmanager.mapper;
 
-import com.dialosoft.postmanager.models.Comments;
+import com.dialosoft.postmanager.models.dto.Comments;
 import com.dialosoft.postmanager.models.entities.CommentsEntity;
-import com.dialosoft.postmanager.models.web.request.CreateCommentRequest;
+import com.dialosoft.postmanager.models.web.request.CreateCommentCommonAttributes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public interface CommentsMapper {
     @Mapping(source = "username", target = "username")
     @Mapping(source = "content", target = "content")
-    CommentsEntity toEntity(CreateCommentRequest comments);
+    CommentsEntity toEntity(CreateCommentCommonAttributes comments);
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "content", target = "content")

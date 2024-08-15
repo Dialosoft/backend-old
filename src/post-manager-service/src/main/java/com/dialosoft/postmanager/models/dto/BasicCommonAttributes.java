@@ -1,5 +1,4 @@
-package com.dialosoft.postmanager.models;
-
+package com.dialosoft.postmanager.models.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +8,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Comments {
+public class BasicCommonAttributes {
+    String id;
     String username;
     String content;
 }

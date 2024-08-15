@@ -1,6 +1,6 @@
 package com.dialosoft.postmanager.controller;
 
-import com.dialosoft.postmanager.models.web.request.PostManagerRequest;
+import com.dialosoft.postmanager.models.web.request.PostManagerCommonAttributes;
 import com.dialosoft.postmanager.models.web.response.PostManagerResponse;
 import com.dialosoft.postmanager.services.PostManagerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +35,7 @@ public class PostManagerController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
     })
     @PostMapping("create-post")
-    public void createPost(@RequestBody PostManagerRequest request) {
+    public void createPost(@RequestBody PostManagerCommonAttributes request) {
         service.CreateNewPost(request);
     }
 
@@ -51,6 +51,7 @@ public class PostManagerController {
     })
     @DeleteMapping("delete-post/{id}")
     public void deletePost(@PathVariable String id) {
+
         service.DeletePost(id);
     }
 
@@ -66,7 +67,7 @@ public class PostManagerController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
     })
     @PutMapping("modify-post")
-    public void modifyPost(@RequestBody PostManagerRequest request) {
+    public void modifyPost(@RequestBody PostManagerCommonAttributes request) {
         service.ModifiedPost(request);
     }
 
@@ -82,7 +83,7 @@ public class PostManagerController {
     })
     @GetMapping("get-post/{id}")
     public PostManagerResponse getSinglePost(@PathVariable String id) {
-        return service.GetPost(id);
+       return service.GetPost(id);
     }
 
     @Operation(
@@ -97,6 +98,8 @@ public class PostManagerController {
     })
     @GetMapping("get-post-from-id")
     public List<PostManagerResponse> getAllPostFromUser(@RequestParam String username) {
-        return service.GetMultiPost(username);
+       return service.GetMultiPost(username);
     }
+
+
 }
