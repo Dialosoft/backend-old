@@ -1,6 +1,7 @@
 package com.biznetbb.postmanager.controller;
 
 import com.biznetbb.postmanager.models.web.request.CreateCommentCommonAttributes;
+import com.biznetbb.postmanager.models.web.request.CreateReactionCommonAttributes;
 import com.biznetbb.postmanager.services.InteractionsPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +26,9 @@ public class InteractionPostController {
         service.deleteComment(id);
     }
 
-    @PostMapping("/add-reaction")
-    void postReaction(@RequestBody CreateCommentCommonAttributes request){
-        service.createComment(request);
+    @PostMapping("/create-reaction")
+    void postReaction(@RequestBody CreateReactionCommonAttributes request){
+        service.createReaction(request);
     }
 
     @PutMapping("/modify-reaction")

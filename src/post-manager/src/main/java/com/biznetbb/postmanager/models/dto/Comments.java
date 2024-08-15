@@ -10,5 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comments extends BasicCommonAttributes{
-
+    Integer positiveReaction;
+    Integer negativeReaction;
 }

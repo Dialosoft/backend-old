@@ -17,4 +17,6 @@ public class PostManagerResponse {
     String image;
     List<Comments> comments;
     String postId;
+    Integer positiveReaction;
+    Integer negativeReaction;
 }

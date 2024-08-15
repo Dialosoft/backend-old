@@ -3,7 +3,6 @@ package com.biznetbb.postmanager.services.impl;
 import com.biznetbb.postmanager.mapper.CommentsMapper;
 import com.biznetbb.postmanager.models.entities.CommentsEntity;
 import com.biznetbb.postmanager.models.entities.PostEntity;
-import com.biznetbb.postmanager.models.entities.ReactionsEntity;
 import com.biznetbb.postmanager.models.web.request.CreateCommentCommonAttributes;
 import com.biznetbb.postmanager.models.web.request.CreateReactionCommonAttributes;
 import com.biznetbb.postmanager.repository.CommentsRepository;
@@ -13,6 +12,7 @@ import com.biznetbb.postmanager.services.InteractionsPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,7 +20,6 @@ import java.util.UUID;
 public class InteractionPostServiceImpl implements InteractionsPostService {
     private final CommentsRepository commentsRepository;
     private final PostManagerRepository postManagerRepository;
-    private final ReactionsRepository reactionsRepository;
     private final CommentsMapper commentsMapper;
 
 
@@ -76,10 +75,32 @@ public class InteractionPostServiceImpl implements InteractionsPostService {
 
     @Override
     public void createReaction(CreateReactionCommonAttributes request) {
-        ReactionsEntity reactionsEntity = new ReactionsEntity();
-       // reactionsEntity.setPost();
-       // reactionsEntity.s
-       //  reactionsRepository.save()
+
+        if(request.getPostId()!= null && !request.getPostId().isEmpty()){
+            Optional<PostEntity> postEntity =  postManagerRepository.findById(UUID.fromString(request.getPostId()));
+            int precedentPositivePostCount = postEntity.get().getPositiveReaction() != null ? postEntity.get().getPositiveReaction() : 0;
+            int precedentNegativePostCount = postEntity.get().getNegativeReaction()!= null ? postEntity.get().getNegativeReaction() : 0;
+          if (request.getReaction()){
+              postEntity.get().setPositiveReaction(precedentPositivePostCount + 1);
+          }
+          if(!request.getReaction()){
+              postEntity.get().setNegativeReaction(precedentNegativePostCount + 1);
+          }
+            postManagerRepository.save(postEntity.get());
+        }
+        if(request.getCommentId() != null && !request.getCommentId().isEmpty()){
+            Optional<CommentsEntity> comment =  commentsRepository.findById(UUID.fromString(request.getCommentId()));
+            int precedentPositiveCommentCount = comment.get().getPositiveReaction() != null ? comment.get().getPositiveReaction() : 0;
+            int precedentNegativeCommentCount = comment.get().getNegativeReaction()!= null ? comment.get().getNegativeReaction() : 0;
+            if (request.getReaction()){
+                comment.get().setPositiveReaction(precedentPositiveCommentCount + 1);
+            }
+            if(!request.getReaction()){
+                comment.get().setNegativeReaction(precedentNegativeCommentCount + 1);
+            }
+            commentsRepository.save(comment.get());
+        }
+
     }
 
     @Override
