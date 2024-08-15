@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -19,4 +20,5 @@ public class PostManagerResponse {
     String postId;
     Integer positiveReaction;
     Integer negativeReaction;
+    LocalDateTime creationTime;
 }

@@ -7,11 +7,11 @@ import com.biznetbb.postmanager.models.web.request.CreateCommentCommonAttributes
 import com.biznetbb.postmanager.models.web.request.CreateReactionCommonAttributes;
 import com.biznetbb.postmanager.repository.CommentsRepository;
 import com.biznetbb.postmanager.repository.PostManagerRepository;
-import com.biznetbb.postmanager.repository.ReactionsRepository;
 import com.biznetbb.postmanager.services.InteractionsPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +32,7 @@ public class InteractionPostServiceImpl implements InteractionsPostService {
         CommentsEntity entity = commentsMapper.toEntity(request);
 
         entity.setPost(post);
+        entity.setCreationTime(LocalDateTime.now());
         commentsRepository.save(entity);
 
         post.getComments().add(entity);

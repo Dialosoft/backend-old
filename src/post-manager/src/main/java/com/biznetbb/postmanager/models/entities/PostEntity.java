@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,4 +35,6 @@ public class PostEntity {
      @OneToOne(cascade = CascadeType.ALL)
      @JoinColumn(name = "reaction_id", referencedColumnName = "id")
      ReactionsEntity reactions;
+     @Column
+     LocalDateTime creationTime;
 }

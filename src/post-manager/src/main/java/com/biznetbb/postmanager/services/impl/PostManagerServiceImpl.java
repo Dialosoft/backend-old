@@ -10,6 +10,7 @@ import com.biznetbb.postmanager.services.PostManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -25,6 +26,7 @@ public class PostManagerServiceImpl implements PostManagerService {
 
         if (request != null){
             PostEntity entity = mapper.toEntity(request);
+            entity.setCreationTime(LocalDateTime.now());
             postManagerRepository.save(entity);
         }
     }
