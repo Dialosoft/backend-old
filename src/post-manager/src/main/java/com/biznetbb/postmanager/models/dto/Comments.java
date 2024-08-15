@@ -1,4 +1,4 @@
-package com.biznetbb.postmanager.models;
+package com.biznetbb.postmanager.models.dto;
 
 
 import lombok.AccessLevel;
@@ -9,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Comments {
-    String username;
-    String content;
+public class Comments extends BasicCommonAttributes{
+
 }

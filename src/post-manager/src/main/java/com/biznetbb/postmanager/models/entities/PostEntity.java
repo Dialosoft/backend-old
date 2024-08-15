@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -32,4 +31,7 @@ public class PostEntity {
      Integer negativeReaction;
      @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
      List<CommentsEntity> comments;
+     @OneToOne(cascade = CascadeType.ALL)
+     @JoinColumn(name = "reaction_id", referencedColumnName = "id")
+     ReactionsEntity reactions;
 }

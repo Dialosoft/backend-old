@@ -1,6 +1,6 @@
 package com.biznetbb.postmanager.models.web.response;
 
-import com.biznetbb.postmanager.models.Comments;
+import com.biznetbb.postmanager.models.dto.Comments;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,4 +16,5 @@ public class PostManagerResponse {
     String content;
     String image;
     List<Comments> comments;
+    String postId;
 }

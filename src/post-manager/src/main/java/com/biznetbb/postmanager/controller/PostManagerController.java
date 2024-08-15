@@ -1,6 +1,6 @@
 package com.biznetbb.postmanager.controller;
 
-import com.biznetbb.postmanager.models.web.request.PostManagerRequest;
+import com.biznetbb.postmanager.models.web.request.PostManagerCommonAttributes;
 import com.biznetbb.postmanager.models.web.response.PostManagerResponse;
 import com.biznetbb.postmanager.services.PostManagerService;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +16,18 @@ public class PostManagerController {
     private final PostManagerService service; // all injections of dependencies must be with constructor
 
     @PostMapping("create-post")
-    public void createPost(@RequestBody PostManagerRequest request) {
+    public void createPost(@RequestBody PostManagerCommonAttributes request) {
         service.CreateNewPost(request);
     }
 
     @DeleteMapping("delete-post/{id}")
     public void deletePost(@PathVariable String id) {
-        //todo managment the exc
+
         service.DeletePost(id);
     }
 
     @PutMapping("modify-post")
-    public void modifyPost(@RequestBody PostManagerRequest request) {
+    public void modifyPost(@RequestBody PostManagerCommonAttributes request) {
         service.ModifiedPost(request);
     }
 

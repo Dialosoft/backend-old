@@ -1,8 +1,8 @@
 package com.biznetbb.postmanager.mapper;
 
-import com.biznetbb.postmanager.models.Comments;
+import com.biznetbb.postmanager.models.dto.Comments;
 import com.biznetbb.postmanager.models.entities.CommentsEntity;
-import com.biznetbb.postmanager.models.web.request.CreateCommentRequest;
+import com.biznetbb.postmanager.models.web.request.CreateCommentCommonAttributes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public interface CommentsMapper {
     @Mapping(source = "username", target = "username")
     @Mapping(source = "content", target = "content")
-    CommentsEntity toEntity(CreateCommentRequest comments);
+    CommentsEntity toEntity(CreateCommentCommonAttributes comments);
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "content", target = "content")

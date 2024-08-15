@@ -3,7 +3,7 @@ package com.biznetbb.postmanager.services.impl;
 import com.biznetbb.postmanager.mapper.CommentsMapper;
 import com.biznetbb.postmanager.mapper.PostManagerMapper;
 import com.biznetbb.postmanager.models.entities.PostEntity;
-import com.biznetbb.postmanager.models.web.request.PostManagerRequest;
+import com.biznetbb.postmanager.models.web.request.PostManagerCommonAttributes;
 import com.biznetbb.postmanager.models.web.response.PostManagerResponse;
 import com.biznetbb.postmanager.repository.PostManagerRepository;
 import com.biznetbb.postmanager.services.PostManagerService;
@@ -21,7 +21,7 @@ public class PostManagerServiceImpl implements PostManagerService {
     private  final PostManagerRepository postManagerRepository;
     private final CommentsMapper commentsMapper;
     @Override
-    public void CreateNewPost(PostManagerRequest request) {
+    public void CreateNewPost(PostManagerCommonAttributes request) {
 
         if (request != null){
             PostEntity entity = mapper.toEntity(request);
@@ -31,11 +31,13 @@ public class PostManagerServiceImpl implements PostManagerService {
 
     @Override
     public void DeletePost(String id) {
-        postManagerRepository.deleteById(UUID.fromString(id));
+        if(postManagerRepository.existsById(UUID.fromString(id))){
+            postManagerRepository.deleteById(UUID.fromString(id));
+        }
     }
 
     @Override
-    public void ModifiedPost(PostManagerRequest request) {
+    public void ModifiedPost(PostManagerCommonAttributes request) {
         Optional<PostEntity> entity = postManagerRepository.findById(UUID.fromString(request.getId()));
         if (entity.isPresent()){
             entity = Optional.ofNullable(mapper.toEntity(request));

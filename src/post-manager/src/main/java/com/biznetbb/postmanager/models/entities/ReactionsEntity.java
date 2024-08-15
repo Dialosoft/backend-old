@@ -11,25 +11,23 @@ import java.util.UUID;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name="comments-table")
+@Table(name="reactions-table")
 @Entity
-public class CommentsEntity {
+public class ReactionsEntity {
     @Id
     @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
-    @Column(nullable = false)
+    @Column()
     String username;
-    @Column(nullable = false)
-    String content;
-    @Column
-    Integer positiveReaction;
-    @Column
-    Integer negativeReaction;
-    @ManyToOne
-    @JoinColumn(name = "post_id")
+    @Column()
+    int countReactions;
+    @Column()
+    int positiveReaction;
+    @Column()
+    int negativeReaction;
+    @OneToOne(mappedBy = "reactions")
     PostEntity post;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "reaction_id", referencedColumnName = "id")
-    ReactionsEntity reactions;
+    @OneToOne(mappedBy = "reactions")
+    CommentsEntity comment;
 }
