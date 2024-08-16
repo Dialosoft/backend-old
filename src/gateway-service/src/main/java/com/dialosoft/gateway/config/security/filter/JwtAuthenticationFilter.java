@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             if (routerValidator.isSecured(request)) {
 
                 if (authUtils.isAuthorizationHeaderMissing(request)) {
-                    return authUtils.onError(exchange, HttpStatus.UNAUTHORIZED);
+                    return authUtils.onError(exchange, HttpStatus.UNAUTHORIZED, "Missing Authorization header");
                 }
 
                 String token = authUtils.getAuthorizationHeader(request);

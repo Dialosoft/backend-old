@@ -75,16 +75,16 @@ spring:
             - name: NonSpringServicesRoutingFilter # For non-spring-boot services
               args:
                 belongServiceName: user-microservice
-        - id: user_service_routes_swagger
-          uri: lb://user-microservice/
-          predicates:
-            - Path=/dialosoft-api/user-service/swagger/index.html
-          filters:
-            - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1
-            - name: NonSpringServicesRoutingFilter
-              args:
-                belongServiceName: user-microservice
+#        - id: user_service_routes_swagger
+#          uri: lb://user-microservice/
+#          predicates:
+#            - Path=/dialosoft-api/user-service/swagger/index.html
+#          filters:
+#            - AddRequestHeader=X-Request-Service, user-microservice
+#            - StripPrefix=1
+#            - name: NonSpringServicesRoutingFilter
+#              args:
+#                belongServiceName: user-microservice
         - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
@@ -96,7 +96,7 @@ spring:
             - name: RoleBasedAuthorizationFilter
               args:
                 requiredRoles: ROLE_USER
-            - name: NonSpringServicesRoutingFilter
+            - name: NonSpringServicesRoutingFilter # must be the last filter due to first has to be applied token verification filters
               args:
                 belongServiceName: user-microservice
         - id: post_manager_service_routes

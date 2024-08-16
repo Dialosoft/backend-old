@@ -5,6 +5,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.netflix.eureka.EurekaServiceInstance;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -48,11 +49,19 @@ public class NonSpringServicesRoutingFilter extends AbstractGatewayFilterFactory
 
                         return clientResponse.bodyToMono(byte[].class)
                                 .defaultIfEmpty(new byte[0])
-                                .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                                        .bufferFactory().wrap(body))));
+                                .flatMap(body -> {
+                                    DataBuffer dataBuffer = exchange.getResponse().bufferFactory().wrap(body);
+                                    return exchange.getResponse().writeWith(Mono.just(dataBuffer));
+                                });
                     });
 
-            return responseMono.then(chain.filter(exchange));
+            return responseMono.then(Mono.defer(() -> {
+                // Ensure the chain is continued only if the response has not been committed
+                if (!exchange.getResponse().isCommitted()) {
+                    return chain.filter(exchange);
+                }
+                return Mono.empty(); // If committed, terminate the chain
+            }));
         };
     }
 
