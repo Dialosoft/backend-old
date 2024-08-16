@@ -89,6 +89,17 @@ spring:
             - name: RoleBasedAuthorizationFilter
               args:
                 requiredRoles: ROLE_USER
+        - id: post_manager_service_routes
+          uri: lb://post-manager-microservice/
+          predicates:
+            - Path=/dialosoft-api/v1/**, /dialosoft-api/**
+          filters:
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                requiredRoles: ROLE_USER
         # * Other service template
 #        - id: other_service_routes
 #          uri: lb://other-microservice/
@@ -167,3 +178,7 @@ springdoc:
         name: Auth Service Swagger
         primaryName: Auth Service Swagger
         belongServiceName: auth-microservice
+      - url: /post-manager-service/v3/api-docs
+        name: Post Manager Service Swagger
+        primaryName: Post Manager Service Swagger
+        belongServiceName: post-manager-microservice

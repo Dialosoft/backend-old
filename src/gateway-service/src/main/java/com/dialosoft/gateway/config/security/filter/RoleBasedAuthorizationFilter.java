@@ -84,10 +84,8 @@ public class RoleBasedAuthorizationFilter extends AbstractGatewayFilterFactory<R
 
     private boolean hasRequiredRole(String token, Config config) {
 
-        List<String> userRoles = jwtUtils.getRoles(token).stream()
-                .map(RoleDTO::getRoleName)
-                .toList();
+        var mainRole = jwtUtils.getMainRole(token).getRoleName();
 
-        return userRoles.stream().anyMatch(config.requiredRoles::contains);
+        return config.requiredRoles.contains(mainRole);
     }
 }

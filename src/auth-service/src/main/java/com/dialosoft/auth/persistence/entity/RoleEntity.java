@@ -17,7 +17,7 @@ public class RoleEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Enumerated(EnumType.STRING)
@@ -25,8 +25,20 @@ public class RoleEntity {
     private RoleType roleType;
 
     @Column(nullable = false)
+    private Integer permission;
+
+    @Column(nullable = false)
     private Boolean adminRole;
 
     @Column(nullable = false)
     private Boolean modRole;
+
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    private void initializePermission() {
+        if (this.roleType != null) {
+            this.permission = this.roleType.getPermissionName();
+        }
+    }
 }

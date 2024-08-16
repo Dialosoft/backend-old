@@ -41,26 +41,28 @@ public class JwtUtil {
         this.algorithmWithSecret = Algorithm.HMAC256(secretKey);
     }
 
-    public String generateAccessToken(String username, Collection<? extends GrantedAuthority> authorities) {
-        return createToken(username,
+    public String generateAccessToken(UUID userId, String username, Collection<? extends GrantedAuthority> authorities) {
+        return createToken(userId, username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
                 TimeUnit.MINUTES.toMillis(accessTokenExpiration));
     }
 
-    public String generateRefreshToken(String username, Collection<? extends GrantedAuthority> authorities) {
-        return createToken(username,
+    public String generateRefreshToken(UUID userId, String username, Collection<? extends GrantedAuthority> authorities) {
+        return createToken(userId, username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
                 TimeUnit.MINUTES.toMillis(refreshTokenExpiration));
     }
 
-    public String createToken(String username, List<String> roles, long expiredTime) {
+    public String createToken(UUID userId, String username, List<String> roles, long expiredTime) {
         // helps to identify token together with username
         String uuid = UUID.randomUUID().toString();
+        String mainRole = roles.get(0);
 
         return JWT.create()
                 .withJWTId(uuid)
                 .withSubject(username)
-                .withArrayClaim("role", roles.toArray(new String[0]))
+                .withClaim("role", mainRole)
+                .withClaim("userId", userId.toString())
                 .withIssuer(String.format("%s-service", issuer))
                 .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withExpiresAt(new Date(System.currentTimeMillis() + expiredTime))
