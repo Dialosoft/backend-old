@@ -1,0 +1,236 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/user-service/change-avatar": {
+            "put": {
+                "description": "Change the avatar of a user by passing the user ID and an image file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Change user avatar",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Avatar image file",
+                        "name": "avatar",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Avatar changed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing fields",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/user-service/change-email": {
+            "put": {
+                "description": "Change the email address of a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Change user email",
+                "parameters": [
+                    {
+                        "description": "User email change request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email changed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/user-service/get-simpleuser-info": {
+            "get": {
+                "description": "Get basic information about a user by passing the \"X-Auth-Username\" header",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get simple user information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username for the user to retrieve",
+                        "name": "X-Auth-Username",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing username",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/user-service/get-user-info": {
+            "get": {
+                "description": "Get detailed information about a user by passing the \"X-Auth-Username\" header",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get detailed user information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username for the user to retrieve",
+                        "name": "X-Auth-Username",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing username",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "request.Email": {
+            "type": "object",
+            "properties": {
+                "newEmail": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Standard": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "statusCode": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

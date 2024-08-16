@@ -13,13 +13,17 @@ type User struct {
 	Password  string     `gorm:"type:varchar(100);not null" json:"password"`
 	Locked    bool       `gorm:"not null;default:false" json:"locked"`
 	Disable   bool       `gorm:"not null;default:false" json:"disable"`
-	Roles     []Role     `gorm:"many2many:user_roles" json:"roles"`
+	RoleID    string     `gorm:"not null" json:"roleId"`
+	Role      Role       `gorm:"foreignKey:RoleID;references:ID" json:"role"`
 	CreatedAt time.Time  `gorm:"not null;autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time  `gorm:"not null;autoUpdateTime" json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
-type UserRole struct {
-	UserID uuid.UUID `gorm:"type:uuid;primary_key"`
-	RoleID uuid.UUID `gorm:"type:uuid;primary_key"`
+type Role struct {
+	ID         string `gorm:"primary_key" json:"id"`
+	AdminRole  bool   `gorm:"default:false" json:"admin_role"`
+	ModRole    bool   `gorm:"default:false" json:"mod_role"`
+	Permission int    `json:"permission"`
+	RoleType   string `gorm:"type:varchar(50)" json:"role_type"`
 }

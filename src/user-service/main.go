@@ -7,12 +7,15 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/Dialosoft/user-service/docs"
 	"github.com/Dialosoft/user-service/src/adapters/repositories"
 	"github.com/Dialosoft/user-service/src/adapters/router"
 	"github.com/Dialosoft/user-service/src/application/services"
 	"github.com/Dialosoft/user-service/src/infraestructure/db"
 	"github.com/Dialosoft/user-service/src/infraestructure/registry"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginswagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -30,7 +33,7 @@ func main() {
 	for {
 		database, err = db.DBConnection()
 		if err != nil {
-			log.Fatalf("error initializing database: %v", err)
+			log.Printf("error initializing database: %v", err)
 			time.Sleep(3 * time.Second)
 		} else {
 			break
@@ -60,6 +63,8 @@ func main() {
 
 	r := router.NewRouter(userService)
 	router := r.SetupRoutes()
+
+	router.GET("/user-service/swagger/*any", ginswagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())

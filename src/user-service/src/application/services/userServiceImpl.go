@@ -34,7 +34,7 @@ func (s *userServiceImpl) GetSimpleUser(username string) (*entities.SimpleUser, 
 	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("user not found")
+			return nil, gorm.ErrRecordNotFound
 		} else {
 			return nil, err
 		}
@@ -42,7 +42,7 @@ func (s *userServiceImpl) GetSimpleUser(username string) (*entities.SimpleUser, 
 
 	simpleUser.ID = user.ID
 	simpleUser.Username = user.Username
-	simpleUser.Roles = user.Roles
+	simpleUser.Role = user.Role
 
 	return simpleUser, nil
 }
@@ -55,7 +55,7 @@ func (s *userServiceImpl) GetUser(username string) (*entities.User, error) {
 	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, errors.New("user not found")
+			return nil, gorm.ErrRecordNotFound
 		} else {
 			return nil, err
 		}

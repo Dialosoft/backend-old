@@ -1,0 +1,157 @@
+definitions:
+  request.Email:
+    properties:
+      newEmail:
+        type: string
+      userId:
+        type: string
+    type: object
+  response.Standard:
+    properties:
+      data: {}
+      message:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /user-service/change-avatar:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Change the avatar of a user by passing the user ID and an image
+        file
+      parameters:
+      - description: User ID
+        in: formData
+        name: userId
+        required: true
+        type: string
+      - description: Avatar image file
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Avatar changed successfully
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid request or missing fields
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Change user avatar
+      tags:
+      - user
+  /user-service/change-email:
+    put:
+      consumes:
+      - application/json
+      description: Change the email address of a user
+      parameters:
+      - description: User email change request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.Email'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Email changed successfully
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Change user email
+      tags:
+      - user
+  /user-service/get-simpleuser-info:
+    get:
+      consumes:
+      - application/json
+      description: Get basic information about a user by passing the "X-Auth-Username"
+        header
+      parameters:
+      - description: Username for the user to retrieve
+        in: header
+        name: X-Auth-Username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid or missing username
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get simple user information
+      tags:
+      - user
+  /user-service/get-user-info:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a user by passing the "X-Auth-Username"
+        header
+      parameters:
+      - description: Username for the user to retrieve
+        in: header
+        name: X-Auth-Username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid or missing username
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get detailed user information
+      tags:
+      - user
+swagger: "2.0"
