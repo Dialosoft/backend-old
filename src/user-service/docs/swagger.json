@@ -6,7 +6,7 @@
     "paths": {
         "/user-service/change-avatar": {
             "put": {
-                "description": "Change the avatar of a user by passing a userId and an image file",
+                "description": "Change the avatar of a user by passing the user ID and an image file",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -16,7 +16,7 @@
                 "tags": [
                     "user"
                 ],
-                "summary": "Change User Avatar",
+                "summary": "Change user avatar",
                 "parameters": [
                     {
                         "type": "string",
@@ -27,9 +27,105 @@
                     },
                     {
                         "type": "file",
-                        "description": "Avatar Image File",
+                        "description": "Avatar image file",
                         "name": "avatar",
                         "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Avatar changed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing fields",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/user-service/change-email": {
+            "put": {
+                "description": "Change the email address of a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Change user email",
+                "parameters": [
+                    {
+                        "description": "User email change request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email changed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/user-service/get-simpleuser-info": {
+            "get": {
+                "description": "Get basic information about a user by passing the \"X-Auth-Username\" header",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get simple user information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username for the user to retrieve",
+                        "name": "X-Auth-Username",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -41,115 +137,19 @@
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/user-service/change-email": {
-            "put": {
-                "description": "Change the email of a user using the userId and new email passed in the request body",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Change User Email",
-                "parameters": [
-                    {
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "New Email",
-                        "name": "newEmail",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid or missing username",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "User not found",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/user-service/get-simpleuser-info": {
-            "get": {
-                "description": "Get simplified user information by username from the header \"X-Auth-Username\"",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Get Simple User Information",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
@@ -159,7 +159,7 @@
         },
         "/user-service/get-user-info": {
             "get": {
-                "description": "Get information about a user by their username from the header \"X-Auth-Username\"",
+                "description": "Get detailed information about a user by passing the \"X-Auth-Username\" header",
                 "consumes": [
                     "application/json"
                 ],
@@ -169,7 +169,16 @@
                 "tags": [
                     "user"
                 ],
-                "summary": "Get User Information",
+                "summary": "Get detailed user information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username for the user to retrieve",
+                        "name": "X-Auth-Username",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -178,19 +187,19 @@
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid or missing username",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "User not found",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
@@ -200,6 +209,17 @@
         }
     },
     "definitions": {
+        "request.Email": {
+            "type": "object",
+            "properties": {
+                "newEmail": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Standard": {
             "type": "object",
             "properties": {

@@ -14,8 +14,8 @@ import (
 	"github.com/Dialosoft/user-service/src/infraestructure/db"
 	"github.com/Dialosoft/user-service/src/infraestructure/registry"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerfiles "github.com/swaggo/files"
+	ginswagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -64,7 +64,7 @@ func main() {
 	r := router.NewRouter(userService)
 	router := r.SetupRoutes()
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/user-service/swagger/*any", ginswagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())

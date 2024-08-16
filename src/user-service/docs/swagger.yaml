@@ -1,4 +1,11 @@
 definitions:
+  request.Email:
+    properties:
+      newEmail:
+        type: string
+      userId:
+        type: string
+    type: object
   response.Standard:
     properties:
       data: {}
@@ -14,14 +21,15 @@ paths:
     put:
       consumes:
       - multipart/form-data
-      description: Change the avatar of a user by passing a userId and an image file
+      description: Change the avatar of a user by passing the user ID and an image
+        file
       parameters:
       - description: User ID
         in: formData
         name: userId
         required: true
         type: string
-      - description: Avatar Image File
+      - description: Avatar image file
         in: formData
         name: avatar
         required: true
@@ -30,66 +38,66 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Avatar changed successfully
           schema:
             $ref: '#/definitions/response.Standard'
         "400":
-          description: Bad Request
+          description: Invalid request or missing fields
           schema:
             $ref: '#/definitions/response.Standard'
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             $ref: '#/definitions/response.Standard'
-      summary: Change User Avatar
+      summary: Change user avatar
       tags:
       - user
   /user-service/change-email:
     put:
       consumes:
       - application/json
-      description: Change the email of a user using the userId and new email passed
-        in the request body
+      description: Change the email address of a user
       parameters:
-      - description: User ID
+      - description: User email change request
         in: body
-        name: userId
+        name: request
         required: true
         schema:
-          type: string
-      - description: New Email
-        in: body
-        name: newEmail
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/request.Email'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Email changed successfully
           schema:
             $ref: '#/definitions/response.Standard'
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             $ref: '#/definitions/response.Standard'
         "404":
-          description: Not Found
+          description: User not found
           schema:
             $ref: '#/definitions/response.Standard'
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             $ref: '#/definitions/response.Standard'
-      summary: Change User Email
+      summary: Change user email
       tags:
       - user
   /user-service/get-simpleuser-info:
     get:
       consumes:
       - application/json
-      description: Get simplified user information by username from the header "X-Auth-Username"
+      description: Get basic information about a user by passing the "X-Auth-Username"
+        header
+      parameters:
+      - description: Username for the user to retrieve
+        in: header
+        name: X-Auth-Username
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -98,26 +106,32 @@ paths:
           schema:
             $ref: '#/definitions/response.Standard'
         "400":
-          description: Bad Request
+          description: Invalid or missing username
           schema:
             $ref: '#/definitions/response.Standard'
         "404":
-          description: Not Found
+          description: User not found
           schema:
             $ref: '#/definitions/response.Standard'
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             $ref: '#/definitions/response.Standard'
-      summary: Get Simple User Information
+      summary: Get simple user information
       tags:
       - user
   /user-service/get-user-info:
     get:
       consumes:
       - application/json
-      description: Get information about a user by their username from the header
-        "X-Auth-Username"
+      description: Get detailed information about a user by passing the "X-Auth-Username"
+        header
+      parameters:
+      - description: Username for the user to retrieve
+        in: header
+        name: X-Auth-Username
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -126,18 +140,18 @@ paths:
           schema:
             $ref: '#/definitions/response.Standard'
         "400":
-          description: Bad Request
+          description: Invalid or missing username
           schema:
             $ref: '#/definitions/response.Standard'
         "404":
-          description: Not Found
+          description: User not found
           schema:
             $ref: '#/definitions/response.Standard'
         "500":
-          description: Internal Server Error
+          description: Internal server error
           schema:
             $ref: '#/definitions/response.Standard'
-      summary: Get User Information
+      summary: Get detailed user information
       tags:
       - user
 swagger: "2.0"

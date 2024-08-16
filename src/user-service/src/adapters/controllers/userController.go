@@ -11,15 +11,21 @@ import (
 	"gorm.io/gorm"
 )
 
-// @Summary Get User Information
-// @Description Get information about a user by their username from the header "X-Auth-Username"
+type GetUserParams struct {
+	Username string `json:"username"`
+}
+
+// GetUserInfo godoc
+// @Summary Get detailed user information
+// @Description Get detailed information about a user by passing the "X-Auth-Username" header
 // @Tags user
 // @Accept  json
 // @Produce  json
+// @Param X-Auth-Username header string true "Username for the user to retrieve"
 // @Success 200 {object} response.Standard
-// @Failure 400 {object} response.Standard
-// @Failure 404 {object} response.Standard
-// @Failure 500 {object} response.Standard
+// @Failure 400 {object} response.Standard "Invalid or missing username"
+// @Failure 404 {object} response.Standard "User not found"
+// @Failure 500 {object} response.Standard "Internal server error"
 // @Router /user-service/get-user-info [get]
 func GetUserInfo(c *gin.Context, userService services.UserService) {
 	var username string
@@ -58,15 +64,17 @@ func GetUserInfo(c *gin.Context, userService services.UserService) {
 	c.JSON(http.StatusOK, res)
 }
 
-// @Summary Get Simple User Information
-// @Description Get simplified user information by username from the header "X-Auth-Username"
+// GetSimpleInfo godoc
+// @Summary Get simple user information
+// @Description Get basic information about a user by passing the "X-Auth-Username" header
 // @Tags user
 // @Accept  json
 // @Produce  json
+// @Param X-Auth-Username header string true "Username for the user to retrieve"
 // @Success 200 {object} response.Standard
-// @Failure 400 {object} response.Standard
-// @Failure 404 {object} response.Standard
-// @Failure 500 {object} response.Standard
+// @Failure 400 {object} response.Standard "Invalid or missing username"
+// @Failure 404 {object} response.Standard "User not found"
+// @Failure 500 {object} response.Standard "Internal server error"
 // @Router /user-service/get-simpleuser-info [get]
 func GetSimpleInfo(c *gin.Context, userService services.UserService) {
 	var username string
@@ -104,17 +112,17 @@ func GetSimpleInfo(c *gin.Context, userService services.UserService) {
 	c.JSON(http.StatusOK, res)
 }
 
-// @Summary Change User Email
-// @Description Change the email of a user using the userId and new email passed in the request body
+// ChangeEmailController godoc
+// @Summary Change user email
+// @Description Change the email address of a user
 // @Tags user
 // @Accept  json
 // @Produce  json
-// @Param   userId body string true "User ID"
-// @Param   newEmail body string true "New Email"
-// @Success 200 {object} response.Standard
-// @Failure 400 {object} response.Standard
-// @Failure 404 {object} response.Standard
-// @Failure 500 {object} response.Standard
+// @Param request body request.Email true "User email change request"
+// @Success 200 {object} response.Standard "Email changed successfully"
+// @Failure 400 {object} response.Standard "Invalid request"
+// @Failure 404 {object} response.Standard "User not found"
+// @Failure 500 {object} response.Standard "Internal server error"
 // @Router /user-service/change-email [put]
 func ChangeEmailController(c *gin.Context, userService services.UserService) {
 	var req request.Email
@@ -158,16 +166,17 @@ func ChangeEmailController(c *gin.Context, userService services.UserService) {
 	c.JSON(http.StatusOK, res)
 }
 
-// @Summary Change User Avatar
-// @Description Change the avatar of a user by passing a userId and an image file
+// ChangeUserAvatarController godoc
+// @Summary Change user avatar
+// @Description Change the avatar of a user by passing the user ID and an image file
 // @Tags user
 // @Accept  multipart/form-data
 // @Produce  json
-// @Param   userId formData string true "User ID"
-// @Param   avatar formData file true "Avatar Image File"
-// @Success 200 {object} response.Standard
-// @Failure 400 {object} response.Standard
-// @Failure 500 {object} response.Standard
+// @Param userId formData string true "User ID"
+// @Param avatar formData file true "Avatar image file"
+// @Success 200 {object} response.Standard "Avatar changed successfully"
+// @Failure 400 {object} response.Standard "Invalid request or missing fields"
+// @Failure 500 {object} response.Standard "Internal server error"
 // @Router /user-service/change-avatar [put]
 func ChangeUserAvatarController(c *gin.Context, userService services.UserService) {
 	var res response.Standard
