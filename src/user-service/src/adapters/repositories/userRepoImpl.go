@@ -17,7 +17,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 // Find a user by the uuid
 func (r *userRepositoryImpl) FindByID(uuid uuid.UUID) (*entities.User, error) {
 	var user entities.User
-	if err := r.db.First(&user, uuid).Error; err != nil {
+	if err := r.db.Preload("Role").Where("id = ?", uuid.String()).First(&user).Error; err != nil {
 		return nil, err
 	}
 
@@ -27,7 +27,7 @@ func (r *userRepositoryImpl) FindByID(uuid uuid.UUID) (*entities.User, error) {
 // Find a user by the username
 func (r *userRepositoryImpl) FindByUsername(username string) (*entities.User, error) {
 	var user entities.User
-	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
+	if err := r.db.Preload("Role").Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
 

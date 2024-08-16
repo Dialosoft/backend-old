@@ -42,7 +42,7 @@ func (s *userServiceImpl) GetSimpleUser(username string) (*entities.SimpleUser, 
 
 	simpleUser.ID = user.ID
 	simpleUser.Username = user.Username
-	simpleUser.Roles = user.Roles
+	simpleUser.Role = user.Role
 
 	return simpleUser, nil
 }
