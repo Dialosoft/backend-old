@@ -33,7 +33,7 @@ public class RefreshTokenService {
     private RefreshToken createRefreshToken(UserEntity userEntity) {
 
         UserDetails userDetails = userSecurityService.loadUserByUsername(userEntity.getUsername());
-        String stringRefreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername(), userDetails.getAuthorities());
+        String stringRefreshToken = jwtUtil.generateRefreshToken(userEntity.getId(), userDetails.getUsername(), userDetails.getAuthorities());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(userEntity)
@@ -43,11 +43,11 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    public Optional<RefreshToken> findByToken(String token){
+    public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByRefreshToken(token);
     }
 
-    public Optional<RefreshToken> findByUserId(UUID userId){
+    public Optional<RefreshToken> findByUserId(UUID userId) {
         return refreshTokenRepository.findByUserId(userId);
     }
 

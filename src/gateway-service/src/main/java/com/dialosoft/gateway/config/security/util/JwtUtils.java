@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -30,20 +32,6 @@ public class JwtUtils {
     @PostConstruct
     public void init() {
         this.algorithmWithSecret = Algorithm.HMAC256(secretKey);
-    }
-
-    public String createToken(String username, List<String> roles, long expiredTime) {
-        // helps to identify token together with username
-        String uuid = UUID.randomUUID().toString();
-
-        return JWT.create()
-                .withJWTId(uuid)
-                .withSubject(username)
-                .withArrayClaim("role", roles.toArray(new String[0]))
-                .withIssuer(String.format("%s-service", issuer))
-                .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withExpiresAt(new Date(System.currentTimeMillis() + expiredTime))
-                .sign(algorithmWithSecret);
     }
 
     public boolean isValid(String jwt) {
@@ -70,32 +58,36 @@ public class JwtUtils {
                 .verify(jwt).getSubject();
     }
 
-    public List<String> getRolesAsString(String jwt) {
-        return Arrays.asList(JWT.require(algorithmWithSecret)
+    public String getUserId(String jwt) {
+        return JWT.require(algorithmWithSecret)
                 .build()
                 .verify(jwt)
-                .getClaim("role")
-                .asArray(String.class));
+                .getClaim("userId")
+                .asString();
     }
 
-    public List<RoleDTO> getRoles(String jwt) {
-        List<String> roleNames = Arrays.asList(JWT.require(algorithmWithSecret)
+    public String getRoleAsString(String jwt) {
+
+        return JWT.require(algorithmWithSecret)
                 .build()
                 .verify(jwt)
                 .getClaim("role")
-                .asArray(String.class));
+                .asString();
+    }
 
-        return roleNames.stream().map(roleName -> {
-            RoleType roleType = RoleType.getRoleType(roleName);
-            boolean isAdmin = roleType == RoleType.ADMIN;
-            boolean isMod = roleType == RoleType.MOD;
+    public RoleDTO getMainRole(String jwt) {
 
-            return RoleDTO.builder()
-                    .roleName(roleType.getRoleName())
-                    .adminRole(isAdmin)
-                    .modRole(isMod)
-                    .build();
-        }).toList();
+        String mainRoleName = getRoleAsString(jwt);
+
+        RoleType roleType = RoleType.getRoleType(mainRoleName);
+        boolean isAdmin = roleType == RoleType.ADMIN;
+        boolean isMod = roleType == RoleType.MOD;
+
+        return RoleDTO.builder()
+                .roleName(roleType.getRoleName())
+                .adminRole(isAdmin)
+                .modRole(isMod)
+                .build();
     }
 
     public Date getExpirationDate(String jwt) {

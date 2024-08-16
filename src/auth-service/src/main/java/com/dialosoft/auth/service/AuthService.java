@@ -60,10 +60,11 @@ public class AuthService {
                     .username(registerDto.getUsername())
                     .email(registerDto.getEmail())
                     .password(securityConfig.encoder().encode(registerDto.getPassword()))
-                    .roles(Collections.singleton(defaultRole))
+                    .role(defaultRole)
                     .build();
 
             newUser = userRepository.save(userEntity);
+
         } catch (Exception e) {
 
             throw new CustomTemplateException("An error occurred while creating the user", "Internal Server Error", e, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -90,7 +91,9 @@ public class AuthService {
 
             if (authentication.isAuthenticated()) {
 
-                String accessToken = jwtUtil.generateAccessToken(loginDto.getUsername(), authentication.getAuthorities());
+                UserEntity userEntity = userSecurityService.getUserByUserName(loginDto.getUsername());
+
+                String accessToken = jwtUtil.generateAccessToken(userEntity.getId(), loginDto.getUsername(), authentication.getAuthorities());
                 Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
                 RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(loginDto.getUsername());
 
@@ -125,9 +128,8 @@ public class AuthService {
                 .map(RefreshToken::getUser)
                 .map(userInfo -> {
 
-                    String username = userInfo.getUsername();
-                    UserDetails userDetails = userSecurityService.loadUserByUsername(username);
-                    String accessToken = jwtUtil.generateAccessToken(username, userDetails.getAuthorities());
+                    UserDetails userDetails = userSecurityService.loadUserByUsername(userInfo.getUsername());
+                    String accessToken = jwtUtil.generateAccessToken(userInfo.getId(), userInfo.getUsername(), userDetails.getAuthorities());
                     Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
 
                     JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
