@@ -18,6 +18,7 @@ public class RoleInitializer {
         if (roleRepository.findByRoleType(RoleType.USER).isEmpty()) {
             RoleEntity userRole = RoleEntity.builder()
                     .roleType(RoleType.USER)
+                    .permission(RoleType.USER.getPermissionName())
                     .adminRole(false)
                     .modRole(false)
                     .build();
@@ -27,6 +28,7 @@ public class RoleInitializer {
         if (roleRepository.findByRoleType(RoleType.ADMIN).isEmpty()) {
             RoleEntity adminRole = RoleEntity.builder()
                     .roleType(RoleType.ADMIN)
+                    .permission(RoleType.ADMIN.getPermissionName())
                     .adminRole(true)
                     .modRole(true)
                     .build();
@@ -36,6 +38,7 @@ public class RoleInitializer {
         if (roleRepository.findByRoleType(RoleType.MOD).isEmpty()) {
             RoleEntity modRole = RoleEntity.builder()
                     .roleType(RoleType.MOD)
+                    .permission(RoleType.MOD.getPermissionName())
                     .adminRole(false)
                     .modRole(true)
                     .build();

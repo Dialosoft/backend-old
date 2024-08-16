@@ -38,11 +38,9 @@ public class UserEntity {
     @Builder.Default
     private Boolean disable = Boolean.FALSE;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<RoleEntity> roles;
+    @OneToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private RoleEntity role;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

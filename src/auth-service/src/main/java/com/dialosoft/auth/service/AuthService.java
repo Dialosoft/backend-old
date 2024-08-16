@@ -60,10 +60,11 @@ public class AuthService {
                     .username(registerDto.getUsername())
                     .email(registerDto.getEmail())
                     .password(securityConfig.encoder().encode(registerDto.getPassword()))
-                    .roles(Collections.singleton(defaultRole))
+                    .role(defaultRole)
                     .build();
 
             newUser = userRepository.save(userEntity);
+
         } catch (Exception e) {
 
             throw new CustomTemplateException("An error occurred while creating the user", "Internal Server Error", e, HttpStatus.INTERNAL_SERVER_ERROR);

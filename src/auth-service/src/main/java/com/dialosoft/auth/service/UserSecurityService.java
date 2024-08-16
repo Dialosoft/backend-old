@@ -38,15 +38,13 @@ public class UserSecurityService implements UserDetailsService{
 
         UserEntity userEntity = getUserByUserName(username);
 
-        Set<RoleEntity> roles = userEntity.getRoles();
-        Set<GrantedAuthority> authorities = roles.stream()
-                .map(role -> generateGrantedAuthority(role.getRoleType()))
-                .collect(Collectors.toSet());
+        RoleEntity role = userEntity.getRole();
+        GrantedAuthority authority = generateGrantedAuthority(role.getRoleType());
 
         return User.builder()
             .username(userEntity.getUsername())
             .password(userEntity.getPassword())
-            .authorities(authorities)
+            .authorities(authority)
             .accountLocked(userEntity.getLocked())
             .disabled(userEntity.getDisable())
             .build();
