@@ -1,0 +1,143 @@
+definitions:
+  response.Standard:
+    properties:
+      data: {}
+      message:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /user-service/change-avatar:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Change the avatar of a user by passing a userId and an image file
+      parameters:
+      - description: User ID
+        in: formData
+        name: userId
+        required: true
+        type: string
+      - description: Avatar Image File
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Change User Avatar
+      tags:
+      - user
+  /user-service/change-email:
+    put:
+      consumes:
+      - application/json
+      description: Change the email of a user using the userId and new email passed
+        in the request body
+      parameters:
+      - description: User ID
+        in: body
+        name: userId
+        required: true
+        schema:
+          type: string
+      - description: New Email
+        in: body
+        name: newEmail
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Change User Email
+      tags:
+      - user
+  /user-service/get-simpleuser-info:
+    get:
+      consumes:
+      - application/json
+      description: Get simplified user information by username from the header "X-Auth-Username"
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get Simple User Information
+      tags:
+      - user
+  /user-service/get-user-info:
+    get:
+      consumes:
+      - application/json
+      description: Get information about a user by their username from the header
+        "X-Auth-Username"
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get User Information
+      tags:
+      - user
+swagger: "2.0"
