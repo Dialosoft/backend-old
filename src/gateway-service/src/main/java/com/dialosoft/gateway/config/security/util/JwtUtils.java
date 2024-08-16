@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -64,32 +66,28 @@ public class JwtUtils {
                 .asString();
     }
 
-    public List<String> getRolesAsString(String jwt) {
-        return Arrays.asList(JWT.require(algorithmWithSecret)
+    public String getRoleAsString(String jwt) {
+
+        return JWT.require(algorithmWithSecret)
                 .build()
                 .verify(jwt)
                 .getClaim("role")
-                .asArray(String.class));
+                .asString();
     }
 
-    public List<RoleDTO> getRoles(String jwt) {
-        List<String> roleNames = Arrays.asList(JWT.require(algorithmWithSecret)
-                .build()
-                .verify(jwt)
-                .getClaim("role")
-                .asArray(String.class));
+    public RoleDTO getMainRole(String jwt) {
 
-        return roleNames.stream().map(roleName -> {
-            RoleType roleType = RoleType.getRoleType(roleName);
-            boolean isAdmin = roleType == RoleType.ADMIN;
-            boolean isMod = roleType == RoleType.MOD;
+        String mainRoleName = getRoleAsString(jwt);
 
-            return RoleDTO.builder()
-                    .roleName(roleType.getRoleName())
-                    .adminRole(isAdmin)
-                    .modRole(isMod)
-                    .build();
-        }).toList();
+        RoleType roleType = RoleType.getRoleType(mainRoleName);
+        boolean isAdmin = roleType == RoleType.ADMIN;
+        boolean isMod = roleType == RoleType.MOD;
+
+        return RoleDTO.builder()
+                .roleName(roleType.getRoleName())
+                .adminRole(isAdmin)
+                .modRole(isMod)
+                .build();
     }
 
     public Date getExpirationDate(String jwt) {

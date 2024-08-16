@@ -9,11 +9,12 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum RoleType {
 
-    USER("ROLE_USER"),
-    ADMIN("ROLE_ADMIN"),
-    MOD("ROLE_MOD");
+    USER("ROLE_USER", 1),
+    ADMIN("ROLE_ADMIN", 2),
+    MOD("ROLE_MOD", 3);
 
     private final String roleName;
+    private final Integer permissionName;
 
     public static RoleType getRoleType(String roleName) {
         return Arrays.stream(RoleType.values())
