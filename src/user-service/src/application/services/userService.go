@@ -9,6 +9,7 @@ import (
 
 type UserService interface {
 	GetUser(username string) (*entities.User, error)
+	GetSimpleUser(username string) (*entities.SimpleUser, error)
 	ChangeEmail(userID uuid.UUID, newMail string) error
 	ChangeAvatar(userID uuid.UUID, avatar io.Reader) error
 }

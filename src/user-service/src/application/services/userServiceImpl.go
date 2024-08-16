@@ -24,6 +24,29 @@ func NewUserService(userRepo repositories.UserRepository) UserService {
 	return &userServiceImpl{userRepo: userRepo}
 }
 
+func (s *userServiceImpl) GetSimpleUser(username string) (*entities.SimpleUser, error) {
+	var simpleUser *entities.SimpleUser
+
+	if username == "" {
+		return nil, errors.New("any of the parameters cannot be empty")
+	}
+
+	user, err := s.userRepo.FindByUsername(username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("user not found")
+		} else {
+			return nil, err
+		}
+	}
+
+	simpleUser.ID = user.ID
+	simpleUser.Username = user.Username
+	simpleUser.Roles = user.Roles
+
+	return simpleUser, nil
+}
+
 func (s *userServiceImpl) GetUser(username string) (*entities.User, error) {
 	if username == "" {
 		return nil, errors.New("any of the parameters cannot be empty")

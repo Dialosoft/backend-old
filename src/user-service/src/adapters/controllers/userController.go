@@ -39,10 +39,46 @@ func GetUserInfo(c *gin.Context, userService services.UserService) {
 		}
 		return
 	}
-
 	user.Password = ""
 
-	c.JSON(http.StatusOK, &user)
+	res.Message = "OK"
+	res.StatusCode = http.StatusOK
+	res.Data = &user
+	c.JSON(http.StatusOK, res)
+}
+
+func GetSimpleInfo(c *gin.Context, userService services.UserService) {
+	var username string
+	var res response.Standard
+
+	username = c.GetHeader("X-Auth-Username")
+	if username == "" {
+		res.StatusCode = http.StatusBadRequest
+		res.Message = "BAD REQUEST"
+		res.Data = nil
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	simpleUser, err := userService.GetSimpleUser(username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			res.StatusCode = http.StatusNotFound
+			res.Message = "NOT FOUND"
+			res.Data = nil
+			c.JSON(http.StatusNotFound, res)
+		} else {
+			res.StatusCode = http.StatusInternalServerError
+			res.Message = err.Error()
+			res.Data = nil
+			c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+
+	res.Message = "OK"
+	res.StatusCode = http.StatusOK
+	res.Data = &simpleUser
+	c.JSON(http.StatusOK, res)
 }
 
 func ChangeEmailController(c *gin.Context, userService services.UserService) {
