@@ -13,21 +13,31 @@ import (
 	"github.com/Dialosoft/user-service/src/infraestructure/db"
 	"github.com/Dialosoft/user-service/src/infraestructure/registry"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func main() {
+
+	var database *gorm.DB
+	var err error
+
 	EUREKAURL := "http://registry-service:8761/eureka" //os.Getenv("EUREKA_CLIENT_SERVICEURL_DEFAULTZONE")
 	appName := "user-microservice"
 	hostname := "user-microservice"
 	ipAddr := getoutBoundIp().String()
 	port := 8086
 
-	db, err := db.DBConnection()
-	if err != nil {
-		log.Fatalf("error initializing database: %v", err)
+	for {
+		database, err = db.DBConnection()
+		if err != nil {
+			log.Fatalf("error initializing database: %v", err)
+			time.Sleep(3 * time.Second)
+		} else {
+			break
+		}
 	}
 
-	fmt.Println("Database connection successful", db)
+	fmt.Println("Database connection successful", database)
 
 	err = os.MkdirAll("avatars", os.ModePerm)
 	if err != nil {
@@ -45,7 +55,7 @@ func main() {
 		}
 	}
 
-	userRepo := repositories.NewUserRepository(db)
+	userRepo := repositories.NewUserRepository(database)
 	userService := services.NewUserService(userRepo)
 
 	r := router.NewRouter(userService)

@@ -8,7 +8,78 @@ import (
 	"github.com/Dialosoft/user-service/src/domain/entities/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
+
+func GetUserInfo(c *gin.Context, userService services.UserService) {
+	var username string
+	var res response.Standard
+
+	username = c.GetHeader("X-Auth-Username")
+	if username == "" {
+		res.StatusCode = http.StatusBadRequest
+		res.Message = "BAD REQUEST"
+		res.Data = nil
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	user, err := userService.GetUser(username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			res.StatusCode = http.StatusNotFound
+			res.Message = "NOT FOUND"
+			res.Data = nil
+			c.JSON(http.StatusNotFound, res)
+		} else {
+			res.StatusCode = http.StatusInternalServerError
+			res.Message = err.Error()
+			res.Data = nil
+			c.JSON(http.StatusInternalServerError, res)
+		}
+		return
+	}
+	user.Password = ""
+
+	res.Message = "OK"
+	res.StatusCode = http.StatusOK
+	res.Data = &user
+	c.JSON(http.StatusOK, res)
+}
+
+func GetSimpleInfo(c *gin.Context, userService services.UserService) {
+	var username string
+	var res response.Standard
+
+	username = c.GetHeader("X-Auth-Username")
+	if username == "" {
+		res.StatusCode = http.StatusBadRequest
+		res.Message = "BAD REQUEST"
+		res.Data = nil
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	simpleUser, err := userService.GetSimpleUser(username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			res.StatusCode = http.StatusNotFound
+			res.Message = "NOT FOUND"
+			res.Data = nil
+			c.JSON(http.StatusNotFound, res)
+		} else {
+			res.StatusCode = http.StatusInternalServerError
+			res.Message = err.Error()
+			res.Data = nil
+			c.JSON(http.StatusInternalServerError, res)
+		}
+	}
+
+	res.Message = "OK"
+	res.StatusCode = http.StatusOK
+	res.Data = &simpleUser
+	c.JSON(http.StatusOK, res)
+}
 
 func ChangeEmailController(c *gin.Context, userService services.UserService) {
 	var req request.Email
@@ -32,14 +103,24 @@ func ChangeEmailController(c *gin.Context, userService services.UserService) {
 	}
 
 	if err := userService.ChangeEmail(userID, req.NewEmail); err != nil {
-		res.StatusCode = http.StatusInternalServerError
-		res.Message = err.Error()
-		res.Data = nil
-		c.JSON(http.StatusInternalServerError, res)
+		if err == gorm.ErrRecordNotFound {
+			res.StatusCode = http.StatusNotFound
+			res.Message = "NOT FOUND"
+			res.Data = nil
+			c.JSON(http.StatusNotFound, res)
+		} else {
+			res.StatusCode = http.StatusInternalServerError
+			res.Message = err.Error()
+			res.Data = nil
+			c.JSON(http.StatusInternalServerError, res)
+		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Email changed successfully"})
+	res.StatusCode = http.StatusOK
+	res.Message = "Email changed successfully"
+	res.Data = nil
+	c.JSON(http.StatusOK, res)
 }
 
 func ChangeUserAvatarController(c *gin.Context, userService services.UserService) {
@@ -82,7 +163,7 @@ func ChangeUserAvatarController(c *gin.Context, userService services.UserService
 	}
 
 	res.StatusCode = http.StatusOK
-	res.Message = "OK"
-	res.Data = "avatar changed successfully"
+	res.Message = "avatar changed successfully"
+	res.Data = nil
 	c.JSON(http.StatusOK, res)
 }

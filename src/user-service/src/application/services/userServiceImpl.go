@@ -11,7 +11,9 @@ import (
 	"path/filepath"
 
 	"github.com/Dialosoft/user-service/src/adapters/repositories"
+	"github.com/Dialosoft/user-service/src/domain/entities"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type userServiceImpl struct {
@@ -22,6 +24,46 @@ func NewUserService(userRepo repositories.UserRepository) UserService {
 	return &userServiceImpl{userRepo: userRepo}
 }
 
+func (s *userServiceImpl) GetSimpleUser(username string) (*entities.SimpleUser, error) {
+	simpleUser := &entities.SimpleUser{}
+
+	if username == "" {
+		return nil, errors.New("any of the parameters cannot be empty")
+	}
+
+	user, err := s.userRepo.FindByUsername(username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("user not found")
+		} else {
+			return nil, err
+		}
+	}
+
+	simpleUser.ID = user.ID
+	simpleUser.Username = user.Username
+	simpleUser.Roles = user.Roles
+
+	return simpleUser, nil
+}
+
+func (s *userServiceImpl) GetUser(username string) (*entities.User, error) {
+	if username == "" {
+		return nil, errors.New("any of the parameters cannot be empty")
+	}
+
+	user, err := s.userRepo.FindByUsername(username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("user not found")
+		} else {
+			return nil, err
+		}
+	}
+
+	return user, nil
+}
+
 func (s *userServiceImpl) ChangeEmail(userID uuid.UUID, newMail string) error {
 	if userID == uuid.Nil || newMail == "" {
 		return errors.New("any of the parameters cannot be empty")
@@ -29,7 +71,11 @@ func (s *userServiceImpl) ChangeEmail(userID uuid.UUID, newMail string) error {
 
 	user, err := s.userRepo.FindByID(userID)
 	if err != nil {
-		return err
+		if err == gorm.ErrRecordNotFound {
+			return errors.New("user not found")
+		} else {
+			return err
+		}
 	}
 
 	user.Email = newMail
