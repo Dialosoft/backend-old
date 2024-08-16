@@ -25,7 +25,7 @@ func NewUserService(userRepo repositories.UserRepository) UserService {
 }
 
 func (s *userServiceImpl) GetSimpleUser(username string) (*entities.SimpleUser, error) {
-	var simpleUser *entities.SimpleUser
+	simpleUser := &entities.SimpleUser{}
 
 	if username == "" {
 		return nil, errors.New("any of the parameters cannot be empty")
