@@ -117,7 +117,10 @@ func ChangeEmailController(c *gin.Context, userService services.UserService) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Email changed successfully"})
+	res.StatusCode = http.StatusOK
+	res.Message = "Email changed successfully"
+	res.Data = nil
+	c.JSON(http.StatusOK, res)
 }
 
 func ChangeUserAvatarController(c *gin.Context, userService services.UserService) {
@@ -160,7 +163,7 @@ func ChangeUserAvatarController(c *gin.Context, userService services.UserService
 	}
 
 	res.StatusCode = http.StatusOK
-	res.Message = "OK"
-	res.Data = "avatar changed successfully"
+	res.Message = "avatar changed successfully"
+	res.Data = nil
 	c.JSON(http.StatusOK, res)
 }
