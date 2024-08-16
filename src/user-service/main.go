@@ -30,7 +30,7 @@ func main() {
 	for {
 		database, err = db.DBConnection()
 		if err != nil {
-			log.Fatalf("error initializing database: %v", err)
+			log.Printf("error initializing database: %v", err)
 			time.Sleep(3 * time.Second)
 		} else {
 			break
