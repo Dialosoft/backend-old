@@ -82,13 +82,13 @@ spring:
           filters:
             - AddRequestHeader=X-Request-Service, user-microservice
             - StripPrefix=1
-            - name: NonSpringServicesRoutingFilter
-              args:
-                belongServiceName: user-microservice
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:
                 requiredRoles: ROLE_USER
+            - name: NonSpringServicesRoutingFilter
+              args:
+                belongServiceName: user-microservice
         - id: post_manager_service_routes
           uri: lb://post-manager-microservice/
           predicates:
