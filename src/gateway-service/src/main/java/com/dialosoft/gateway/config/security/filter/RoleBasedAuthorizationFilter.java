@@ -1,5 +1,6 @@
 package com.dialosoft.gateway.config.security.filter;
 
+import com.dialosoft.gateway.config.error.exception.CustomTemplateException;
 import com.dialosoft.gateway.config.security.util.JwtUtils;
 import com.dialosoft.gateway.config.security.dto.RoleDTO;
 import com.dialosoft.gateway.config.security.util.AuthUtils;
@@ -44,19 +45,19 @@ public class RoleBasedAuthorizationFilter extends AbstractGatewayFilterFactory<R
             if (routerValidator.isSecured(request)) {
 
                 if (authUtils.isAuthorizationHeaderMissing(request)) {
-                    return authUtils.onError(exchange, HttpStatus.UNAUTHORIZED);
+                    throw new CustomTemplateException("Missing Authorization header", null, HttpStatus.UNAUTHORIZED);
                 }
 
                 String token = authUtils.getAuthorizationHeader(request);
 
                 if (token == null || !token.startsWith("Bearer ")) {
-                    return authUtils.onError(exchange, HttpStatus.FORBIDDEN, "Missing or invalid Authorization header");
+                    throw new CustomTemplateException("Missing or invalid Authorization header", null, HttpStatus.UNAUTHORIZED);
                 }
 
                 token = token.substring(7);
 
                 if (!jwtUtils.isValid(token)) {
-                    return authUtils.onError(exchange, HttpStatus.FORBIDDEN);
+                    throw new CustomTemplateException("Invalid token", null, HttpStatus.UNAUTHORIZED);
                 }
 
                 return checkRequiredRole(exchange, chain, config, token);
@@ -73,10 +74,10 @@ public class RoleBasedAuthorizationFilter extends AbstractGatewayFilterFactory<R
             boolean hasRole = hasRequiredRole(token, config);
 
             if (!hasRole) {
-                return authUtils.onError(exchange, HttpStatus.FORBIDDEN, "You do not have the necessary permissions to access this resource");
+                throw new CustomTemplateException("You do not have the necessary permissions to access this resource", null, HttpStatus.FORBIDDEN);
             }
         } catch (Exception e) {
-            return authUtils.onError(exchange, HttpStatus.FORBIDDEN, "Error processing roles");
+            throw new CustomTemplateException("Error processing roles", e, HttpStatus.FORBIDDEN);
         }
 
         return chain.filter(exchange);
