@@ -112,7 +112,7 @@ func (repo *forumRepositoryImpl) FindByName(name string) (*entities.Forum, error
 
 // Update implements ForumRepository.
 func (repo *forumRepositoryImpl) Update(forum *entities.Forum) error {
-	// Actualizar foro
+
 	result := repo.db.Model(forum).Updates(forum)
 	if result.Error != nil {
 		return result.Error

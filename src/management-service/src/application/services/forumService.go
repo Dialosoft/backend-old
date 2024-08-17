@@ -9,7 +9,9 @@ type ForumService interface {
 	GetAllForums() ([]*entities.Forum, error)
 	GetForumByID(id uuid.UUID) (*entities.Forum, error)
 	GetForumByName(name string) (*entities.Forum, error)
-	CreateForum(name string) error
-	RenameForum(newName string) error
+	CreateForum(name, description string, categoryOwner *entities.Category) error
+	UpdateForum(id uuid.UUID, name, description string, categoryOwner *entities.Category) error
+	UpdateCountPostForum(id uuid.UUID, posts int) error
 	DeleteForum(id uuid.UUID) error
+	RestoreForum(id uuid.UUID) error
 }
