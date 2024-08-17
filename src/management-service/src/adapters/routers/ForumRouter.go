@@ -16,6 +16,10 @@ func NewForumRouter(service services.ForumService) *ForumRouter {
 func (r *ForumRouter) SetupForumRoutes(group *gin.RouterGroup) {
 	forumGroup := group.Group("/forums")
 	{
-		forumGroup.GET("/")
+		forumGroup.GET("/test", r.Test)
 	}
+}
+
+func (r *ForumRouter) Test(c *gin.Context) {
+	c.JSON(200, gin.H{"message": "ok"})
 }
