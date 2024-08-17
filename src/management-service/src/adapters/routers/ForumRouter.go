@@ -13,15 +13,9 @@ func NewForumRouter(service services.ForumService) *ForumRouter {
 	return &ForumRouter{ForumService: service}
 }
 
-func (r *ForumRouter) SetupForumRoutes() *gin.Engine {
-	router := gin.Default()
-
-	manager := router.Group("/management-service")
-	forums := manager.Group("/forums")
-
-	// Routes
-
-	forums.GET("")
-
-	return router
+func (r *ForumRouter) SetupForumRoutes(group *gin.RouterGroup) {
+	forumGroup := group.Group("/forums")
+	{
+		forumGroup.GET("/")
+	}
 }

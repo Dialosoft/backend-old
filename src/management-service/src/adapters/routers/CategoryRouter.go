@@ -13,13 +13,9 @@ func NewCategoryRouter(service services.CategoryService) *CategoryRouter {
 	return &CategoryRouter{CategoryService: service}
 }
 
-func (r *CategoryRouter) SetupCategoryRoutes() *gin.Engine {
-	router := gin.Default()
-
-	manager := router.Group("/management-service")
-	categories := manager.Group("/categories")
-
-	categories.GET("")
-
-	return router
+func (r *CategoryRouter) SetupCategoryRoutes(group *gin.RouterGroup) {
+	categoryGroup := group.Group("/Categorys")
+	{
+		categoryGroup.GET("/")
+	}
 }
