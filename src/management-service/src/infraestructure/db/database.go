@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/Dialosoft/post-manager-service/src/domain/entities"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -39,6 +40,11 @@ func DBConnection() (*gorm.DB, error) {
 		if err != nil {
 			log.Printf("could not connect to database: %v", err)
 			return
+		}
+
+		err = dbInstance.AutoMigrate(&entities.Forum{}, &entities.Category{})
+		if err != nil {
+			log.Printf("error during migration: %v", err)
 		}
 
 		sqlDB, err := dbInstance.DB()
