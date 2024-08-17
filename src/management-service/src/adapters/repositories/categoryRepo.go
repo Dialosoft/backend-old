@@ -6,9 +6,11 @@ import (
 )
 
 type CategoryRepository interface {
-	FindAll() []*entities.Category
+	FindAll() ([]*entities.Category, error)
 	FindByID(uuid uuid.UUID) (*entities.Category, error)
 	FindByName(name string) (*entities.Category, error)
+	FindAllIncludingDeleted() ([]*entities.Category, error)
+	Create(forum *entities.Category) error
 	Update(category *entities.Category) error
 	Delete(uuid uuid.UUID) error
 }

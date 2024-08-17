@@ -9,6 +9,7 @@ type ForumRepository interface {
 	FindAll() []*entities.Forum
 	FindByID(uuid uuid.UUID) (*entities.Forum, error)
 	FindByName(name string) (*entities.Forum, error)
+	Create(name string, category *entities.Category) error
 	Update(forum *entities.Forum) error
 	Delete(uuid uuid.UUID) error
 }

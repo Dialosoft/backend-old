@@ -10,6 +10,11 @@ type forumRepositoryImpl struct {
 	db *gorm.DB
 }
 
+// Create implements ForumRepository.
+func (*forumRepositoryImpl) Create(name string, category *entities.Category) error {
+	panic("unimplemented")
+}
+
 // Delete implements ForumRepository.
 func (db *forumRepositoryImpl) Delete(uuid uuid.UUID) error {
 	panic("unimplemented")
