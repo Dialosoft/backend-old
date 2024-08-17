@@ -10,7 +10,7 @@ type CategoryRepository interface {
 	FindByID(uuid uuid.UUID) (*entities.Category, error)
 	FindByName(name string) (*entities.Category, error)
 	FindAllIncludingDeleted() ([]*entities.Category, error)
-	Create(forum *entities.Category) error
+	Create(category *entities.Category) error
 	Update(category *entities.Category) error
 	Delete(uuid uuid.UUID) error
 	Restore(uuid uuid.UUID) error
