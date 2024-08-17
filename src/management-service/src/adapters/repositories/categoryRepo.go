@@ -13,4 +13,5 @@ type CategoryRepository interface {
 	Create(forum *entities.Category) error
 	Update(category *entities.Category) error
 	Delete(uuid uuid.UUID) error
+	Restore(uuid uuid.UUID) error
 }

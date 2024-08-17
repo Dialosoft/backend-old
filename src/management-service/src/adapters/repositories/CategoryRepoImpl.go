@@ -78,6 +78,17 @@ func (repo *categoryRepositoryImpl) Update(category *entities.Category) error {
 	return nil
 }
 
+// Restore implements ForumRepository (Restaurar Soft Delete).
+func (repo *categoryRepositoryImpl) Restore(id uuid.UUID) error {
+
+	result := repo.db.Unscoped().Model(&entities.Category{}).Where("id = ?", id).Update("deleted_at", nil)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 // Delete implements CategoryRepository.
 func (repo *categoryRepositoryImpl) Delete(uuid uuid.UUID) error {
 

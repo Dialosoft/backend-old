@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/Dialosoft/post-manager-service/src/domain/entities"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -11,33 +13,112 @@ type forumRepositoryImpl struct {
 }
 
 // Create implements ForumRepository.
-func (*forumRepositoryImpl) Create(name string, category *entities.Category) error {
-	panic("unimplemented")
+func (repo *forumRepositoryImpl) Create(forum *entities.Forum, categoryOwner *entities.Category) error {
+	forum.CategoryID = categoryOwner.ID.String()
+	forum.Category = *categoryOwner
+
+	result := repo.db.Create(forum)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
-// Delete implements ForumRepository.
-func (db *forumRepositoryImpl) Delete(uuid uuid.UUID) error {
-	panic("unimplemented")
+// Delete implements ForumRepository (Soft Delete).
+func (repo *forumRepositoryImpl) Delete(id uuid.UUID) error {
+	result := repo.db.Delete(&entities.Forum{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
-// FindAll implements ForumRepository.
-func (db *forumRepositoryImpl) FindAll() []*entities.Forum {
-	panic("unimplemented")
+// Restore implements ForumRepository (Restaurar Soft Delete).
+func (repo *forumRepositoryImpl) Restore(id uuid.UUID) error {
+
+	result := repo.db.Unscoped().Model(&entities.Forum{}).Where("id = ?", id).Update("deleted_at", nil)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
-// FindByID implements ForumRepository.
-func (db *forumRepositoryImpl) FindByID(uuid uuid.UUID) (*entities.Forum, error) {
-	panic("unimplemented")
+// FindAll implements ForumRepository (sin foros eliminados).
+func (repo *forumRepositoryImpl) FindAll() ([]*entities.Forum, error) {
+	var forums []*entities.Forum
+	result := repo.db.Find(&forums)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return forums, nil
+}
+
+// FindAllWithDeleted implements ForumRepository (incluye foros eliminados).
+func (repo *forumRepositoryImpl) FindAllWithDeleted() ([]*entities.Forum, error) {
+	var forums []*entities.Forum
+	result := repo.db.Unscoped().Find(&forums)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return forums, nil
+}
+
+// FindByID implements ForumRepository (sin foros eliminados).
+func (repo *forumRepositoryImpl) FindByID(id uuid.UUID) (*entities.Forum, error) {
+	var forum entities.Forum
+	result := repo.db.First(&forum, "id = ?", id)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &forum, nil
+}
+
+// FindByIDWithDeleted implements ForumRepository (incluye foros eliminados).
+func (repo *forumRepositoryImpl) FindByIDWithDeleted(id uuid.UUID) (*entities.Forum, error) {
+	var forum entities.Forum
+	result := repo.db.Unscoped().First(&forum, "id = ?", id)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &forum, nil
 }
 
 // FindByName implements ForumRepository.
-func (db *forumRepositoryImpl) FindByName(name string) (*entities.Forum, error) {
-	panic("unimplemented")
+func (repo *forumRepositoryImpl) FindByName(name string) (*entities.Forum, error) {
+	var forum entities.Forum
+	result := repo.db.First(&forum, "name = ?", name)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &forum, nil
 }
 
 // Update implements ForumRepository.
-func (db *forumRepositoryImpl) Update(forum *entities.Forum) error {
-	panic("unimplemented")
+func (repo *forumRepositoryImpl) Update(forum *entities.Forum) error {
+	// Actualizar foro
+	result := repo.db.Model(forum).Updates(forum)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 func NewForumRepository(db *gorm.DB) ForumRepository {
