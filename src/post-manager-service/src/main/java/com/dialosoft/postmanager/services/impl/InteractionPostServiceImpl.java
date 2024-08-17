@@ -1,6 +1,7 @@
 package com.dialosoft.postmanager.services.impl;
 
 import com.dialosoft.postmanager.mapper.CommentsMapper;
+import com.dialosoft.postmanager.models.dto.Comments;
 import com.dialosoft.postmanager.models.entities.CommentsEntity;
 import com.dialosoft.postmanager.models.entities.PostEntity;
 import com.dialosoft.postmanager.models.web.request.CreateCommentCommonAttributes;
@@ -12,8 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,17 +26,39 @@ public class InteractionPostServiceImpl implements InteractionsPostService {
     @Override
     public void createComment(CreateCommentCommonAttributes request) {
 
-        PostEntity post = postManagerRepository.findById(UUID.fromString(request.getPostId()))
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+        if (request.getPostId() != null && !request.getPostId().isEmpty()) {
+            // validation of the post must be exist
+            PostEntity post = postManagerRepository.findById(UUID.fromString(request.getPostId()))
+                    .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        CommentsEntity entity = commentsMapper.toEntity(request);
 
-        entity.setPost(post);
-        entity.setCreationTime(LocalDateTime.now());
-        commentsRepository.save(entity);
+            if (request.getCommentId() != null && !request.getCommentId().isEmpty()) {
+                // validation of the commentId for create a reply
+                CommentsEntity parentComment = commentsRepository.findById(UUID.fromString(request.getCommentId()))
+                        .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        post.getComments().add(entity);
-        postManagerRepository.save(post);
+                CommentsEntity replayComment = commentsMapper.toEntity(request);
+                replayComment.setCreationTime(LocalDateTime.now());
+                replayComment.setParentCommentId(parentComment.getId());
+              //  replayComment.setParentComment(parentComment);
+                replayComment.setPost(post);
+                commentsRepository.save(replayComment);
+                post.getComments().add(replayComment);
+                postManagerRepository.save(post);
+
+
+            } else {
+                // other way just create a new comment
+                CommentsEntity entity = commentsMapper.toEntity(request);
+
+                entity.setPost(post);
+                entity.setCreationTime(LocalDateTime.now());
+                commentsRepository.save(entity);
+
+                post.getComments().add(entity);
+                postManagerRepository.save(post);
+            }
+        }
 
     }
 
@@ -73,6 +95,41 @@ public class InteractionPostServiceImpl implements InteractionsPostService {
 
     }
 
+    @Override
+    public List<Comments> getAllCommentsFromPost(String id) {
+            List<Comments> allComments = commentsMapper.toCommentList(
+                    postManagerRepository.findCommentsById(UUID.fromString(id)).get());
+
+
+            Map<String, Comments> commentsMap = new HashMap<>();
+            for (Comments comment : allComments) {
+                commentsMap.put(comment.getId(), comment);
+            }
+
+            List<Comments> rootComments = new ArrayList<>();
+
+
+            for (Comments comment : allComments) {
+                if (comment.getParentCommentId() != null) {
+
+                    Comments parentComment = commentsMap.get(comment.getParentCommentId());
+                    if (parentComment != null) {
+
+                        if (parentComment.getRepliesComment() == null) {
+                            parentComment.setRepliesComment(new ArrayList<>());
+                        }
+                        parentComment.getRepliesComment().add(comment);
+                    }
+                } else {
+
+                    rootComments.add(comment);
+                }
+            }
+
+            return rootComments;
+
+    }
+
 
     @Override
     public void createReaction(CreateReactionCommonAttributes request) {
@@ -106,7 +163,21 @@ public class InteractionPostServiceImpl implements InteractionsPostService {
 
     @Override
     public void modifyReaction(CreateReactionCommonAttributes request) {
+         if (request.getPostId() != null && !request.getPostId().isEmpty() && request.getReaction() != null){
+             int count = request.getReaction()? 1 : -1;
+             PostEntity post = postManagerRepository.findById(UUID.fromString(request.getPostId()))
+                     .orElseThrow(() -> new RuntimeException("Post not found"));
+             int precedentPositivePostCount = post.getPositiveReaction() != null ? post.getPositiveReaction() : 0;
+             int precedentNegativePostCount = post.getNegativeReaction() != null ? post.getNegativeReaction() : 0;
 
+             if (request.getCommentId() != null && !request.getCommentId().isEmpty()){
+                 CommentsEntity existingComment = commentsRepository.findById(UUID.fromString(request.getCommentId()))
+                         .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+             }
+
+
+         }
     }
 
     @Override
