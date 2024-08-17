@@ -85,6 +85,7 @@ spring:
             - name: NonSpringServicesRoutingFilter
               args:
                 belongServiceName: user-microservice
+        ## User Service: Flussen
         - id: user_service_routes
           uri: lb://user-microservice/
           predicates:
@@ -99,8 +100,21 @@ spring:
             - name: NonSpringServicesRoutingFilter
               args:
                 belongServiceName: user-microservice
+        ## Post manager Service: Aleister
         - id: post_manager_service_routes
           uri: lb://post-manager-microservice/
+          predicates:
+            - Path=/dialosoft-api/v1/**, /dialosoft-api/**
+          filters:
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                requiredRoles: ROLE_USER
+        ## Management Service: Flussen
+        - id: management-service_routes
+          uri: lb://management-microservice/
           predicates:
             - Path=/dialosoft-api/v1/**, /dialosoft-api/**
           filters:
