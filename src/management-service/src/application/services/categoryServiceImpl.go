@@ -43,8 +43,8 @@ func (impl *categoryServiceImpl) GetCategoryByID(id uuid.UUID) (*entities.Catego
 }
 
 // UpdateCategory implements CategoryService.
-func (impl *categoryServiceImpl) UpdateCategory(name string, description string) error {
-	category, err := impl.categoryRepo.FindByName(name)
+func (impl *categoryServiceImpl) UpdateCategory(uuid uuid.UUID, name string, description string) error {
+	category, err := impl.categoryRepo.FindByID(uuid)
 	if err != nil {
 		return err
 	}

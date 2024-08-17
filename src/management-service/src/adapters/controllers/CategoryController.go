@@ -33,17 +33,9 @@ func GetAllCategories(c *gin.Context, service services.CategoryService) {
 
 func GetCategoryByID(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
-	var req request.GetCategoryByIdRequest
+	id := c.Param("id")
 
-	if err := c.BindJSON(&req); err != nil {
-		res.StatusCode = http.StatusBadRequest
-		res.Message = "BAD REQUEST"
-		res.Data = nil
-		c.JSON(http.StatusBadRequest, res)
-		return
-	}
-
-	id, err := uuid.Parse(req.CategoryId)
+	uuid, err := uuid.Parse(id)
 	if err != nil {
 		res.StatusCode = http.StatusBadRequest
 		res.Message = "UUID INVALID"
@@ -52,7 +44,7 @@ func GetCategoryByID(c *gin.Context, service services.CategoryService) {
 		return
 	}
 
-	categories, err := service.GetCategoryByID(id)
+	categories, err := service.GetCategoryByID(uuid)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			res.StatusCode = http.StatusNotFound
@@ -106,6 +98,16 @@ func CreateCategory(c *gin.Context, service services.CategoryService) {
 func UpdateCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	var req request.CreateCategoryRequest
+	id := c.Param("id")
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		res.StatusCode = http.StatusBadRequest
+		res.Message = "UUID INVALID"
+		res.Data = nil
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
 
 	if err := c.BindJSON(&req); err != nil {
 		res.StatusCode = http.StatusBadRequest
@@ -115,7 +117,7 @@ func UpdateCategory(c *gin.Context, service services.CategoryService) {
 		return
 	}
 
-	if err := service.UpdateCategory(req.Name, req.Description); err != nil {
+	if err := service.UpdateCategory(uuid, req.Name, req.Description); err != nil {
 		if err == gorm.ErrRecordNotFound {
 			res.StatusCode = http.StatusNotFound
 			res.Message = "NOT FOUND"
