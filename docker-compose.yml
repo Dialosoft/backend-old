@@ -196,7 +196,6 @@ services:
    image: dialosoft-management-service:v1.0
    ports:
      - "8087:8087"
-     - "5008:5005"
    depends_on:
      - registry-service
    networks:
