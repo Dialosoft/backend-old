@@ -59,8 +59,7 @@ func main() {
 	forumRouter := routers.NewForumRouter(forumService)
 	categoryRouter := routers.NewCategoryRouter(categoryService)
 
-	api := router.Group("/dialosoft-api")
-	management := api.Group("/management-service")
+	management := router.Group("/management-service")
 
 	{
 		forumRouter.SetupForumRoutes(management)
