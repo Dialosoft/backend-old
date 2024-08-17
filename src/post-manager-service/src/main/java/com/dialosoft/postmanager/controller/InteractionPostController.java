@@ -1,5 +1,6 @@
 package com.dialosoft.postmanager.controller;
 
+import com.dialosoft.postmanager.models.dto.Comments;
 import com.dialosoft.postmanager.models.web.request.CreateCommentCommonAttributes;
 import com.dialosoft.postmanager.models.web.request.CreateReactionCommonAttributes;
 import com.dialosoft.postmanager.services.InteractionsPostService;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/post-reaction/")
@@ -66,6 +69,19 @@ public class InteractionPostController {
     }
 
     @Operation(
+            summary = "get the comment from a post",
+            description = "provide the list o comment based on the provided post ID.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Comments found successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid post ID or comment not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
+    })
+    @GetMapping("/get-comments")
+    public List<Comments> getAllCommentsFromPost(@RequestParam String id){return service.getAllCommentsFromPost(id);}
+
+    @Operation(
             summary = "Add a reaction to a post or comment",
             description = "Adds a reaction (like or dislike) to a specified post or comment.",
             security = @SecurityRequirement(name = "bearerAuth")
@@ -91,8 +107,8 @@ public class InteractionPostController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
     })
     @PutMapping("/modify-reaction")
-    public void modifyReaction(@RequestBody CreateCommentCommonAttributes request) {
-        service.modifyComment(request);
+    public void modifyReaction(@RequestBody CreateReactionCommonAttributes request) {
+        service.modifyReaction(request);
     }
 
     @Operation(

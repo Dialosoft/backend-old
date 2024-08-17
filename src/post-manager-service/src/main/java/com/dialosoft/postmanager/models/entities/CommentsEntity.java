@@ -35,4 +35,10 @@ public class CommentsEntity {
     ReactionsEntity reactions;
     @Column
     LocalDateTime creationTime;
+    //@ManyToOne
+    //@JoinColumn(name = "parent_comment_id")
+    @Column
+    UUID parentCommentId;
+  //  @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+  //  List<CommentsEntity> repliesComment = new ArrayList<>();
 }
