@@ -21,7 +21,7 @@ func (repo *forumRepositoryImpl) Create(forum *entities.Forum, categoryID uuid.U
 	}
 
 	forum.CategoryID = category.ID.String()
-	forum.Category = *&category
+	forum.Category = category
 
 	result = repo.db.Create(forum)
 	if result.Error != nil {
@@ -122,6 +122,32 @@ func (repo *forumRepositoryImpl) Update(forum *entities.Forum) error {
 	result := repo.db.Model(forum).Updates(forum)
 	if result.Error != nil {
 		return result.Error
+	}
+
+	return nil
+}
+
+// UpdateCategoryOwner implements ForumRepository.
+func (repo *forumRepositoryImpl) UpdateCategoryOwner(id uuid.UUID, categoryID uuid.UUID) error {
+	var category entities.Category
+	var forum entities.Forum
+
+	resultCat := repo.db.Find(&category, "id = ?", categoryID)
+	if resultCat.Error != nil {
+		return resultCat.Error
+	}
+
+	resultFor := repo.db.Find(&forum, "id = ?", id)
+	if resultFor.Error != nil {
+		return resultFor.Error
+	}
+
+	forum.CategoryID = category.ID.String()
+	forum.Category = category
+
+	resultSave := repo.db.Save(&forum)
+	if resultSave.Error != nil {
+		return resultSave.Error
 	}
 
 	return nil

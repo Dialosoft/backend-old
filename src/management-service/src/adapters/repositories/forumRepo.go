@@ -13,6 +13,7 @@ type ForumRepository interface {
 	FindByName(name string) (*entities.Forum, error)
 	Create(forum *entities.Forum, categoryID uuid.UUID) error
 	Update(forum *entities.Forum) error
+	UpdateCategoryOwner(id uuid.UUID, categoryID uuid.UUID) error
 	Delete(uuid uuid.UUID) error
 	Restore(uuid uuid.UUID) error
 }
