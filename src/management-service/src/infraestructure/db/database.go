@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/Dialosoft/post-manager-service/src/domain/entities"
+	"github.com/Dialosoft/management-service/src/domain/entities"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

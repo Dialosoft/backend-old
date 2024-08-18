@@ -6,11 +6,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/Dialosoft/post-manager-service/src/adapters/repositories"
-	"github.com/Dialosoft/post-manager-service/src/adapters/routers"
-	"github.com/Dialosoft/post-manager-service/src/application/services"
-	"github.com/Dialosoft/post-manager-service/src/infraestructure/db"
-	"github.com/Dialosoft/post-manager-service/src/infraestructure/registry"
+	"github.com/Dialosoft/management-service/src/adapters/repositories"
+	"github.com/Dialosoft/management-service/src/adapters/routers"
+	"github.com/Dialosoft/management-service/src/application/services"
+	"github.com/Dialosoft/management-service/src/infraestructure/db"
+	"github.com/Dialosoft/management-service/src/infraestructure/registry"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

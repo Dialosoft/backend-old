@@ -3,7 +3,7 @@ package repositories
 import (
 	"fmt"
 
-	"github.com/Dialosoft/post-manager-service/src/domain/entities"
+	"github.com/Dialosoft/management-service/src/domain/entities"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )

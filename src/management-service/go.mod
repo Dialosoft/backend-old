@@ -1,4 +1,4 @@
-module github.com/Dialosoft/post-manager-service
+module github.com/Dialosoft/management-service
 
 go 1.22.0
 

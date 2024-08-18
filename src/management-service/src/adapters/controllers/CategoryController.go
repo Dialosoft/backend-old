@@ -3,9 +3,10 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Dialosoft/post-manager-service/src/application/services"
-	"github.com/Dialosoft/post-manager-service/src/domain/entities/request"
-	"github.com/Dialosoft/post-manager-service/src/domain/entities/response"
+	"github.com/Dialosoft/management-service/src/application/services"
+	"github.com/Dialosoft/management-service/src/domain/entities/request"
+	"github.com/Dialosoft/management-service/src/domain/entities/response"
+	utility "github.com/Dialosoft/management-service/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -17,10 +18,10 @@ func GetAllCategories(c *gin.Context, service services.CategoryService) {
 	categories, err := service.GetAllCategories()
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			res.StatusCode = http.StatusNotFound
-			res.Message = "NOT FOUND"
-			res.Data = nil
-			c.JSON(http.StatusNotFound, res)
+			utility.ErrNotFound(c)
+			return
+		} else {
+			utility.ErrInternalServer(c)
 			return
 		}
 	}

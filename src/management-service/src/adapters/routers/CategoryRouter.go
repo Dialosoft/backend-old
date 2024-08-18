@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"github.com/Dialosoft/post-manager-service/src/adapters/controllers"
-	"github.com/Dialosoft/post-manager-service/src/application/services"
+	"github.com/Dialosoft/management-service/src/adapters/controllers"
+	"github.com/Dialosoft/management-service/src/application/services"
 	"github.com/gin-gonic/gin"
 )
 

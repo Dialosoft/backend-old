@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/Dialosoft/post-manager-service/src/adapters/repositories"
-	"github.com/Dialosoft/post-manager-service/src/domain/entities"
+	"github.com/Dialosoft/management-service/src/adapters/repositories"
+	"github.com/Dialosoft/management-service/src/domain/entities"
 	"github.com/google/uuid"
 )
 
