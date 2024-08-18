@@ -69,6 +69,21 @@ func (impl *forumServiceImpl) RestoreForum(id uuid.UUID) error {
 	return nil
 }
 
+// UpdateForumCategoryOwner implements ForumService.
+func (*forumServiceImpl) UpdateForumCategoryOwner(id uuid.UUID, categoryID uuid.UUID) error {
+	panic("unimplemented")
+}
+
+// UpdateForumDescription implements ForumService.
+func (*forumServiceImpl) UpdateForumDescription(id uuid.UUID, description string) error {
+	panic("unimplemented")
+}
+
+// UpdateForumName implements ForumService.
+func (*forumServiceImpl) UpdateForumName(id uuid.UUID, name string) error {
+	panic("unimplemented")
+}
+
 // UpdateCountPostForum implements ForumService.
 func (impl *forumServiceImpl) UpdateCountPostForum(id uuid.UUID, posts int) error {
 	forum, err := impl.forumRepo.FindByID(id)
@@ -82,34 +97,6 @@ func (impl *forumServiceImpl) UpdateCountPostForum(id uuid.UUID, posts int) erro
 	err = impl.forumRepo.Update(forum)
 	if err != nil {
 		return nil
-	}
-
-	return nil
-}
-
-// UpdateForum implements ForumService.
-func (impl *forumServiceImpl) UpdateForum(id uuid.UUID, name string, description string, categoryOwner *entities.Category) error {
-	forum, err := impl.forumRepo.FindByID(id)
-	if err != nil {
-		return err
-	}
-
-	if name != "" {
-		forum.Name = name
-	}
-
-	if name != "" {
-		forum.Description = description
-	}
-
-	if categoryOwner != nil {
-		forum.CategoryID = categoryOwner.ID.String()
-		forum.Category = *categoryOwner
-	}
-
-	err = impl.forumRepo.Update(forum)
-	if err != nil {
-		return err
 	}
 
 	return nil
