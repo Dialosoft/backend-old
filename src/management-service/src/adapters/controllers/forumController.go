@@ -198,3 +198,59 @@ func UpdateForumDescription(c *gin.Context, service services.ForumService) {
 
 	c.JSON(http.StatusOK, res)
 }
+
+func DeleteForum(c *gin.Context, service services.ForumService) {
+	id := c.Param("id")
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		utility.ErrInvalidUUID(c)
+		return
+	}
+
+	err = service.DeleteForum(uuid)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utility.ErrNotFound(c)
+			return
+		} else {
+			utility.ErrInternalServer(c)
+			return
+		}
+	}
+
+	res := response.Standard{
+		StatusCode: http.StatusOK,
+		Message:    "DELETED",
+		Data:       nil,
+	}
+	c.JSON(http.StatusOK, res)
+}
+
+func RestoreForum(c *gin.Context, service services.ForumService) {
+	id := c.Param("id")
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		utility.ErrInvalidUUID(c)
+		return
+	}
+
+	err = service.RestoreForum(uuid)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utility.ErrNotFound(c)
+			return
+		} else {
+			utility.ErrInternalServer(c)
+			return
+		}
+	}
+
+	res := response.Standard{
+		StatusCode: http.StatusOK,
+		Message:    "RESTORED",
+		Data:       nil,
+	}
+	c.JSON(http.StatusOK, res)
+}
