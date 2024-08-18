@@ -11,13 +11,13 @@ type forumServiceImpl struct {
 }
 
 // CreateForum implements ForumService.
-func (impl *forumServiceImpl) CreateForum(name string, description string, categoryOwner *entities.Category) error {
+func (impl *forumServiceImpl) CreateForum(name string, description string, categoryID uuid.UUID) error {
 	newForum := entities.Forum{
 		Name:        name,
 		Description: description,
 	}
 
-	err := impl.forumRepo.Create(&newForum, categoryOwner)
+	err := impl.forumRepo.Create(&newForum, categoryID)
 	if err != nil {
 		return err
 	}

@@ -11,7 +11,7 @@ type ForumRepository interface {
 	FindByID(uuid uuid.UUID) (*entities.Forum, error)
 	FindByIDWithDeleted(uuid uuid.UUID) (*entities.Forum, error)
 	FindByName(name string) (*entities.Forum, error)
-	Create(forum *entities.Forum, categoryOwner *entities.Category) error
+	Create(forum *entities.Forum, categoryID uuid.UUID) error
 	Update(forum *entities.Forum) error
 	Delete(uuid uuid.UUID) error
 	Restore(uuid uuid.UUID) error

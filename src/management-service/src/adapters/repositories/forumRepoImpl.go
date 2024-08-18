@@ -13,11 +13,17 @@ type forumRepositoryImpl struct {
 }
 
 // Create implements ForumRepository.
-func (repo *forumRepositoryImpl) Create(forum *entities.Forum, categoryOwner *entities.Category) error {
-	forum.CategoryID = categoryOwner.ID.String()
-	forum.Category = *categoryOwner
+func (repo *forumRepositoryImpl) Create(forum *entities.Forum, categoryID uuid.UUID) error {
+	var category entities.Category
+	result := repo.db.Find(&category, "id = ?", categoryID.String())
+	if result.Error != nil {
+		return result.Error
+	}
 
-	result := repo.db.Create(forum)
+	forum.CategoryID = category.ID.String()
+	forum.Category = *&category
+
+	result = repo.db.Create(forum)
 	if result.Error != nil {
 		return result.Error
 	}
