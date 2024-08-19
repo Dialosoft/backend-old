@@ -2,8 +2,8 @@ app:
   security:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
-      access-token-expiration: 10
-      refresh-token-expiration: 60
+      access-token-expiration: 20
+      refresh-token-expiration: 1440
 
 logging:
   level:

@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +16,6 @@ public class Comments extends BasicCommonAttributes{
     Integer positiveReaction;
     Integer negativeReaction;
     LocalDateTime creationTime;
+    String parentCommentId;
+    List<Comments> repliesComment;
 }

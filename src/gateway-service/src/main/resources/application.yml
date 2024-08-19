@@ -11,6 +11,12 @@ app:
     - /dialosoft-api/auth/register
     - /dialosoft-api/auth/refresh-token
     - /dialosoft-api/user/test
+  uriServices:
+    auth-microservice: lb://auth-microservice/
+    user-microservice: lb://user-microservice/
+    post-manager-microservice: lb://post-manager-microservice/
+  cacheableRoutes:
+    - /user-service/get-user-info
 
 
 # SPRING configuration
@@ -48,7 +54,7 @@ spring:
           predicates:
             - Path=/actuator/**
         - id: auth_service_hello_world_route
-          uri: lb://auth-microservice/
+          uri: ${app.uriServices.auth-microservice}
           predicates:
             - Path=/dialosoft-api/hello-world
           filters:
@@ -59,35 +65,24 @@ spring:
               args:
                   requiredRoles: ROLE_USER
         - id: auth_service_routes
-          uri: lb://auth-microservice/
+          uri: ${app.uriServices.auth-microservice}
           predicates:
             - Path=/dialosoft-api/auth/**
           filters:
             - AddRequestHeader=X-Request-Service, auth-microservice
             - StripPrefix=1
-        - id: user_test_service_route
-          uri: lb://user-microservice/
-          predicates:
-            - Path=/dialosoft-api/user-service/test
-          filters:
-            - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1
-            - name: NonSpringServicesRoutingFilter # For non-spring-boot services
-              args:
-                belongServiceName: user-microservice
-        - id: user_service_routes_swagger
-          uri: lb://user-microservice/
-          predicates:
-            - Path=/dialosoft-api/user-service/swagger/index.html
-          filters:
-            - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1
-            - name: NonSpringServicesRoutingFilter
-              args:
-                belongServiceName: user-microservice
-        ## User Service: Flussen
+#        - id: user_service_routes_swagger
+#          uri: ${app.uriServices.auth-microservice}
+#          predicates:
+#            - Path=/dialosoft-api/user-service/swagger/index.html
+#          filters:
+#            - AddRequestHeader=X-Request-Service, user-microservice
+#            - StripPrefix=1
+#            - name: NonSpringServicesRoutingFilter
+#              args:
+#                belongServiceName: user-microservice
         - id: user_service_routes
-          uri: lb://user-microservice/
+          uri: ${app.uriServices.user-microservice}
           predicates:
             - Path=/dialosoft-api/user-service/**
           filters:
@@ -97,9 +92,21 @@ spring:
             - name: RoleBasedAuthorizationFilter
               args:
                 requiredRoles: ROLE_USER
-            - name: NonSpringServicesRoutingFilter
+            - name: NonSpringServicesRoutingFilter # must be the last filter due to first has to be applied token verification filters
               args:
                 belongServiceName: user-microservice
+            - name: CheckCacheRedisFilter
+        - id: post_manager_service_routes
+          uri: ${app.uriServices.post-manager-microservice}
+          predicates:
+            - Path=/dialosoft-api/post-manager-service
+          filters:
+            - AddRequestHeader=X-Request-Service, auth-microservice
+            - StripPrefix=1
+            - name: JwtAuthenticationFilter
+            - name: RoleBasedAuthorizationFilter
+              args:
+                requiredRoles: ROLE_USER
         ## Management Service: Flussen
         - id: management-service_routes
           uri: lb://management-microservice/
@@ -115,18 +122,6 @@ spring:
             - name: NonSpringServicesRoutingFilter
               args:
                 belongServiceName: management-microservice
-        ## Post manager Service: Aleister
-        - id: post_manager_service_routes
-          uri: lb://post-manager-microservice/
-          predicates:
-            - Path=/dialosoft-api/post-manager-service
-          filters:
-            - AddRequestHeader=X-Request-Service, auth-microservice
-            - StripPrefix=1
-            - name: JwtAuthenticationFilter
-            - name: RoleBasedAuthorizationFilter
-              args:
-                requiredRoles: ROLE_USER
         # * Other service template
 #        - id: other_service_routes
 #          uri: lb://other-microservice/

@@ -38,7 +38,7 @@ public class UserEntity {
     @Builder.Default
     private Boolean disable = Boolean.FALSE;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private RoleEntity role;
 

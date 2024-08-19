@@ -35,7 +35,7 @@ public class SimpleController {
         return ResponseEntity.ok(ResponseBody.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Hello world successful")
-                .metadata(null)
+                .data(null)
                 .build());
     }
 }

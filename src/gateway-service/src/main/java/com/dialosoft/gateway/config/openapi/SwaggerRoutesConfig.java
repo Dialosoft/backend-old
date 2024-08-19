@@ -8,6 +8,8 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 
 import java.util.Objects;
@@ -20,6 +22,8 @@ public class SwaggerRoutesConfig {
     private String gatewayServiceName;
     @Autowired
     private SwaggerProperties swaggerProperties;
+    @Autowired
+    private Environment environment;
 
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
@@ -29,8 +33,15 @@ public class SwaggerRoutesConfig {
                 .filter(swaggerUrlConfig -> Objects.nonNull(swaggerUrlConfig.getBelongServiceName()))
                 .filter(swaggerUrlConfig -> !swaggerUrlConfig.getBelongServiceName().equals(gatewayServiceName))
                 .forEach(swaggerUrlConfig -> {
+
                     String pathOpenApiService = swaggerUrlConfig.getUrl();
-                    String baseUriService = "lb://" + swaggerUrlConfig.getBelongServiceName();
+                    String baseUriService;
+                    if (environment.acceptsProfiles(Profiles.of("local"))) {
+                        baseUriService = swaggerUrlConfig.getBelongServiceName();
+                    } else {
+                        baseUriService = "lb://" + swaggerUrlConfig.getBelongServiceName();
+                    }
+
                     routes.route(r -> r.path(pathOpenApiService)
                             .and()
                             .method(HttpMethod.GET)

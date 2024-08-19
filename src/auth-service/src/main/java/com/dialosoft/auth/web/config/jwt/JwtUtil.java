@@ -88,9 +88,11 @@ public class JwtUtil {
     public boolean isValid(String jwt) {
         try {
 
-            // Check if the token is blacklisted first
-            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
-                return false;
+            if (tokenBlacklistService.isRedisAvailable()) {
+                // Check if the token is blacklisted first
+                if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                    return false;
+                }
             }
 
             JWTVerifier verifier = JWT.require(algorithmWithSecret)
