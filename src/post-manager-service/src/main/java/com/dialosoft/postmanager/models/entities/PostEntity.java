@@ -22,6 +22,7 @@ public class PostEntity {
      UUID id;
      @Column()
      String username;
+     String forumId;
      @Column()
      String content;
      @Column()
