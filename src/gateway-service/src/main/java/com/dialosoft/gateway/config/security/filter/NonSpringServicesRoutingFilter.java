@@ -5,6 +5,9 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.netflix.eureka.EurekaServiceInstance;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -17,11 +20,13 @@ public class NonSpringServicesRoutingFilter extends AbstractGatewayFilterFactory
 
     private final DiscoveryClient discoveryClient;
     private final WebClient.Builder webClientBuilder;
+    private final Environment environment;
 
-    public NonSpringServicesRoutingFilter(DiscoveryClient discoveryClient, WebClient.Builder webClientBuilder) {
+    public NonSpringServicesRoutingFilter(DiscoveryClient discoveryClient, WebClient.Builder webClientBuilder, Environment environment) {
         super(Config.class);
         this.discoveryClient = discoveryClient;
         this.webClientBuilder = webClientBuilder;
+        this.environment = environment;
     }
 
     @Data
@@ -32,6 +37,11 @@ public class NonSpringServicesRoutingFilter extends AbstractGatewayFilterFactory
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+
+            if (environment.acceptsProfiles(Profiles.of("local"))) {
+                return chain.filter(exchange);
+            }
+
             ServerHttpRequest request = exchange.getRequest();
 
             String baseUrl = getGatewayBaseUrl(config.getBelongServiceName());
@@ -55,13 +65,7 @@ public class NonSpringServicesRoutingFilter extends AbstractGatewayFilterFactory
                                 });
                     });
 
-            return responseMono.then(Mono.defer(() -> {
-                // Ensure the chain is continued only if the response has not been committed
-                if (!exchange.getResponse().isCommitted()) {
-                    return chain.filter(exchange);
-                }
-                return Mono.empty(); // If committed, terminate the chain
-            }));
+            return responseMono.then(chain.filter(exchange));
         };
     }
 
