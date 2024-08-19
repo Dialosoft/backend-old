@@ -10,11 +10,13 @@ import com.dialosoft.gateway.config.security.dto.RoleDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -37,9 +39,11 @@ public class JwtUtils {
     public boolean isValid(String jwt) {
         try {
 
-            // Check if the token is blacklisted first
-            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
-                return false;
+            if (tokenBlacklistService.isRedisAvailable()) {
+                // Check if the token is blacklisted first
+                if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                    return false;
+                }
             }
 
             JWTVerifier verifier = JWT.require(algorithmWithSecret).build();
@@ -104,6 +108,10 @@ public class JwtUtils {
 
     public DecodedJWT decodeTokenWithoutVerification(String jwt) {
         return JWT.decode(jwt);
+    }
+
+    public String extractToken(ServerHttpRequest request) {
+        return Objects.requireNonNull(request.getHeaders().getFirst("Authorization")).substring(7);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.dialosoft.auth.persistence.response;
+package com.dialosoft.gateway.config.security.dto;
 
 import lombok.*;
 

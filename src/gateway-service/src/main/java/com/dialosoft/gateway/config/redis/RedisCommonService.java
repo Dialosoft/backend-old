@@ -1,30 +1,20 @@
-package com.dialosoft.auth.service;
+package com.dialosoft.gateway.config.redis;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Getter
 @Slf4j
-public class TokenBlacklistService {
+public class RedisCommonService {
 
-    private final RedisTemplate<String, String> redisTemplate;
-
-    public void addToBlacklist(String token, Long expirationTime) {
-        if (!isTokenBlacklisted(token)) {
-            // Use the token as a key and assign an expiration in seconds
-            redisTemplate.opsForValue().set(token, "blacklisted", expirationTime, TimeUnit.SECONDS);
-        }
-    }
-
-    public boolean isTokenBlacklisted(String token) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(token));
-    }
+    protected final RedisTemplate<String, Object> redisTemplate;
 
     public boolean isRedisAvailable() {
         try {

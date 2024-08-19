@@ -12,4 +12,5 @@ public class JwtResponseDTO {
     private String accessToken;
     private Long accessTokenExpiresInSeconds;
     private String refreshToken;
+    private Long refreshTokenExpiresInSeconds;
 }

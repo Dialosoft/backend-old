@@ -1,12 +1,14 @@
-package com.dialosoft.auth.web.config.error.exception;
+package com.dialosoft.gateway.config.error.exception;
 
-import com.dialosoft.auth.persistence.response.ErrorDTO;
+import com.dialosoft.gateway.config.error.dto.ErrorDTO;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
+@Getter
 public class CustomTemplateException extends RuntimeException {
 
     protected final Throwable innerException;

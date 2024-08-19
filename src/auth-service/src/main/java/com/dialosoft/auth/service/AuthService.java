@@ -25,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -47,7 +46,7 @@ public class AuthService {
 
         if (userEntityOp.isPresent()) {
 
-            throw new CustomTemplateException("any of the parameters already exists", "Username or email already exists", null, HttpStatus.CONFLICT);
+            throw new CustomTemplateException("any of the parameters already exists", null, HttpStatus.CONFLICT);
         }
 
         UserEntity newUser;
@@ -67,13 +66,13 @@ public class AuthService {
 
         } catch (Exception e) {
 
-            throw new CustomTemplateException("An error occurred while creating the user", "Internal Server Error", e, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomTemplateException("An error occurred while creating the user", e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         ResponseBody<?> response = ResponseBody.builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message(String.format("User %s created sucessfully", newUser.getId()))
-                .metadata(null)
+                .data(null)
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -96,17 +95,19 @@ public class AuthService {
                 String accessToken = jwtUtil.generateAccessToken(userEntity.getId(), loginDto.getUsername(), authentication.getAuthorities());
                 Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
                 RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(loginDto.getUsername());
+                Long refreshTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(refreshToken.getRefreshToken());
 
                 JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
                         .accessToken(accessToken)
                         .accessTokenExpiresInSeconds(accessTokenExpiresInSeconds)
                         .refreshToken(refreshToken.getRefreshToken())
+                        .refreshTokenExpiresInSeconds(refreshTokenExpiresInSeconds)
                         .build();
 
                 ResponseBody<JwtResponseDTO> response = ResponseBody.<JwtResponseDTO>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("Authentication successfully")
-                        .metadata(jwtResponseDTO)
+                        .data(jwtResponseDTO)
                         .build();
 
                 return new ResponseEntity<>(response, HttpStatus.OK);
@@ -117,7 +118,7 @@ public class AuthService {
 
         } catch (BadCredentialsException e) {
 
-            throw new CustomTemplateException("Invalid credentials", "Unauthorized", e, HttpStatus.UNAUTHORIZED);
+            throw new CustomTemplateException("Invalid credentials", e, HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -135,17 +136,18 @@ public class AuthService {
                     JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
                             .accessToken(accessToken)
                             .accessTokenExpiresInSeconds(accessTokenExpiresInSeconds)
-                            .refreshToken(refreshTokenDto.getRefreshToken()).build();
+                            .refreshToken(refreshTokenDto.getRefreshToken())
+                            .build();
 
                     ResponseBody<JwtResponseDTO> response = ResponseBody.<JwtResponseDTO>builder()
                             .statusCode(HttpStatus.OK.value())
                             .message("Pair tokens created successfully")
-                            .metadata(jwtResponseDTO)
+                            .data(jwtResponseDTO)
                             .build();
 
                     return new ResponseEntity<>(response, HttpStatus.OK);
                 })
-                .orElseThrow(() -> new RuntimeException(String.format("Refresh token: '%s' was not found in our system", refreshTokenDto.getRefreshToken())));
+                .orElseThrow(() -> new CustomTemplateException("Refresh token not found in our system, this commonly means that was expired", null, HttpStatus.UNAUTHORIZED));
     }
 
     public ResponseEntity<ResponseBody<?>> logout(String accessToken) {
@@ -164,7 +166,7 @@ public class AuthService {
         ResponseBody<?> response = ResponseBody.builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Logout successfully")
-                .metadata(null)
+                .data(null)
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
