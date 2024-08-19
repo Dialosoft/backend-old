@@ -8,27 +8,24 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 public class CustomTemplateException extends RuntimeException {
-    protected final String errorCode;
+
     protected final Throwable innerException;
     protected final HttpStatus httpStatus;
 
-    public CustomTemplateException(String message, String errorCode) {
+    public CustomTemplateException(String message) {
         super(message);
-        this.errorCode = errorCode;
         this.innerException = null;
         this.httpStatus = HttpStatus.BAD_REQUEST;
     }
 
-    public CustomTemplateException(String message, String errorCode, Throwable cause) {
+    public CustomTemplateException(String message, Throwable cause) {
         super(message, cause);
-        this.errorCode = errorCode;
         this.innerException = cause;
         this.httpStatus = HttpStatus.BAD_REQUEST;
     }
 
-    public CustomTemplateException(String message, String errorCode, Throwable cause, HttpStatus httpStatus) {
+    public CustomTemplateException(String message, Throwable cause, HttpStatus httpStatus) {
         super(message, cause);
-        this.errorCode = errorCode;
         this.innerException = cause;
         this.httpStatus = httpStatus;
     }
