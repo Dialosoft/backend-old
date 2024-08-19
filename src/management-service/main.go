@@ -6,12 +6,15 @@ import (
 	"net"
 	"time"
 
+	docs "github.com/Dialosoft/management-service/docs"
 	"github.com/Dialosoft/management-service/src/adapters/repositories"
 	"github.com/Dialosoft/management-service/src/adapters/routers"
 	"github.com/Dialosoft/management-service/src/application/services"
 	"github.com/Dialosoft/management-service/src/infraestructure/db"
 	"github.com/Dialosoft/management-service/src/infraestructure/registry"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -65,6 +68,11 @@ func main() {
 		forumRouter.SetupForumRoutes(management)
 		categoryRouter.SetupCategoryRoutes(management)
 	}
+
+	docs.SwaggerInfo.BasePath = "/swagger"
+	docs := management.Group("/swagger")
+
+	docs.GET("/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Run(fmt.Sprintf(":%d", port))
 }
