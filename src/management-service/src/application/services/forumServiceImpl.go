@@ -15,6 +15,7 @@ func (impl *forumServiceImpl) CreateForum(name string, description string, categ
 	newForum := entities.Forum{
 		Name:        name,
 		Description: description,
+		IsActive:    true,
 	}
 
 	err := impl.forumRepo.Create(&newForum, categoryID)
