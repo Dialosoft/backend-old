@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/biznetbb/user-service/src/domain/entities"
+	"github.com/Dialosoft/user-service/src/domain/entities"
 	"github.com/google/uuid"
 )
 

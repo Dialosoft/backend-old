@@ -2,7 +2,7 @@
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:${DATASOURCE_PORT}/${DATASOURCE_DB}
+    url: jdbc:postgresql://localhost:${DATASOURCE_PORT_LOCAL}/${DATASOURCE_DB}
 
 eureka:
   instance:
@@ -12,3 +12,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+
+openapi:
+  service:
+    url: http://localhost:8081
