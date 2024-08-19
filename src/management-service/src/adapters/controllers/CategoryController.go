@@ -13,6 +13,15 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetAllCategories godoc
+// @Summary Get all categories
+// @Description Get a list of all categories
+// @Tags categories
+// @Produce json
+// @Success 200 {object} response.Standard
+// @Failure 404 {object} response.Standard "Not Found"
+// @Failure 500 {object} response.Standard "Internal Server Error"
+// @Router /get-all-categories [get]
 func GetAllCategories(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 
@@ -33,6 +42,17 @@ func GetAllCategories(c *gin.Context, service services.CategoryService) {
 	c.JSON(http.StatusOK, res)
 }
 
+// GetCategoryByID godoc
+// @Summary Get category by ID
+// @Description Get a single category by its UUID
+// @Tags categories
+// @Produce json
+// @Param id path string true "Category ID"
+// @Success 200 {object} response.Standard
+// @Failure 400 {object} response.Standard "Invalid UUID"
+// @Failure 404 {object} response.Standard "Not Found"
+// @Failure 500 {object} response.Standard "Internal Server Error"
+// @Router /get-category-id/{id} [get]
 func GetCategoryByID(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	id := c.Param("id")
@@ -60,6 +80,18 @@ func GetCategoryByID(c *gin.Context, service services.CategoryService) {
 	c.JSON(http.StatusOK, res)
 }
 
+// CreateCategory godoc
+// @Summary Create a new category
+// @Description Create a new category with a name and description
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param request body request.CreateCategoryRequest true "Category creation data"
+// @Success 201 {object} response.Standard
+// @Failure 400 {object} response.Standard "Bad Request"
+// @Failure 409 {object} response.Standard "Conflict (Duplicate Category)"
+// @Failure 500 {object} response.Standard "Internal Server Error"
+// @Router /create-category [post]
 func CreateCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	var req request.CreateCategoryRequest
@@ -85,6 +117,19 @@ func CreateCategory(c *gin.Context, service services.CategoryService) {
 	c.JSON(http.StatusCreated, res)
 }
 
+// UpdateCategory godoc
+// @Summary Update a category by ID
+// @Description Update a category's name and description by its UUID
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param id path string true "Category ID"
+// @Param request body request.CreateCategoryRequest true "Category update data"
+// @Success 200 {object} response.Standard
+// @Failure 400 {object} response.Standard "Invalid UUID"
+// @Failure 404 {object} response.Standard "Category Not Found"
+// @Failure 500 {object} response.Standard "Internal Server Error"
+// @Router /update-category/{id} [put]
 func UpdateCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	var req request.CreateCategoryRequest
@@ -122,6 +167,17 @@ func UpdateCategory(c *gin.Context, service services.CategoryService) {
 	c.JSON(http.StatusOK, res)
 }
 
+// DeleteCategory godoc
+// @Summary Delete a category by ID
+// @Description Soft delete a category by its UUID
+// @Tags categories
+// @Produce json
+// @Param id path string true "Category ID"
+// @Success 200 {object} response.Standard
+// @Failure 400 {object} response.Standard "Invalid UUID"
+// @Failure 404 {object} response.Standard "Category Not Found"
+// @Failure 500 {object} response.Standard "Internal Server Error"
+// @Router /delete-category/{id} [delete]
 func DeleteCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	id := c.Param("id")
@@ -148,6 +204,17 @@ func DeleteCategory(c *gin.Context, service services.CategoryService) {
 	c.JSON(http.StatusOK, res)
 }
 
+// RestoreCategory godoc
+// @Summary Restore a soft deleted category by ID
+// @Description Restore a category that was previously soft deleted by its UUID
+// @Tags categories
+// @Produce json
+// @Param id path string true "Category ID"
+// @Success 200 {object} response.Standard
+// @Failure 400 {object} response.Standard "Invalid UUID"
+// @Failure 404 {object} response.Standard "Category Not Found"
+// @Failure 500 {object} response.Standard "Internal Server Error"
+// @Router /restore-category/{id} [post]
 func RestoreCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	id := c.Param("id")
