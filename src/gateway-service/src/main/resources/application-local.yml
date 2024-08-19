@@ -6,6 +6,7 @@ app:
     auth-microservice: http://localhost:8081
     user-microservice: http://localhost:8086
     post-manager-microservice: http://localhost:8084
+    management-microservice: http://localhost:8087
 
 # SPRING configuration
 

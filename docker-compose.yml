@@ -189,6 +189,27 @@ services:
       retries: 5
     command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
 
+  management-service:
+   build:
+     context: src/management-service
+   container_name: management-service
+   image: dialosoft-management-service:v1.0
+   ports:
+     - "8087:8087"
+   depends_on:
+     - registry-service
+   networks:
+     - dialosoft-network
+   env_file:
+     - .env
+   environment:
+     DATASOURCE_HOST: ${DATASOURCE_HOST}
+     DATASOURCE_PORT: 5432
+     DATASOURCE_DB: ${DATASOURCE_DB}
+     DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+     DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+
 volumes:
   dialosoft-db-data:
     name: dialosoft-db-data
