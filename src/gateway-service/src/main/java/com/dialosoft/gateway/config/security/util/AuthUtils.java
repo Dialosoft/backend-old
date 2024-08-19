@@ -1,16 +1,13 @@
 package com.dialosoft.gateway.config.security.util;
 
 import com.dialosoft.gateway.config.security.dto.RoleDTO;
+import com.dialosoft.gateway.config.security.dto.UserCacheInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 @Component
 public class AuthUtils {
@@ -35,6 +32,19 @@ public class AuthUtils {
                 .header("X-Auth-Role", mainRoleJson)
                 .header("X-Auth-Username", jwtUtils.getUsername(token))
                 .header("X-Auth-UserId", jwtUtils.getUserId(token))
+                .build();
+    }
+
+    public void mutateRequestWithAuthHeaders(ServerWebExchange exchange, UserCacheInfo userCacheInfo) {
+
+        // We mutate the request with the user information obtained from Redis
+        var mainRole = userCacheInfo.getRole();
+        String mainRoleJson = convertRoleDTOToJson(mainRole);
+
+        exchange.getRequest().mutate()
+                .header("X-Auth-Role", mainRoleJson)
+                .header("X-Auth-Username", userCacheInfo.getUsername())
+                .header("X-Auth-UserId", userCacheInfo.getUuid())
                 .build();
     }
 
