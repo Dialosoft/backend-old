@@ -12,5 +12,6 @@ public interface PostManagerService {
 
     PostManagerResponse GetPost(String id);
     List<PostManagerResponse> GetMultiPost(String username);
+    List<PostManagerResponse> GetMultiPostFromForum(String forumId);
 
 }

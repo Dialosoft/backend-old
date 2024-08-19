@@ -96,10 +96,20 @@ public class PostManagerController {
             @ApiResponse(responseCode = "404", description = "No posts found for the given username", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
     })
-    @GetMapping("get-post-from-id")
+    @GetMapping("get-post-from-user")
     public List<PostManagerResponse> getAllPostFromUser(@RequestParam String username) {
        return service.GetMultiPost(username);
     }
 
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostManagerResponse.class))),
+            @ApiResponse(responseCode = "404", description = "No posts found for the given forumId", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
+    })
+    @GetMapping("get-post-from-forum")
+    public List<PostManagerResponse> getAllPostFromForum(@RequestParam String forumId) {
+        return service.GetMultiPostFromForum(forumId);
+    }
 
 }

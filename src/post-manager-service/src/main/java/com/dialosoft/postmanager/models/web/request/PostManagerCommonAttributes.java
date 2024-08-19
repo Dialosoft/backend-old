@@ -11,4 +11,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PostManagerCommonAttributes extends BasicCommonAttributes {
     String image;
+    String forumId;
 }
