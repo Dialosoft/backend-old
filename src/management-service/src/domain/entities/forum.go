@@ -19,3 +19,10 @@ type Forum struct {
 	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeleteAt    gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 }
+
+func (f *Forum) BeforeCreate(tx *gorm.DB) (err error) {
+	if f.ID == uuid.Nil {
+		f.ID = uuid.New()
+	}
+	return nil
+}
