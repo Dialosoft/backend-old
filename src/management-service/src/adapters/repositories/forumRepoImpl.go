@@ -55,7 +55,7 @@ func (repo *forumRepositoryImpl) Restore(id uuid.UUID) error {
 // FindAll implements ForumRepository (sin foros eliminados).
 func (repo *forumRepositoryImpl) FindAll() ([]*entities.Forum, error) {
 	var forums []*entities.Forum
-	result := repo.db.Find(&forums)
+	result := repo.db.Preload("Category").Find(&forums)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -77,7 +77,7 @@ func (repo *forumRepositoryImpl) FindAllWithDeleted() ([]*entities.Forum, error)
 // FindByID implements ForumRepository (sin foros eliminados).
 func (repo *forumRepositoryImpl) FindByID(id uuid.UUID) (*entities.Forum, error) {
 	var forum entities.Forum
-	result := repo.db.First(&forum, "id = ?", id)
+	result := repo.db.Preload("Category").First(&forum, "id = ?", id)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
