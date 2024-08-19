@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/Dialosoft/management-service/src/application/services"
 	"github.com/Dialosoft/management-service/src/domain/entities/request"
@@ -69,7 +70,7 @@ func CreateCategory(c *gin.Context, service services.CategoryService) {
 	}
 
 	if err := service.CreateCategory(req.Name, req.Description); err != nil {
-		if err == gorm.ErrDuplicatedKey {
+		if strings.Contains(err.Error(), "duplicate key value") {
 			utility.ErrConflict(c)
 			return
 		} else {

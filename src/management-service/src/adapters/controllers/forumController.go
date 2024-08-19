@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/Dialosoft/management-service/src/application/services"
 	"github.com/Dialosoft/management-service/src/domain/entities/request"
@@ -84,6 +85,9 @@ func CreateForum(c *gin.Context, service services.ForumService) {
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			utility.ErrNotFound(c)
+			return
+		} else if strings.Contains(err.Error(), "duplicate key value") {
+			utility.ErrConflict(c)
 			return
 		} else {
 			utility.ErrInternalServer(c)
