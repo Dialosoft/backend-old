@@ -64,4 +64,10 @@ public class PostManagerServiceImpl implements PostManagerService {
         Optional<List<PostEntity>> entities = postManagerRepository.findByUsername(username);
         return entities.map(mapper::toResponseList).orElse(null);
     }
+
+    @Override
+    public List<PostManagerResponse> GetMultiPostFromForum(String forumId) {
+        Optional<List<PostEntity>> entities = postManagerRepository.findByForumId(forumId);
+        return entities.map(mapper::toResponseList).orElse(null);
+    }
 }
