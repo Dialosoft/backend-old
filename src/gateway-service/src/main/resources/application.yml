@@ -15,6 +15,7 @@ app:
     auth-microservice: lb://auth-microservice/
     user-microservice: lb://user-microservice/
     post-manager-microservice: lb://post-manager-microservice/
+    management-microservice: lb://management-microservice/
   cacheableRoutes:
     - /user-service/get-user-info
 
@@ -109,7 +110,7 @@ spring:
                 requiredRoles: ROLE_USER
         ## Management Service: Flussen
         - id: management-service_routes
-          uri: lb://management-microservice/
+          uri: ${app.uriServices.management-microservice}
           predicates:
             - Path=/dialosoft-api/management-service/**
           filters:
