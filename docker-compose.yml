@@ -17,7 +17,7 @@ services:
     volumes:
       - dialosoft-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dialosoft_user} -d ${DB_NAME:-dialosoft}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-dialosoft_user} -d ${DB_NAME:-dialosoft}" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -58,11 +58,11 @@ services:
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
-    command: ["sh", "-c", "echo 'Registry Service ready to start' && tail -f /dev/null"]
+    command: [ "sh", "-c", "echo 'Registry Service ready to start' && tail -f /dev/null" ]
 
   auth-service:
     build:
@@ -92,39 +92,39 @@ services:
       REDIS_HOST: redis
       REDIS_PORT_LOCAL: ${REDIS_PORT_LOCAL}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
-    command: ["sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null"]
+    command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
 
   user-service:
-   build:
-     context: src/user-service
-   container_name: user-service
-   image: dialosoft-user-service:v1.0
-   ports:
-     - "8086:8086"
-     - "5007:5005"
-   depends_on:
-     - registry-service
-   networks:
-     - dialosoft-network
-   env_file:
-     - .env
-   environment:
-     DATASOURCE_HOST: ${DATASOURCE_HOST}
-     DATASOURCE_PORT: 5432
-     DATASOURCE_DB: ${DATASOURCE_DB}
-     DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
-     DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
-     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-#    command: [ "sh", "-c", "echo 'User Service ready to start' && tail -f /dev/null" ]
+    build:
+      context: src/user-service
+    container_name: user-service
+    image: dialosoft-user-service:v1.0
+    ports:
+      - "8086:8086"
+      - "5007:5005"
+    depends_on:
+      - registry-service
+    networks:
+      - dialosoft-network
+    env_file:
+      - .env
+    environment:
+      DATASOURCE_HOST: ${DATASOURCE_HOST}
+      DATASOURCE_PORT: 5432
+      DATASOURCE_DB: ${DATASOURCE_DB}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
+  #    healthcheck:
+  #      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+  #      interval: 30s
+  #      timeout: 10s
+  #      retries: 5
+  #    command: [ "sh", "-c", "echo 'User Service ready to start' && tail -f /dev/null" ]
 
   post-manager-service:
     build:
@@ -152,11 +152,33 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
-    command: ["sh", "-c", "echo 'Post-Manager Service ready to start' && tail -f /dev/null"]
+    command: [ "sh", "-c", "echo 'Post-Manager Service ready to start' && tail -f /dev/null" ]
+
+
+  management-service:
+    build:
+      context: src/management-service
+    container_name: management-service
+    image: dialosoft-management-service:v1.0
+    ports:
+      - "8087:8087"
+    depends_on:
+      - registry-service
+    networks:
+      - dialosoft-network
+    env_file:
+      - .env
+    environment:
+      DATASOURCE_HOST: ${DATASOURCE_HOST}
+      DATASOURCE_PORT: 5432
+      DATASOURCE_DB: ${DATASOURCE_DB}
+      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
 
   gateway-service:
     build:
@@ -183,32 +205,12 @@ services:
       REDIS_HOST: redis
       REDIS_PORT_LOCAL: ${REDIS_PORT_LOCAL}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
-    command: ["sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null"]
+    command: [ "sh", "-c", "echo 'Gateway Service ready to start' && tail -f /dev/null" ]
 
-  management-service:
-   build:
-     context: src/management-service
-   container_name: management-service
-   image: dialosoft-management-service:v1.0
-   ports:
-     - "8087:8087"
-   depends_on:
-     - registry-service
-   networks:
-     - dialosoft-network
-   env_file:
-     - .env
-   environment:
-     DATASOURCE_HOST: ${DATASOURCE_HOST}
-     DATASOURCE_PORT: 5432
-     DATASOURCE_DB: ${DATASOURCE_DB}
-     DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
-     DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
-     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
 
 volumes:
   dialosoft-db-data:
