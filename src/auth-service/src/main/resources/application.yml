@@ -4,6 +4,7 @@ app:
       secret-key: ${JWT_SECRET_KEY}
       access-token-expiration: 20
       refresh-token-expiration: 1440
+      recover-token-expiration: 8
 
 logging:
   level:

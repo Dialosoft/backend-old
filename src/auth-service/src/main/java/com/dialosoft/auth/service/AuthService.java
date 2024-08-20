@@ -2,8 +2,10 @@ package com.dialosoft.auth.service;
 
 import com.dialosoft.auth.persistence.entity.RefreshToken;
 import com.dialosoft.auth.persistence.entity.RoleEntity;
+import com.dialosoft.auth.persistence.entity.SeedPhraseEntity;
 import com.dialosoft.auth.persistence.entity.UserEntity;
 import com.dialosoft.auth.persistence.repository.RoleRepository;
+import com.dialosoft.auth.persistence.repository.SeedPhraseRepository;
 import com.dialosoft.auth.persistence.repository.UserRepository;
 import com.dialosoft.auth.persistence.response.JwtResponseDTO;
 import com.dialosoft.auth.persistence.response.ResponseBody;
@@ -25,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,6 +42,9 @@ public class AuthService {
     private final SecurityConfig securityConfig;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final SeedPhraseRepository seedPhraseRepository;
+    private final RecoverService recoverService;
+
 
     public ResponseEntity<ResponseBody<?>> register(RegisterDto registerDto) {
 
@@ -64,6 +70,8 @@ public class AuthService {
 
             newUser = userRepository.save(userEntity);
 
+            generatedAndSaveSelectedSeedPhrase(userEntity);
+
         } catch (Exception e) {
 
             throw new CustomTemplateException("An error occurred while creating the user", e, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -76,6 +84,18 @@ public class AuthService {
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    private void generatedAndSaveSelectedSeedPhrase(UserEntity userEntity) {
+
+        List<String> seedPhrase = recoverService.generateSeedPhrase(12);
+
+        SeedPhraseEntity seedPhraseEntity = SeedPhraseEntity.builder()
+                .hashPhrase(recoverService.hashSeedPhrase(seedPhrase))
+                .userId(userEntity.getId())
+                .build();
+
+        seedPhraseRepository.save(seedPhraseEntity);
     }
 
     public ResponseEntity<ResponseBody<?>> login(LoginDto loginDto) {

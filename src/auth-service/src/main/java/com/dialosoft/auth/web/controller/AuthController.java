@@ -1,11 +1,11 @@
 package com.dialosoft.auth.web.controller;
 
 import com.dialosoft.auth.persistence.response.JwtResponseDTO;
+import com.dialosoft.auth.persistence.response.RecoverTokenResponse;
 import com.dialosoft.auth.persistence.response.ResponseBody;
 import com.dialosoft.auth.service.AuthService;
-import com.dialosoft.auth.service.dto.LoginDto;
-import com.dialosoft.auth.service.dto.RefreshTokenDto;
-import com.dialosoft.auth.service.dto.RegisterDto;
+import com.dialosoft.auth.service.RecoverService;
+import com.dialosoft.auth.service.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final RecoverService recoverService;
 
     @Operation(summary = "Register a new user",
             description = "Registers a new user in the system. Validates that the username and email do not already exist and stores the new user's information.")
@@ -81,6 +81,19 @@ public class AuthController {
     public ResponseEntity<ResponseBody<?>> logout(@RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.substring(7); // Extract the token from the Authorization header
         return authService.logout(token);
+    }
+
+    @PostMapping("/recover-token")
+    public ResponseEntity<ResponseBody<RecoverTokenResponse>> recoverToken(
+            @Valid @RequestBody @Schema(implementation = RecoverDto.class) RecoverDto request) {
+
+        return ResponseEntity.ok(recoverService.checkHashPhraseAndGetRecoverToken(request));
+    }
+
+    @PutMapping("/recover-password")
+    public ResponseEntity<?> recoverPassword(@RequestBody RecoverChangePasswordDto request, @RequestHeader("Recover") String header) {
+
+        return ResponseEntity.ok(recoverService.applyRecoverChangePassword(request, header));
     }
 
 }
