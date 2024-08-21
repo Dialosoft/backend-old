@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.Optional;
+
 @Slf4j
 @Configuration
 @Data
@@ -25,23 +27,37 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
-        redisStandaloneConfiguration.setPort(port);
 
-        return new JedisConnectionFactory(redisStandaloneConfiguration);
+            RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+            redisStandaloneConfiguration.setHostName(host);
+            redisStandaloneConfiguration.setPort(port);
+
+            JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
+            jedisConnectionFactory.afterPropertiesSet();
+
+            return jedisConnectionFactory;
     }
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new JdkSerializationRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new JdkSerializationRedisSerializer());
-        template.afterPropertiesSet();
+
+            template.setConnectionFactory(redisConnectionFactory);
+            template.setKeySerializer(new StringRedisSerializer());
+            template.setValueSerializer(new JdkSerializationRedisSerializer());
+            template.setHashKeySerializer(new StringRedisSerializer());
+            template.setHashValueSerializer(new JdkSerializationRedisSerializer());
+            template.afterPropertiesSet();
 
         return template;
+    }
+
+    private boolean isRedisAvailable(JedisConnectionFactory jedisConnectionFactory) {
+        try {
+            return jedisConnectionFactory.getConnection().ping() != null;
+        } catch (Exception e) {
+            log.error("Redis ping failed: {}", e.getMessage());
+            return false;
+        }
     }
 }

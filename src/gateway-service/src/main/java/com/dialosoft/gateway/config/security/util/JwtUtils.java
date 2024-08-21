@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -39,12 +37,11 @@ public class JwtUtils {
     public boolean isValid(String jwt) {
         try {
 
-            if (tokenBlacklistService.isRedisAvailable()) {
-                // Check if the token is blacklisted first
-                if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
-                    return false;
-                }
+            // Check if the token is blacklisted first
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                return false;
             }
+
 
             JWTVerifier verifier = JWT.require(algorithmWithSecret).build();
 

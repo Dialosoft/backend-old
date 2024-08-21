@@ -43,12 +43,22 @@ spring:
 #      file: ./docker-compose.yml
   cloud:
     gateway:
+
       discovery:
         locator:
           enabled: true
           lowerCaseServiceId: true
       httpclient:
+        pool:
+          max-connections: 1000 # max allowed connections
+          connection-timeout: 5000 # max allowed time to establish a connection
+          response-timeout: 10000 # max allowed time to receive data from a connection
         max-header-size: 65536 # max allowed size of header
+      retry:
+        retries: 3
+        backoff:
+          first-backoff: 100ms # define the first initial delay between retries
+          max-backoff: 1000ms # define the maximum delay between retries
       routes:
         - id: actuator_route
           uri: http://localhost:${server.port}
@@ -183,6 +193,11 @@ logging:
 management:
   security:
     enabled: false
+#  health:
+#    circuitbreakers:
+#      enabled: true
+#    ratelimiters:
+#      enabled: true
   endpoints:
     web:
       exposure:
@@ -192,6 +207,22 @@ management:
       enabled: true
     health:
       show-details: always
+
+# RESILIENCE4J
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      redisService:
+#        registerHealthIndicator: true
+#        slidingWindowSize: 10
+#        failureRateThreshold: 50
+#        waitDurationInOpenState: 30s
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        minimumNumberOfCalls: 5
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        recordExceptions:
+#          - org.springframework.data.redis.RedisConnectionFailureException
+#          - java.net.ConnectException
 
 # SWAGGER
 springdoc:
