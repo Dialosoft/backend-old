@@ -1,4 +1,4 @@
-package com.dialosoft.auth.service.dto;
+package com.dialosoft.auth.web.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RecoverDto {
+public class RecoverRequest {
 
     public String username;
     public List<String> seedPhrase;

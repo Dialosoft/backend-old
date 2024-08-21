@@ -23,7 +23,7 @@ public class RefreshTokenService {
 
     public RefreshToken getOrCreateRefreshTokenByUserName(String username) {
 
-        UserEntity userEntity = userSecurityService.getUserByUserName(username);
+        UserEntity userEntity = userSecurityService.getUserByUsername(username);
 
         return refreshTokenRepository.findByUserId(userEntity.getId())
                 .filter(this::isRefreshTokenValid)

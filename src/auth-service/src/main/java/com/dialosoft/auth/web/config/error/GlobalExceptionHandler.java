@@ -1,11 +1,10 @@
 package com.dialosoft.auth.web.config.error;
 
-import com.dialosoft.auth.persistence.response.ErrorDTO;
 import com.dialosoft.auth.web.config.error.exception.CustomTemplateException;
+import com.dialosoft.auth.web.dto.response.ErrorDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,11 +25,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDTO> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
-
+        // Extracting validation error messages
         List<String> validationErrors = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
+                .map(fieldError -> String.format("%s: %s", fieldError.getField(), fieldError.getDefaultMessage()))
                 .collect(Collectors.toList());
 
+        // Building the ErrorDTO with validation errors
         ErrorDTO errorDTO = ErrorDTO.builder()
                 .timestamp(LocalDateTime.now())
                 .statusCode(HttpStatus.BAD_REQUEST.value())
