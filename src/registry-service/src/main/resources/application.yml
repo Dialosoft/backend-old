@@ -5,13 +5,14 @@ spring:
         name: registry-microservice
 
 eureka:
-    instance:
-        hostname: localhost
-        prefer-ip-address: false
+    # Instance properties are not needed for registry service, only in high distribution environments
+#    instance:
+#        hostname: localhost
+#        prefer-ip-address: true
     server:
         waitTimeInMsWhenSyncEmpty: 0
     client:
-        register-with-eureka: false
-        fetch-registry: false
+        register-with-eureka: false  # No se registra a sí mismo
+        fetch-registry: false        # No intenta obtener el registro de otros
         service-url:
             defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
