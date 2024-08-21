@@ -10,8 +10,10 @@ spring:
 eureka:
   instance:
     # ${HOSTNAME} is set by Docker
-    instanceId: ${spring.application.name}:${HOSTNAME}
-    preferIpAddress: true
+    # // TODO: Check why putting with ${HOSTNAME} doesn't work with golang services
+    instanceId: ${spring.application.name}:${server.port}
+#    instanceId: ${spring.application.name}:${HOSTNAME}
+#    preferIpAddress: true
   client:
     serviceUrl:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://registry-service:8761/eureka/}

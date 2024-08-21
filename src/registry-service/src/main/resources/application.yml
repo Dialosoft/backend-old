@@ -6,9 +6,9 @@ spring:
 
 eureka:
     # Instance properties are not needed for registry service, only in high distribution environments
-#    instance:
-#        hostname: localhost
-#        prefer-ip-address: true
+    instance:
+        hostname: localhost
+        prefer-ip-address: false
     server:
         waitTimeInMsWhenSyncEmpty: 0
     client:
