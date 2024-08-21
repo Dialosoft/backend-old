@@ -18,7 +18,6 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DefaultDataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
@@ -108,11 +107,10 @@ public class CacheResponseInRedisFilter implements WebFilter {
             String userId = jwtUtils.getUserId(token);
             Long expirationTime = calculateExpirationTime(token);
 
-            if (!redisCacheService.isKeyPresent(token, userId)) {
-                ResponseBody<?> responseBodyMapped = objectMapper.readValue(responseBody, ResponseBody.class);
-                UserCacheInfo userCacheInfoMapped = objectMapper.convertValue(responseBodyMapped.getData(), UserCacheInfo.class);
-                redisCacheService.addInfoToCache(token, userId, userCacheInfoMapped, expirationTime);
-            }
+            ResponseBody<?> responseBodyMapped = objectMapper.readValue(responseBody, ResponseBody.class);
+            UserCacheInfo userCacheInfoMapped = objectMapper.convertValue(responseBodyMapped.getData(), UserCacheInfo.class);
+            redisCacheService.addInfoToCache(token, userId, userCacheInfoMapped, expirationTime);
+
         } catch (JsonProcessingException e) {
             throw new CustomTemplateException("Error parsing response to UserCacheInfo in saveResponseInRedis()", e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -121,5 +119,5 @@ public class CacheResponseInRedisFilter implements WebFilter {
     private Long calculateExpirationTime(String token) {
         return jwtUtils.getExpirationDate(token).getTime() - System.currentTimeMillis();
     }
-    
+
 }

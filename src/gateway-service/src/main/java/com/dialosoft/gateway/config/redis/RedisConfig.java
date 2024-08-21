@@ -1,5 +1,8 @@
 package com.dialosoft.gateway.config.redis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +16,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.Optional;
+
 @Slf4j
 @Configuration
 @Data
@@ -25,25 +30,56 @@ public class RedisConfig {
     private int port;
 
     @Bean
-    public RedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
-        redisStandaloneConfiguration.setPort(port);
+    public Optional<RedisConnectionFactory> jedisConnectionFactory() {
+        try {
+            RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+            redisStandaloneConfiguration.setHostName(host);
+            redisStandaloneConfiguration.setPort(port);
 
-        return new JedisConnectionFactory(redisStandaloneConfiguration);
+            JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
+            jedisConnectionFactory.afterPropertiesSet();
+
+            if (isRedisAvailable(jedisConnectionFactory)) {
+                log.info("Connected to Redis server at {}:{}", host, port);
+                return Optional.of(jedisConnectionFactory);
+            } else {
+                log.warn("Redis server at {}:{} is not available. The application will continue without Redis.", host, port);
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            log.error("Failed to connect to Redis server at {}:{}: {}", host, port, e.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(Optional<RedisConnectionFactory> redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
-        template.setValueSerializer(serializer);
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(serializer);
-        template.afterPropertiesSet();
+
+        redisConnectionFactory.ifPresent(factory -> {
+
+            template.setConnectionFactory(factory);
+            template.setKeySerializer(new StringRedisSerializer());
+            Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+            template.setValueSerializer(serializer);
+            template.setHashKeySerializer(new StringRedisSerializer());
+            template.setHashValueSerializer(serializer);
+            template.afterPropertiesSet();
+        });
+
+        if (redisConnectionFactory.isEmpty()) {
+            log.warn("RedisTemplate is being created without a connection factory. Redis operations won't be available.");
+        }
 
         return template;
+    }
+
+    private boolean isRedisAvailable(JedisConnectionFactory jedisConnectionFactory) {
+        try {
+            return jedisConnectionFactory.getConnection().ping() != null;
+        } catch (Exception e) {
+            log.error("Redis ping failed: {}", e.getMessage());
+            return false;
+        }
     }
 }

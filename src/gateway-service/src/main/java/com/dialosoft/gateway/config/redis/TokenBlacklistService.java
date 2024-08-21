@@ -22,6 +22,6 @@ public class TokenBlacklistService extends RedisCommonService {
     }
 
     public boolean isTokenBlacklisted(String token) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(token));
+        return isRedisAvailable() && Boolean.TRUE.equals(redisTemplate.hasKey(token));
     }
 }

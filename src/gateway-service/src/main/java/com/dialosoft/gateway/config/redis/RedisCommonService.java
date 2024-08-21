@@ -17,11 +17,12 @@ public class RedisCommonService {
     protected final RedisTemplate<String, Object> redisTemplate;
 
     public boolean isRedisAvailable() {
+        if (redisTemplate == null || redisTemplate.getConnectionFactory() == null) {
+            return false;
+        }
         try {
-            // Attempt a simple operation to check if Redis is available
-            return Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().ping() != null;
+            return redisTemplate.getConnectionFactory().getConnection().ping() != null;
         } catch (Exception e) {
-            // Log the error if Redis is not available
             log.error("Redis is not available: {}", e.getMessage());
             return false;
         }

@@ -69,6 +69,8 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             if (!redisCacheService.isRedisAvailable()) {
                 // If Redis is not available, do the mutation as before
                 authUtils.mutateRequestWithAuthHeaders(exchange, token);
+
+                return chain.filter(exchange);
             }
 
             // Attempt to retrieve user info from Redis
@@ -78,6 +80,8 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
             if (cachedUserInfo != null && cachedUserInfo.getUuid().equals(userId)) {
                 authUtils.mutateRequestWithAuthHeaders(exchange, cachedUserInfo);
+
+                return chain.filter(exchange);
             }
 
             // If not in Redis, proceed as before
