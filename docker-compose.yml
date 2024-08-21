@@ -85,7 +85,7 @@ services:
       context: src/auth-service
 #    container_name: auth-service # NOTE: This is not needed due to docker needs to be able to resolve the dynamic container names of every replica
     deploy:
-      replicas: 3
+#      replicas: 3
 #      endpoint_mode: dnsrr
       resources:
         limits:
@@ -95,9 +95,9 @@ services:
           cpus: "1.0"
           memory: 512M
     image: dialosoft-auth-service:v1.0
-#    ports:
-#      - "8081:8081" # NOTE: This is not needed due to docker needs to be able to resolve the dynamic container ports of every replica
-#      - "5006:5005"
+    ports:
+      - "8081:8081" # NOTE: This is not needed due to docker needs to be able to resolve the dynamic container ports of every replica
+      - "5006:5005"
     depends_on:
       - database
       - registry-service
@@ -117,12 +117,12 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://registry-service:8761/eureka/"
       REDIS_HOST: redis
       REDIS_PORT_LOCAL: ${REDIS_PORT_LOCAL}
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-#    command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    command: [ "sh", "-c", "echo 'Auth Service ready to start' && tail -f /dev/null" ]
 
   user-service:
     build:
