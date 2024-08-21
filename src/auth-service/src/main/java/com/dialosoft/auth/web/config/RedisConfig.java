@@ -26,8 +26,8 @@ public class RedisConfig {
     private int port;
 
     @Bean
-    public Optional<RedisConnectionFactory> jedisConnectionFactory() {
-        try {
+    public RedisConnectionFactory jedisConnectionFactory() {
+
             RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
             redisStandaloneConfiguration.setHostName(host);
             redisStandaloneConfiguration.setPort(port);
@@ -35,33 +35,20 @@ public class RedisConfig {
             JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
             jedisConnectionFactory.afterPropertiesSet();
 
-            if (isRedisAvailable(jedisConnectionFactory)) {
-                log.info("Connected to Redis server at {}:{}", host, port);
-                return Optional.of(jedisConnectionFactory);
-            } else {
-                log.warn("Redis server at {}:{} is not available. The application will continue without Redis.", host, port);
-                return Optional.empty();
-            }
-        } catch (Exception e) {
-            log.error("Failed to connect to Redis server at {}:{}: {}", host, port, e.getMessage());
-            return Optional.empty();
-        }
+            return jedisConnectionFactory;
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(Optional<RedisConnectionFactory> redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        redisConnectionFactory.ifPresent(factory -> {
-            template.setConnectionFactory(factory);
+
+            template.setConnectionFactory(redisConnectionFactory);
             template.setKeySerializer(new StringRedisSerializer());
             template.setValueSerializer(new JdkSerializationRedisSerializer());
             template.setHashKeySerializer(new StringRedisSerializer());
             template.setHashValueSerializer(new JdkSerializationRedisSerializer());
             template.afterPropertiesSet();
-        });
-        if (redisConnectionFactory.isEmpty()) {
-            log.warn("RedisTemplate is being created without a connection factory. Redis operations won't be available.");
-        }
+
         return template;
     }
 
