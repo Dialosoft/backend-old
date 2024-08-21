@@ -1,4 +1,4 @@
-package com.dialosoft.auth.service.dto;
+package com.dialosoft.auth.web.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RecoverChangePasswordDto {
-    String newPassword;
+public class RecoverTokenResponse {
+    private String recoverToken;
 }

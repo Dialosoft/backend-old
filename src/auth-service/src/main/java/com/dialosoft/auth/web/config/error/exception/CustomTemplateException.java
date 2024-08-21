@@ -1,6 +1,6 @@
 package com.dialosoft.auth.web.config.error.exception;
 
-import com.dialosoft.auth.persistence.response.ErrorDTO;
+import com.dialosoft.auth.web.dto.response.ErrorDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 

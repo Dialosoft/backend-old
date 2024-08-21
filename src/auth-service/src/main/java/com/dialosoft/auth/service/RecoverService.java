@@ -4,10 +4,10 @@ import com.dialosoft.auth.persistence.entity.SeedPhraseEntity;
 import com.dialosoft.auth.persistence.entity.UserEntity;
 import com.dialosoft.auth.persistence.repository.SeedPhraseRepository;
 import com.dialosoft.auth.persistence.repository.UserRepository;
-import com.dialosoft.auth.persistence.response.RecoverTokenResponse;
-import com.dialosoft.auth.persistence.response.ResponseBody;
-import com.dialosoft.auth.service.dto.RecoverChangePasswordDto;
-import com.dialosoft.auth.service.dto.RecoverDto;
+import com.dialosoft.auth.web.dto.response.RecoverTokenResponse;
+import com.dialosoft.auth.web.dto.response.ResponseBody;
+import com.dialosoft.auth.web.dto.request.RecoverChangePasswordRequest;
+import com.dialosoft.auth.web.dto.request.RecoverRequest;
 import com.dialosoft.auth.web.config.error.exception.CustomTemplateException;
 import com.dialosoft.auth.web.config.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +62,7 @@ public class RecoverService {
         return bcrypt.matches(combinedPhrase, savedSeedPhrase);
     }
 
-    public ResponseBody<RecoverTokenResponse> checkHashPhraseAndGetRecoverToken(RecoverDto request) {
+    public ResponseBody<RecoverTokenResponse> checkHashPhraseAndGetRecoverToken(RecoverRequest request) {
 
         UserEntity userEntity = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new CustomTemplateException(String.format("User not found with this username: %s", request.getUsername()), null, HttpStatus.NOT_FOUND));
@@ -89,7 +89,7 @@ public class RecoverService {
 
     }
 
-    public ResponseBody<?> applyRecoverChangePassword(RecoverChangePasswordDto request, String recoverToken) {
+    public ResponseBody<?> applyRecoverChangePassword(RecoverChangePasswordRequest request, String recoverToken) {
 
         if (recoverToken == null || recoverToken.isEmpty()) {
             throw new CustomTemplateException("Invalid recover token", null, HttpStatus.UNAUTHORIZED);
