@@ -1,4 +1,4 @@
-package com.dialosoft.gateway.config.security.filter;
+package com.dialosoft.gateway.config.security.filter.global;
 
 import com.dialosoft.gateway.config.error.exception.CustomTemplateException;
 import com.dialosoft.gateway.config.redis.RedisCacheService;
@@ -61,13 +61,26 @@ public class CacheResponseInRedisFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
-        ServerHttpResponseDecorator decoratedResponse = getDecoratedResponse(response, request);
-        return chain.filter(exchange.mutate().response(decoratedResponse).build());
+        // Check if Redis is available
+        if (redisCacheService.isRedisAvailable()) {
+
+            ServerHttpResponseDecorator decoratedResponse = getDecoratedResponse(response, request);
+            return chain.filter(exchange.mutate().response(decoratedResponse).build());
+        }
+        return chain.filter(exchange);
     }
 
     private boolean isCacheableRequest(ServerHttpRequest request) {
-        return routerValidator.isSecured(request) && cacheableRoutes.contains(request.getURI().getPath());
+        String path = request.getURI().getPath();
+
+        // Chequear si la ruta comienza con "/dialosoft-api/" y removerlo si es así
+        if (path.startsWith("/dialosoft-api/")) {
+            path = path.substring("/dialosoft-api".length());
+        }
+
+        return routerValidator.isSecured(request) && cacheableRoutes.contains(path);
     }
+
 
     private ServerHttpResponseDecorator getDecoratedResponse(ServerHttpResponse response, ServerHttpRequest request) {
         return new ServerHttpResponseDecorator(response) {
@@ -76,9 +89,9 @@ public class CacheResponseInRedisFilter implements WebFilter {
                 if (body instanceof Flux && isCacheableRequest(request)) {
                     return super.writeWith(((Flux<? extends DataBuffer>) body).buffer().map(dataBuffers -> {
                         String responseBody = extractResponseBody(dataBuffers);
-                        if (redisCacheService.isRedisAvailable()) {
-                            saveResponseInRedis(request, responseBody);
-                        }
+
+                        saveResponseInRedis(request, responseBody);
+
                         return wrapResponse(responseBody, response.bufferFactory());
                     })).onErrorResume(err -> {
                         log.error("Error while decorating response: {}", err.getMessage());

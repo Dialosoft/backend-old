@@ -193,6 +193,11 @@ logging:
 management:
   security:
     enabled: false
+#  health:
+#    circuitbreakers:
+#      enabled: true
+#    ratelimiters:
+#      enabled: true
   endpoints:
     web:
       exposure:
@@ -202,6 +207,22 @@ management:
       enabled: true
     health:
       show-details: always
+
+# RESILIENCE4J
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      redisService:
+#        registerHealthIndicator: true
+#        slidingWindowSize: 10
+#        failureRateThreshold: 50
+#        waitDurationInOpenState: 30s
+#        permittedNumberOfCallsInHalfOpenState: 3
+#        minimumNumberOfCalls: 5
+#        automaticTransitionFromOpenToHalfOpenEnabled: true
+#        recordExceptions:
+#          - org.springframework.data.redis.RedisConnectionFailureException
+#          - java.net.ConnectException
 
 # SWAGGER
 springdoc:
