@@ -8,6 +8,7 @@ import com.dialosoft.auth.persistence.repository.RoleRepository;
 import com.dialosoft.auth.persistence.repository.SeedPhraseRepository;
 import com.dialosoft.auth.persistence.repository.UserRepository;
 import com.dialosoft.auth.persistence.response.JwtResponseDTO;
+import com.dialosoft.auth.persistence.response.RegisterResponse;
 import com.dialosoft.auth.persistence.response.ResponseBody;
 import com.dialosoft.auth.service.dto.LoginDto;
 import com.dialosoft.auth.service.dto.RefreshTokenDto;
@@ -56,6 +57,7 @@ public class AuthService {
         }
 
         UserEntity newUser;
+        List<String> seedPhrase;
 
         try {
             RoleEntity defaultRole = roleRepository.findByRoleType(RoleType.USER)
@@ -70,7 +72,9 @@ public class AuthService {
 
             newUser = userRepository.save(userEntity);
 
-            generatedAndSaveSelectedSeedPhrase(userEntity);
+            seedPhrase = recoverService.generateSeedPhrase(12);
+
+            generatedAndSaveSelectedSeedPhrase(userEntity, seedPhrase);
 
         } catch (Exception e) {
 
@@ -80,15 +84,15 @@ public class AuthService {
         ResponseBody<?> response = ResponseBody.builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message(String.format("User %s created sucessfully", newUser.getId()))
-                .data(null)
+                .data(RegisterResponse.builder()
+                        .seedPhrase(seedPhrase)
+                        .build())
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    private void generatedAndSaveSelectedSeedPhrase(UserEntity userEntity) {
-
-        List<String> seedPhrase = recoverService.generateSeedPhrase(12);
+    private void generatedAndSaveSelectedSeedPhrase(UserEntity userEntity, List<String> seedPhrase) {
 
         SeedPhraseEntity seedPhraseEntity = SeedPhraseEntity.builder()
                 .hashPhrase(recoverService.hashSeedPhrase(seedPhrase))
