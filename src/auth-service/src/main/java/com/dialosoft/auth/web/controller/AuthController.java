@@ -96,4 +96,10 @@ public class AuthController {
         return ResponseEntity.ok(recoverService.applyRecoverChangePassword(request, header));
     }
 
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+
+        return ResponseEntity.ok(recoverService.applyAuthenticatedChangePassword(request));
+    }
+
 }

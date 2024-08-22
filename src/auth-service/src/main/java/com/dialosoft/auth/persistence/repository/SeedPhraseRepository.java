@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface SeedPhraseRepository extends JpaRepository<SeedPhraseEntity,String> {
     Optional<SeedPhraseEntity> findSeedPhraseEntityByUserId(UUID userId);
+    Optional<SeedPhraseEntity> findByHashPhrase(String hashPhrase);
 }
