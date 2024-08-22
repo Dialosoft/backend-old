@@ -39,6 +39,7 @@ public class CommentsEntity {
     //@JoinColumn(name = "parent_comment_id")
     @Column
     UUID parentCommentId;
+    // can be otp with a no sql schema to implementation
   //  @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
   //  List<CommentsEntity> repliesComment = new ArrayList<>();
 }

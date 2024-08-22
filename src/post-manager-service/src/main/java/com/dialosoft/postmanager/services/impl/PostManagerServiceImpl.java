@@ -17,7 +17,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PostManagerServiceImpl implements PostManagerService {
 
-    //TODO terminar toda la gestion
     private final PostManagerMapper mapper;
     private  final PostManagerRepository postManagerRepository;
     private final CommentsMapper commentsMapper;
@@ -48,6 +47,17 @@ public class PostManagerServiceImpl implements PostManagerService {
     }
 
     @Override
+    public void savePostAsFavorite(String postId, Boolean isFavorite) {
+        Optional<PostEntity> entity = postManagerRepository.findById(UUID.fromString(postId));
+        if (isFavorite){
+            entity.get().setIsFavorite(true);
+            entity.get().setSaveTime(LocalDateTime.now());
+        }
+        else entity.get().setIsFavorite(false);
+        postManagerRepository.save(entity.get());
+    }
+
+    @Override
     public PostManagerResponse GetPost(String id) {
         Optional<PostEntity> entity = postManagerRepository.findById(UUID.fromString(id));
         if (entity.isPresent()){
@@ -68,6 +78,12 @@ public class PostManagerServiceImpl implements PostManagerService {
     @Override
     public List<PostManagerResponse> GetMultiPostFromForum(String forumId) {
         Optional<List<PostEntity>> entities = postManagerRepository.findByForumId(forumId);
+        return entities.map(mapper::toResponseList).orElse(null);
+    }
+
+    @Override
+    public List<PostManagerResponse> getFavoritesPostFromUser(String username) {
+        Optional<List<PostEntity>> entities = postManagerRepository.findFavoritePost(username);
         return entities.map(mapper::toResponseList).orElse(null);
     }
 }

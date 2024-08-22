@@ -21,4 +21,6 @@ public class PostManagerResponse {
     Integer positiveReaction;
     Integer negativeReaction;
     LocalDateTime creationTime;
+    Boolean isFavorite;
+    LocalDateTime saveTime;
 }
