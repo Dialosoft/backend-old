@@ -38,4 +38,8 @@ public class PostEntity {
      ReactionsEntity reactions;
      @Column
      LocalDateTime creationTime;
+     @Column
+     LocalDateTime saveTime;
+     @Column
+     Boolean isFavorite;
 }

@@ -1,6 +1,7 @@
 package com.dialosoft.postmanager.controller;
 
 import com.dialosoft.postmanager.models.web.request.PostManagerCommonAttributes;
+import com.dialosoft.postmanager.models.web.request.SavePostAsFavoriteFromUserRequest;
 import com.dialosoft.postmanager.models.web.response.PostManagerResponse;
 import com.dialosoft.postmanager.services.PostManagerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -110,6 +111,36 @@ public class PostManagerController {
     @GetMapping("get-post-from-forum")
     public List<PostManagerResponse> getAllPostFromForum(@RequestParam String forumId) {
         return service.GetMultiPostFromForum(forumId);
+    }
+
+    @Operation(
+            summary = "Get the saved as favorites post from a user ",
+            description = "fetch the favorites post identified by the given ID of the user.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostManagerResponse.class))),
+            @ApiResponse(responseCode = "404", description = "No posts found for the given forumId", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
+    })
+    @GetMapping("get-favorites-post")
+    public List<PostManagerResponse> getAllSavePostFromUsername(@RequestParam String username) {
+        return service.getFavoritesPostFromUser(username);
+    }
+
+    @Operation(
+            summary = "Save post as favorite",
+            description = "Save o modified the post as favorite",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post save successfully as favorite"),
+            @ApiResponse(responseCode = "404", description = "Post not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token is missing or invalid", content = @Content)
+    })
+    @PostMapping("add-favorite-post")
+    public void savePostAsFavoriteFromUser(@RequestBody SavePostAsFavoriteFromUserRequest request){
+           service.savePostAsFavorite(request.getPostId(),request.getIsFavorite());
     }
 
 }
