@@ -22,6 +22,13 @@ public class ChangePasswordRequest {
 //            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
 //            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character"
 //    )
+    String oldPassword;
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+//    @Pattern(
+//            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+//            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character"
+//    )
     String newPassword;
 //    public List<String> seedPhrase;
 }
