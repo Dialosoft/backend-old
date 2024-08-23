@@ -17,7 +17,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /user-service/change-avatar:
+  /user-service/v1/change-avatar:
     put:
       consumes:
       - multipart/form-data
@@ -52,7 +52,7 @@ paths:
       summary: Change user avatar
       tags:
       - user
-  /user-service/change-email:
+  /user-service/v1/change-email:
     put:
       consumes:
       - application/json
@@ -86,7 +86,7 @@ paths:
       summary: Change user email
       tags:
       - user
-  /user-service/get-simpleuser-info:
+  /user-service/v1/get-simpleuser-info:
     get:
       consumes:
       - application/json
@@ -120,7 +120,7 @@ paths:
       summary: Get simple user information
       tags:
       - user
-  /user-service/get-user-info:
+  /user-service/v1/get-user-info:
     get:
       consumes:
       - application/json
