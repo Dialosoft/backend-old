@@ -27,6 +27,8 @@ func main() {
 	hostname := "management-microservice"
 	ipAddr := getoutBoundIp().String()
 	port := 8087
+		
+	time.Sleep(time.Second * 5)
 
 	for {
 		database, err = db.DBConnection()
@@ -53,20 +55,30 @@ func main() {
 
 	router := gin.Default()
 
+	// Instances
+
+	// Repositories
 	forumRepo := repositories.NewForumRepository(database)
 	categoryRepo := repositories.NewCategoryRepository(database)
+	roleRepo := repositories.NewRoleRepository(database)
 
+	// Services
 	forumService := services.NewForumService(forumRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
+	roleService := services.NewRoleService(roleRepo)
 
+	// Routers
 	forumRouter := routers.NewForumRouter(forumService)
 	categoryRouter := routers.NewCategoryRouter(categoryService)
+	roleRouter := routers.NewRoleRouter(roleService)
 
 	management := router.Group("/management-service")
 
+	// Setup routes in Engine
 	{
 		forumRouter.SetupForumRoutes(management)
 		categoryRouter.SetupCategoryRoutes(management)
+		roleRouter.SetupRolesRoutes(management)
 	}
 
 	docs.SwaggerInfo.BasePath = "/swagger"

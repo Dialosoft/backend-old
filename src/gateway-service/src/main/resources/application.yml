@@ -11,6 +11,7 @@ app:
     - /dialosoft-api/auth/register
     - /dialosoft-api/auth/refresh-token
     - /dialosoft-api/user/test
+    - /dialosoft-api/user-service/avatars
   uriServices:
     auth-microservice: lb://auth-microservice/
     user-microservice: lb://user-microservice/
@@ -92,6 +93,16 @@ spring:
 #            - name: NonSpringServicesRoutingFilter
 #              args:
 #                belongServiceName: user-microservice
+        - id: user_service_routes_free
+          uri: ${app.uriServices.user-microservice}
+          predicates:
+            - Path=/dialosoft-api/user-service/avatars/**
+          filters:
+            - AddRequestHeader=X-Request-Service, user-microservice
+            - StripPrefix=1
+            - name: NonSpringServicesRoutingFilter
+              args:
+                belongServiceName: user-microservice
         - id: user_service_routes
           uri: ${app.uriServices.user-microservice}
           predicates:
@@ -107,34 +118,35 @@ spring:
               args:
                 belongServiceName: user-microservice
             - name: CheckCacheRedisFilter
-        - id: user_service_routes_free
-          uri: ${app.uriServices.user-microservice}
-          predicates:
-            - Path=/dialosoft-api/user-service/avatars/**
-          filters:
-            - AddRequestHeader=X-Request-Service, user-microservice
-            - StripPrefix=1
-            - name: NonSpringServicesRoutingFilter
-              args:
-                belongServiceName: user-microservice
         - id: post_manager_service_routes
           uri: ${app.uriServices.post-manager-microservice}
           predicates:
             - Path=/dialosoft-api/post-manager-service
           filters:
-            - AddRequestHeader=X-Request-Service, auth-microservice
+            - AddRequestHeader=X-Request-Service, post-manager-microservice
             - StripPrefix=1
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter
               args:
                 requiredRoles: ROLE_USER
         ## Management Service: Flussen
+        - id: management-service_routes_free
+          uri: ${app.uriServices.management-microservice}
+          predicates:
+            - Path=/dialosoft-api/management-service/categories/get-all-categories, /dialosoft-api/management-service/categories/get-category-id/**, /dialosoft-api/management-service/forums/get-all-forums, /dialosoft-api/management-service/forums/get-forum-id/**
+            - Method=GET
+          filters:
+            - AddRequestHeader=X-Request-Service, management-microservice
+            - StripPrefix=1
+            - name: NonSpringServicesRoutingFilter
+              args:
+                belongServiceName: management-microservice
         - id: management-service_routes
           uri: ${app.uriServices.management-microservice}
           predicates:
             - Path=/dialosoft-api/management-service/**
           filters:
-            - AddRequestHeader=X-Request-Service, auth-microservice
+            - AddRequestHeader=X-Request-Service, management-microservice
             - StripPrefix=1
             - name: JwtAuthenticationFilter
             - name: RoleBasedAuthorizationFilter

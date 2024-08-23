@@ -103,7 +103,7 @@ func CreateForum(c *gin.Context, service services.ForumService) {
 		return
 	}
 
-	if req.Name == "" || req.Description == "" || req.CategoryID == "" {
+	if req.Name == "" || req.CategoryID == "" || req.Type == "" {
 		utility.ErrBadRequest(c)
 		return
 	}
