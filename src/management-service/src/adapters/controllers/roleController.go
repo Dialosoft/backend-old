@@ -18,7 +18,7 @@ import (
 // @Description Get all the roles available in the system
 // @Tags roles
 // @Produce json
-// @Success 200 {object} response.Standard{data=[]services.Role}
+// @Success 200 {object} response.Standard
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
 // @Router /roles [get]
@@ -48,7 +48,7 @@ func GetAllRoles(c *gin.Context, service services.RoleService) {
 // @Tags roles
 // @Param id path string true "Role UUID"
 // @Produce json
-// @Success 200 {object} response.Standard{data=services.Role}
+// @Success 200 {object} response.Standard
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
@@ -86,7 +86,7 @@ func GetRoleByID(c *gin.Context, service services.RoleService) {
 // @Tags roles
 // @Param roleType path string true "Role Type"
 // @Produce json
-// @Success 200 {object} response.Standard{data=services.Role}
+// @Success 200 {object} response.Standard{}
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
 // @Router /roles/type/{roleType} [get]
