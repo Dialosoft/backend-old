@@ -26,6 +26,8 @@ public class PostEntity {
      @Column()
      String content;
      @Column()
+     String title;
+     @Column()
      byte[] multimedia;
      @Column
      Integer positiveReaction;

@@ -23,4 +23,5 @@ public class PostManagerResponse {
     LocalDateTime creationTime;
     Boolean isFavorite;
     LocalDateTime saveTime;
+    String title;
 }
