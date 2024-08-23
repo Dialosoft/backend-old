@@ -23,5 +23,5 @@ public class ChangePasswordRequest {
 //            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character"
 //    )
     String newPassword;
-    public List<String> seedPhrase;
+//    public List<String> seedPhrase;
 }
