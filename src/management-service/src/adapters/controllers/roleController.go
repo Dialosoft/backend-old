@@ -104,11 +104,92 @@ func CreateRole(c *gin.Context, service services.RoleService) {
 	c.JSON(http.StatusCreated, res)
 }
 func UpdateRole(c *gin.Context, service services.RoleService) {
-
+	c.JSON(http.StatusNotImplemented, nil)
 }
 func DeleteRole(c *gin.Context, service services.RoleService) {
+	var res response.Standard
+	id := c.Param("id")
 
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		utility.ErrInvalidUUID(c)
+		return
+	}
+
+	if err := service.DeleteRole(uuid); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utility.ErrNotFound(c)
+			return
+		} else {
+			utility.ErrInternalServer(c)
+			return
+		}
+	}
+
+	res.StatusCode = http.StatusOK
+	res.Message = "DELETED"
+	res.Data = nil
+	c.JSON(http.StatusOK, res)
 }
 func RestoreRole(c *gin.Context, service services.RoleService) {
+	var res response.Standard
+	id := c.Param("id")
 
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		utility.ErrInvalidUUID(c)
+		return
+	}
+
+	if err := service.RestoreRole(uuid); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utility.ErrNotFound(c)
+			return
+		} else {
+			utility.ErrInternalServer(c)
+			return
+		}
+	}
+
+	res.StatusCode = http.StatusOK
+	res.Message = "RESTORED"
+	res.Data = nil
+	c.JSON(http.StatusOK, res)
+}
+
+func ChangeUserRole(c *gin.Context, service services.RoleService) {
+	var res response.Standard
+	var req request.ChangeUserRole
+
+	if err := c.BindJSON(&req); err != nil {
+		utility.ErrBadRequest(c)
+		return
+	}
+
+	roleUUID, err := uuid.Parse(req.RoleID)
+	if err != nil {
+		utility.ErrInvalidUUID(c)
+		return
+	}
+
+	userUUID, err := uuid.Parse(req.UserID)
+	if err != nil {
+		utility.ErrInvalidUUID(c)
+		return
+	}
+
+	if err := service.ChangeUserRole(roleUUID, userUUID); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utility.ErrNotFound(c)
+			return
+		} else {
+			utility.ErrInternalServer(c)
+			return
+		}
+	}
+
+	res.StatusCode = http.StatusOK
+	res.Message = "UPDATED"
+	res.Data = nil
+	c.JSON(http.StatusOK, res)
 }

@@ -13,3 +13,8 @@ type RoleUpdateRequest struct {
 	AdminRole  bool   `json:"adminRole"`
 	ModRole    bool   `json:"modRole"`
 }
+
+type ChangeUserRole struct {
+	RoleID string `json:"roleId"`
+	UserID string `json:"userId"`
+}
