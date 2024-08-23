@@ -16,4 +16,6 @@ public interface PostManagerRepository extends JpaRepository<PostEntity, UUID> {
     Optional<List<PostEntity>> findByForumId(String forumId);
     @Query("SELECT c FROM CommentsEntity c WHERE c.post.id = :postId")
     Optional<List<CommentsEntity>> findCommentsById(@Param("postId")  UUID id);
+    @Query("SELECT c FROM PostEntity c WHERE c.username = :username AND c.isFavorite = true")
+    Optional<List<PostEntity>> findFavoritePost(@Param("username")  String username);
 }

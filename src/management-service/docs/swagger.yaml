@@ -1,0 +1,738 @@
+definitions:
+  request.ChangeUserRole:
+    properties:
+      roleId:
+        type: string
+      userId:
+        type: string
+    type: object
+  request.CreateCategoryRequest:
+    properties:
+      categoryName:
+        type: string
+      description:
+        type: string
+    type: object
+  request.CreateForum:
+    properties:
+      categoryId:
+        type: string
+      description:
+        type: string
+      forumName:
+        type: string
+      type:
+        type: string
+    type: object
+  request.CreateRoleRequest:
+    properties:
+      adminRole:
+        type: boolean
+      modRole:
+        type: boolean
+      permission:
+        type: integer
+      roleType:
+        type: string
+    type: object
+  request.ForumUpdateCategoryOwner:
+    properties:
+      categoryId:
+        type: string
+      forumId:
+        type: string
+    type: object
+  request.ForumUpdateDescription:
+    properties:
+      description:
+        type: string
+      forumId:
+        type: string
+    type: object
+  request.ForumUpdateName:
+    properties:
+      forumId:
+        type: string
+      name:
+        type: string
+    type: object
+  response.Standard:
+    properties:
+      data: {}
+      message:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /create-category:
+    post:
+      consumes:
+      - application/json
+      description: Create a new category with a name and description
+      parameters:
+      - description: Category creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "409":
+          description: Conflict (Duplicate Category)
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Create a new category
+      tags:
+      - categories
+  /create-forum:
+    post:
+      consumes:
+      - application/json
+      description: Create a new forum with a name, description, and category ID
+      parameters:
+      - description: Forum creation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateForum'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Category Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "409":
+          description: Conflict (Duplicate Forum)
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Create a new forum
+      tags:
+      - forums
+  /delete-category/{id}:
+    delete:
+      description: Soft delete a category by its UUID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Category Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Delete a category by ID
+      tags:
+      - categories
+  /delete-forum/{id}:
+    delete:
+      description: Soft delete a forum by its UUID
+      parameters:
+      - description: Forum ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Forum Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Delete a forum
+      tags:
+      - forums
+  /get-all-categories:
+    get:
+      description: Get a list of all categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get all categories
+      tags:
+      - categories
+  /get-all-forums:
+    get:
+      description: Get a list of all forums
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get all forums
+      tags:
+      - forums
+  /get-category-id/{id}:
+    get:
+      description: Get a single category by its UUID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get category by ID
+      tags:
+      - categories
+  /get-forum-id/{id}:
+    get:
+      description: Get a single forum by its UUID
+      parameters:
+      - description: Forum ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get forum by ID
+      tags:
+      - forums
+  /restore-category/{id}:
+    post:
+      description: Restore a category that was previously soft deleted by its UUID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Category Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Restore a soft deleted category by ID
+      tags:
+      - categories
+  /restore-forum/{id}:
+    post:
+      description: Restore a forum that was previously soft deleted by its UUID
+      parameters:
+      - description: Forum ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Forum Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Restore a soft deleted forum
+      tags:
+      - forums
+  /roles:
+    get:
+      description: Get all the roles available in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get all roles
+      tags:
+      - roles
+    post:
+      consumes:
+      - application/json
+      description: Create a new role with the specified permissions
+      parameters:
+      - description: Role data
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "409":
+          description: Duplicate role
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Create a new role
+      tags:
+      - roles
+  /roles/{id}:
+    delete:
+      description: Delete an existing role by its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Delete a role
+      tags:
+      - roles
+    get:
+      description: Get details of a role using its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get a role by ID
+      tags:
+      - roles
+    put:
+      consumes:
+      - application/json
+      description: Update an existing role by its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "501":
+          description: Not implemented
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Update a role
+      tags:
+      - roles
+  /roles/{id}/restore:
+    post:
+      description: Restore a previously deleted role by its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Restore a deleted role
+      tags:
+      - roles
+  /roles/type/{roleType}:
+    get:
+      description: Get details of a role by its type (e.g., admin, user)
+      parameters:
+      - description: Role Type
+        in: path
+        name: roleType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get a role by type
+      tags:
+      - roles
+  /update-category/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a category's name and description by its UUID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Category Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Update a category by ID
+      tags:
+      - categories
+  /update-forum-category:
+    put:
+      consumes:
+      - application/json
+      description: Update the category of a forum by its UUID and new category ID
+      parameters:
+      - description: Forum and Category IDs
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.ForumUpdateCategoryOwner'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Forum or Category Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Update the category owner of a forum
+      tags:
+      - forums
+  /update-forum-description:
+    put:
+      consumes:
+      - application/json
+      description: Update the description of a forum by its UUID
+      parameters:
+      - description: Forum description update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.ForumUpdateDescription'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Forum Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Update the description of a forum
+      tags:
+      - forums
+  /update-forum-name:
+    put:
+      consumes:
+      - application/json
+      description: Update the name of a forum by its UUID
+      parameters:
+      - description: Forum name update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.ForumUpdateName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Forum Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Update the name of a forum
+      tags:
+      - forums
+  /users/change-role:
+    post:
+      consumes:
+      - application/json
+      description: Change the role of a specific user
+      parameters:
+      - description: User and Role data
+        in: body
+        name: userRole
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChangeUserRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid request body or UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Change a user's role
+      tags:
+      - roles
+swagger: "2.0"

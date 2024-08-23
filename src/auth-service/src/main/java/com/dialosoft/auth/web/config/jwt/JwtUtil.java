@@ -32,6 +32,8 @@ public class JwtUtil {
 
     @Value("${app.security.jwt.refresh-token-expiration}")
     private Long refreshTokenExpiration;
+    @Value("${app.security.jwt.recover-token-expiration}")
+    private Long recoverTokenExpiration;
 
     private Algorithm algorithmWithSecret;
     private final TokenBlacklistService tokenBlacklistService;
@@ -51,6 +53,12 @@ public class JwtUtil {
         return createToken(userId, username,
                 authorities.stream().map(GrantedAuthority::getAuthority).toList(),
                 TimeUnit.MINUTES.toMillis(refreshTokenExpiration));
+    }
+
+    public String generateRecoverToken(UUID userId, String username, Collection<? extends GrantedAuthority> authorities) {
+        return createToken(userId, username,
+                authorities.stream().map(GrantedAuthority::getAuthority).toList(),
+                TimeUnit.MINUTES.toMillis(recoverTokenExpiration));
     }
 
     public String createToken(UUID userId, String username, List<String> roles, long expiredTime) {
@@ -88,11 +96,9 @@ public class JwtUtil {
     public boolean isValid(String jwt) {
         try {
 
-            if (tokenBlacklistService.isRedisAvailable()) {
-                // Check if the token is blacklisted first
-                if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
-                    return false;
-                }
+            // Check if the token is blacklisted first
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                return false;
             }
 
             JWTVerifier verifier = JWT.require(algorithmWithSecret)

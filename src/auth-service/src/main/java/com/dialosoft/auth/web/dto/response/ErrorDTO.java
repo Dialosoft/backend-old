@@ -1,4 +1,4 @@
-package com.dialosoft.auth.persistence.response;
+package com.dialosoft.auth.web.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

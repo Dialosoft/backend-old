@@ -2,14 +2,17 @@ package com.dialosoft.auth.service;
 
 import com.dialosoft.auth.persistence.entity.RefreshToken;
 import com.dialosoft.auth.persistence.entity.RoleEntity;
+import com.dialosoft.auth.persistence.entity.SeedPhraseEntity;
 import com.dialosoft.auth.persistence.entity.UserEntity;
 import com.dialosoft.auth.persistence.repository.RoleRepository;
+import com.dialosoft.auth.persistence.repository.SeedPhraseRepository;
 import com.dialosoft.auth.persistence.repository.UserRepository;
-import com.dialosoft.auth.persistence.response.JwtResponseDTO;
-import com.dialosoft.auth.persistence.response.ResponseBody;
-import com.dialosoft.auth.service.dto.LoginDto;
-import com.dialosoft.auth.service.dto.RefreshTokenDto;
-import com.dialosoft.auth.service.dto.RegisterDto;
+import com.dialosoft.auth.web.dto.response.JwtResponseDTO;
+import com.dialosoft.auth.web.dto.response.RegisterResponse;
+import com.dialosoft.auth.web.dto.response.ResponseBody;
+import com.dialosoft.auth.web.dto.request.LoginRequest;
+import com.dialosoft.auth.web.dto.request.RefreshTokenRequest;
+import com.dialosoft.auth.web.dto.request.RegisterRequest;
 import com.dialosoft.auth.service.utils.RoleType;
 import com.dialosoft.auth.web.config.SecurityConfig;
 import com.dialosoft.auth.web.config.error.exception.CustomTemplateException;
@@ -25,6 +28,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,10 +43,13 @@ public class AuthService {
     private final SecurityConfig securityConfig;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final SeedPhraseRepository seedPhraseRepository;
+    private final RecoverService recoverService;
 
-    public ResponseEntity<ResponseBody<?>> register(RegisterDto registerDto) {
 
-        Optional<UserEntity> userEntityOp = userRepository.findByUsernameOrEmail(registerDto.getUsername(), registerDto.getEmail());
+    public ResponseEntity<ResponseBody<?>> register(RegisterRequest registerRequest) {
+
+        Optional<UserEntity> userEntityOp = userRepository.findByUsernameOrEmail(registerRequest.getUsername(), registerRequest.getEmail());
 
         if (userEntityOp.isPresent()) {
 
@@ -50,19 +57,24 @@ public class AuthService {
         }
 
         UserEntity newUser;
+        List<String> seedPhrase;
 
         try {
             RoleEntity defaultRole = roleRepository.findByRoleType(RoleType.USER)
                     .orElseThrow(() -> new RuntimeException("Default role not found"));
 
             UserEntity userEntity = UserEntity.builder()
-                    .username(registerDto.getUsername())
-                    .email(registerDto.getEmail())
-                    .password(securityConfig.encoder().encode(registerDto.getPassword()))
+                    .username(registerRequest.getUsername())
+                    .email(registerRequest.getEmail())
+                    .password(securityConfig.encoder().encode(registerRequest.getPassword()))
                     .role(defaultRole)
                     .build();
 
             newUser = userRepository.save(userEntity);
+
+            seedPhrase = recoverService.generateSeedPhrase(12);
+
+            generatedAndSaveSelectedSeedPhrase(userEntity, seedPhrase);
 
         } catch (Exception e) {
 
@@ -72,17 +84,29 @@ public class AuthService {
         ResponseBody<?> response = ResponseBody.builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message(String.format("User %s created sucessfully", newUser.getId()))
-                .data(null)
+                .data(RegisterResponse.builder()
+                        .seedPhrase(seedPhrase)
+                        .build())
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<ResponseBody<?>> login(LoginDto loginDto) {
+    private void generatedAndSaveSelectedSeedPhrase(UserEntity userEntity, List<String> seedPhrase) {
+
+        SeedPhraseEntity seedPhraseEntity = SeedPhraseEntity.builder()
+                .hashPhrase(recoverService.hashSeedPhrase(seedPhrase))
+                .userId(userEntity.getId())
+                .build();
+
+        seedPhraseRepository.save(seedPhraseEntity);
+    }
+
+    public ResponseEntity<ResponseBody<?>> login(LoginRequest loginRequest) {
 
         UsernamePasswordAuthenticationToken login = new UsernamePasswordAuthenticationToken(
-                loginDto.getUsername(),
-                loginDto.getPassword()
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
         );
 
         try {
@@ -90,11 +114,11 @@ public class AuthService {
 
             if (authentication.isAuthenticated()) {
 
-                UserEntity userEntity = userSecurityService.getUserByUserName(loginDto.getUsername());
+                UserEntity userEntity = userSecurityService.getUserByUsername(loginRequest.getUsername());
 
-                String accessToken = jwtUtil.generateAccessToken(userEntity.getId(), loginDto.getUsername(), authentication.getAuthorities());
+                String accessToken = jwtUtil.generateAccessToken(userEntity.getId(), loginRequest.getUsername(), authentication.getAuthorities());
                 Long accessTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(accessToken);
-                RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(loginDto.getUsername());
+                RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshTokenByUserName(loginRequest.getUsername());
                 Long refreshTokenExpiresInSeconds = jwtUtil.getExpirationInSeconds(refreshToken.getRefreshToken());
 
                 JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
@@ -122,9 +146,9 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<ResponseBody<JwtResponseDTO>> refreshTokens(RefreshTokenDto refreshTokenDto) {
+    public ResponseEntity<ResponseBody<JwtResponseDTO>> refreshTokens(RefreshTokenRequest refreshTokenRequest) {
 
-        return refreshTokenService.findByToken(refreshTokenDto.getRefreshToken())
+        return refreshTokenService.findByToken(refreshTokenRequest.getRefreshToken())
                 .map(refreshTokenService::verifyRefreshTokenExpiration)
                 .map(RefreshToken::getUser)
                 .map(userInfo -> {
@@ -136,7 +160,7 @@ public class AuthService {
                     JwtResponseDTO jwtResponseDTO = JwtResponseDTO.builder()
                             .accessToken(accessToken)
                             .accessTokenExpiresInSeconds(accessTokenExpiresInSeconds)
-                            .refreshToken(refreshTokenDto.getRefreshToken())
+                            .refreshToken(refreshTokenRequest.getRefreshToken())
                             .build();
 
                     ResponseBody<JwtResponseDTO> response = ResponseBody.<JwtResponseDTO>builder()

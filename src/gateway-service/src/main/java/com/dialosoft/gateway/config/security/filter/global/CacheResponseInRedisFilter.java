@@ -1,4 +1,4 @@
-package com.dialosoft.gateway.config.security.filter;
+package com.dialosoft.gateway.config.security.filter.global;
 
 import com.dialosoft.gateway.config.error.exception.CustomTemplateException;
 import com.dialosoft.gateway.config.redis.RedisCacheService;
@@ -18,7 +18,6 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DefaultDataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
@@ -62,13 +61,26 @@ public class CacheResponseInRedisFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
-        ServerHttpResponseDecorator decoratedResponse = getDecoratedResponse(response, request);
-        return chain.filter(exchange.mutate().response(decoratedResponse).build());
+        // Check if Redis is available
+        if (redisCacheService.isRedisAvailable()) {
+
+            ServerHttpResponseDecorator decoratedResponse = getDecoratedResponse(response, request);
+            return chain.filter(exchange.mutate().response(decoratedResponse).build());
+        }
+        return chain.filter(exchange);
     }
 
     private boolean isCacheableRequest(ServerHttpRequest request) {
-        return routerValidator.isSecured(request) && cacheableRoutes.contains(request.getURI().getPath());
+        String path = request.getURI().getPath();
+
+        // Chequear si la ruta comienza con "/dialosoft-api/" y removerlo si es así
+        if (path.startsWith("/dialosoft-api/")) {
+            path = path.substring("/dialosoft-api".length());
+        }
+
+        return routerValidator.isSecured(request) && cacheableRoutes.contains(path);
     }
+
 
     private ServerHttpResponseDecorator getDecoratedResponse(ServerHttpResponse response, ServerHttpRequest request) {
         return new ServerHttpResponseDecorator(response) {
@@ -77,9 +89,9 @@ public class CacheResponseInRedisFilter implements WebFilter {
                 if (body instanceof Flux && isCacheableRequest(request)) {
                     return super.writeWith(((Flux<? extends DataBuffer>) body).buffer().map(dataBuffers -> {
                         String responseBody = extractResponseBody(dataBuffers);
-                        if (redisCacheService.isRedisAvailable()) {
-                            saveResponseInRedis(request, responseBody);
-                        }
+
+                        saveResponseInRedis(request, responseBody);
+
                         return wrapResponse(responseBody, response.bufferFactory());
                     })).onErrorResume(err -> {
                         log.error("Error while decorating response: {}", err.getMessage());
@@ -108,11 +120,10 @@ public class CacheResponseInRedisFilter implements WebFilter {
             String userId = jwtUtils.getUserId(token);
             Long expirationTime = calculateExpirationTime(token);
 
-            if (!redisCacheService.isKeyPresent(token, userId)) {
-                ResponseBody<?> responseBodyMapped = objectMapper.readValue(responseBody, ResponseBody.class);
-                UserCacheInfo userCacheInfoMapped = objectMapper.convertValue(responseBodyMapped.getData(), UserCacheInfo.class);
-                redisCacheService.addInfoToCache(token, userId, userCacheInfoMapped, expirationTime);
-            }
+            ResponseBody<?> responseBodyMapped = objectMapper.readValue(responseBody, ResponseBody.class);
+            UserCacheInfo userCacheInfoMapped = objectMapper.convertValue(responseBodyMapped.getData(), UserCacheInfo.class);
+            redisCacheService.addInfoToCache(token, userId, userCacheInfoMapped, expirationTime);
+
         } catch (JsonProcessingException e) {
             throw new CustomTemplateException("Error parsing response to UserCacheInfo in saveResponseInRedis()", e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -121,5 +132,5 @@ public class CacheResponseInRedisFilter implements WebFilter {
     private Long calculateExpirationTime(String token) {
         return jwtUtils.getExpirationDate(token).getTime() - System.currentTimeMillis();
     }
-    
+
 }

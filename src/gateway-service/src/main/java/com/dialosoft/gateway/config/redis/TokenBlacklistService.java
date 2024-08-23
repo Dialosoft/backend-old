@@ -1,11 +1,9 @@
 package com.dialosoft.gateway.config.redis;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -22,6 +20,6 @@ public class TokenBlacklistService extends RedisCommonService {
     }
 
     public boolean isTokenBlacklisted(String token) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(token));
+        return isRedisAvailable() && Boolean.TRUE.equals(redisTemplate.hasKey(token));
     }
 }

@@ -9,7 +9,10 @@ spring:
 
 eureka:
   instance:
+    # ${HOSTNAME} is set by Docker
+    # // TODO: Check why putting with ${HOSTNAME} doesn't work with golang services
     instanceId: ${spring.application.name}:${server.port}
+#    instanceId: ${spring.application.name}:${HOSTNAME}
 #    preferIpAddress: true
   client:
     serviceUrl:

@@ -1,7 +1,6 @@
 package com.dialosoft.gateway.config.redis;
 
 import com.dialosoft.gateway.config.error.exception.CustomTemplateException;
-import com.dialosoft.gateway.config.security.dto.UserCacheInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
