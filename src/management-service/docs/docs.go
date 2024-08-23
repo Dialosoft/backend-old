@@ -15,6 +15,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/change-user-role": {
+            "put": {
+                "description": "Change the role of a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Change a user's role",
+                "parameters": [
+                    {
+                        "description": "User and Role data",
+                        "name": "userRole",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ChangeUserRole"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
         "/create-category": {
             "post": {
                 "description": "Create a new category with a name and description",
@@ -125,6 +177,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/create-role": {
+            "post": {
+                "description": "Create a new role with the specified permissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Create a new role",
+                "parameters": [
+                    {
+                        "description": "Role data",
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "409": {
+                        "description": "Duplicate role",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
         "/delete-category/{id}": {
             "delete": {
                 "description": "Soft delete a category by its UUID",
@@ -219,6 +323,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/delete-role/{id}": {
+            "delete": {
+                "description": "Delete an existing role by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Delete a role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Role UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
         "/get-all-categories": {
             "get": {
                 "description": "Get a list of all categories",
@@ -261,6 +412,38 @@ const docTemplate = `{
                     "forums"
                 ],
                 "summary": "Get all forums",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/get-all-roles": {
+            "get": {
+                "description": "Get all the roles available in the system",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get all roles",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -377,6 +560,94 @@ const docTemplate = `{
                 }
             }
         },
+        "/get-role-by-id/{id}": {
+            "get": {
+                "description": "Get details of a role using its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get a role by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Role UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/get-role-by-type/{roleType}": {
+            "get": {
+                "description": "Get details of a role by its type (e.g., admin, user)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get a role by type",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Role Type",
+                        "name": "roleType",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
         "/restore-category/{id}": {
             "post": {
                 "description": "Restore a category that was previously soft deleted by its UUID",
@@ -471,252 +742,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/roles": {
-            "get": {
-                "description": "Get all the roles available in the system",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Get all roles",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new role with the specified permissions",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Create a new role",
-                "parameters": [
-                    {
-                        "description": "Role data",
-                        "name": "role",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.CreateRoleRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request body",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "409": {
-                        "description": "Duplicate role",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/roles/type/{roleType}": {
-            "get": {
-                "description": "Get details of a role by its type (e.g., admin, user)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Get a role by type",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Role Type",
-                        "name": "roleType",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/roles/{id}": {
-            "get": {
-                "description": "Get details of a role using its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Get a role by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Role UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update an existing role by its UUID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Update a role",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Role UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "501": {
-                        "description": "Not implemented",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete an existing role by its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Delete a role",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Role UUID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/roles/{id}/restore": {
+        "/restore-role/{id}": {
             "post": {
                 "description": "Restore a previously deleted role by its UUID",
                 "produces": [
@@ -978,9 +1004,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/change-role": {
-            "post": {
-                "description": "Change the role of a specific user",
+        "/update-role": {
+            "put": {
+                "description": "Update an existing role by its UUID",
                 "consumes": [
                     "application/json"
                 ],
@@ -990,39 +1016,19 @@ const docTemplate = `{
                 "tags": [
                     "roles"
                 ],
-                "summary": "Change a user's role",
+                "summary": "Update a role",
                 "parameters": [
                     {
-                        "description": "User and Role data",
-                        "name": "userRole",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.ChangeUserRole"
-                        }
+                        "type": "string",
+                        "description": "Role UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request body or UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "501": {
+                        "description": "Not implemented",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
