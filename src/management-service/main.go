@@ -27,6 +27,8 @@ func main() {
 	hostname := "management-microservice"
 	ipAddr := getoutBoundIp().String()
 	port := 8087
+		
+	time.Sleep(time.Second * 5)
 
 	for {
 		database, err = db.DBConnection()

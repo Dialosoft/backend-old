@@ -32,6 +32,7 @@ public class AuthUtils {
                 .header("X-Auth-Role", mainRoleJson)
                 .header("X-Auth-Username", jwtUtils.getUsername(token))
                 .header("X-Auth-UserId", jwtUtils.getUserId(token))
+                .header("userId", jwtUtils.getUserId(token))
                 .build();
     }
 
@@ -45,6 +46,7 @@ public class AuthUtils {
                 .header("X-Auth-Role", mainRoleJson)
                 .header("X-Auth-Username", userCacheInfo.getUsername())
                 .header("X-Auth-UserId", userCacheInfo.getUuid())
+                .header("userId", userCacheInfo.getUuid())
                 .build();
     }
 
