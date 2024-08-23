@@ -144,13 +144,14 @@ public class RecoverService {
                 UserEntity userEntity = userRepository.findByUsername(username)
                         .orElseThrow(() -> new CustomTemplateException(String.format("User not found with this username: %s", username), null, HttpStatus.NOT_FOUND));
 
-                SeedPhraseEntity seedPhraseEntity = seedPhraseRepository.findSeedPhraseEntityByUserId(userEntity.getId())
-                        .orElseThrow(() -> new CustomTemplateException(String.format("Seed phrase not found for this user: %s", username), null, HttpStatus.NOT_FOUND));
-
-                if (!compareHash(request.seedPhrase, seedPhraseEntity.getHashPhrase())) {
-
-                    throw new CustomTemplateException("Recover password failed, incorrect seed phrase", null, HttpStatus.UNAUTHORIZED);
-                }
+                // TODO: Add again after event
+//                SeedPhraseEntity seedPhraseEntity = seedPhraseRepository.findSeedPhraseEntityByUserId(userEntity.getId())
+//                        .orElseThrow(() -> new CustomTemplateException(String.format("Seed phrase not found for this user: %s", username), null, HttpStatus.NOT_FOUND));
+//
+//                if (!compareHash(request.seedPhrase, seedPhraseEntity.getHashPhrase())) {
+//
+//                    throw new CustomTemplateException("Recover password failed, incorrect seed phrase", null, HttpStatus.UNAUTHORIZED);
+//                }
 
                 String passwordHashed = bcrypt.encode(request.getNewPassword());
                 userEntity.setPassword(passwordHashed);
