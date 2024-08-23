@@ -1,4 +1,11 @@
 definitions:
+  request.ChangeUserRole:
+    properties:
+      roleId:
+        type: string
+      userId:
+        type: string
+    type: object
   request.CreateCategoryRequest:
     properties:
       categoryName:
@@ -13,6 +20,19 @@ definitions:
       description:
         type: string
       forumName:
+        type: string
+      type:
+        type: string
+    type: object
+  request.CreateRoleRequest:
+    properties:
+      adminRole:
+        type: boolean
+      modRole:
+        type: boolean
+      permission:
+        type: integer
+      roleType:
         type: string
     type: object
   request.ForumUpdateCategoryOwner:
@@ -347,6 +367,199 @@ paths:
       summary: Restore a soft deleted forum
       tags:
       - forums
+  /roles:
+    get:
+      description: Get all the roles available in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get all roles
+      tags:
+      - roles
+    post:
+      consumes:
+      - application/json
+      description: Create a new role with the specified permissions
+      parameters:
+      - description: Role data
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "409":
+          description: Duplicate role
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Create a new role
+      tags:
+      - roles
+  /roles/{id}:
+    delete:
+      description: Delete an existing role by its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Delete a role
+      tags:
+      - roles
+    get:
+      description: Get details of a role using its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get a role by ID
+      tags:
+      - roles
+    put:
+      consumes:
+      - application/json
+      description: Update an existing role by its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "501":
+          description: Not implemented
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Update a role
+      tags:
+      - roles
+  /roles/{id}/restore:
+    post:
+      description: Restore a previously deleted role by its UUID
+      parameters:
+      - description: Role UUID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Restore a deleted role
+      tags:
+      - roles
+  /roles/type/{roleType}:
+    get:
+      description: Get details of a role by its type (e.g., admin, user)
+      parameters:
+      - description: Role Type
+        in: path
+        name: roleType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Get a role by type
+      tags:
+      - roles
   /update-category/{id}:
     put:
       consumes:
@@ -488,4 +701,38 @@ paths:
       summary: Update the name of a forum
       tags:
       - forums
+  /users/change-role:
+    post:
+      consumes:
+      - application/json
+      description: Change the role of a specific user
+      parameters:
+      - description: User and Role data
+        in: body
+        name: userRole
+        required: true
+        schema:
+          $ref: '#/definitions/request.ChangeUserRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "400":
+          description: Invalid request body or UUID
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Standard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Standard'
+      summary: Change a user's role
+      tags:
+      - roles
 swagger: "2.0"
