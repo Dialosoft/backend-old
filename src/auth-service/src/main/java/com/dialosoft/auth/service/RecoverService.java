@@ -144,7 +144,12 @@ public class RecoverService {
                 UserEntity userEntity = userRepository.findByUsername(username)
                         .orElseThrow(() -> new CustomTemplateException(String.format("User not found with this username: %s", username), null, HttpStatus.NOT_FOUND));
 
-                // TODO: Add again after event
+                if (!bcrypt.matches(request.getOldPassword(), userEntity.getPassword())) {
+
+                    throw new CustomTemplateException("Old password is incorrect", null, HttpStatus.UNAUTHORIZED);
+                }
+
+                    // TODO: Add again after event
 //                SeedPhraseEntity seedPhraseEntity = seedPhraseRepository.findSeedPhraseEntityByUserId(userEntity.getId())
 //                        .orElseThrow(() -> new CustomTemplateException(String.format("Seed phrase not found for this user: %s", username), null, HttpStatus.NOT_FOUND));
 //
@@ -169,7 +174,7 @@ public class RecoverService {
             }
 
         } catch (Exception e) {
-            throw new CustomTemplateException("Change password failed", e, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomTemplateException("Change password failed", e, HttpStatus.UNAUTHORIZED);
         }
     }
 
