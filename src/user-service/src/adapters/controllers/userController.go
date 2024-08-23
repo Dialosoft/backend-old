@@ -26,7 +26,7 @@ type GetUserParams struct {
 // @Failure 400 {object} response.Standard "Invalid or missing username"
 // @Failure 404 {object} response.Standard "User not found"
 // @Failure 500 {object} response.Standard "Internal server error"
-// @Router /user-service/get-user-info [get]
+// @Router /user-service/v1/get-user-info [get]
 func GetUserInfo(c *gin.Context, userService services.UserService) {
 	var username string
 	var res response.Standard
@@ -75,7 +75,7 @@ func GetUserInfo(c *gin.Context, userService services.UserService) {
 // @Failure 400 {object} response.Standard "Invalid or missing username"
 // @Failure 404 {object} response.Standard "User not found"
 // @Failure 500 {object} response.Standard "Internal server error"
-// @Router /user-service/get-simpleuser-info [get]
+// @Router /user-service/v1/get-simpleuser-info [get]
 func GetSimpleInfo(c *gin.Context, userService services.UserService) {
 	var username string
 	var res response.Standard
@@ -123,7 +123,7 @@ func GetSimpleInfo(c *gin.Context, userService services.UserService) {
 // @Failure 400 {object} response.Standard "Invalid request"
 // @Failure 404 {object} response.Standard "User not found"
 // @Failure 500 {object} response.Standard "Internal server error"
-// @Router /user-service/change-email [put]
+// @Router /user-service/v1/change-email [put]
 func ChangeEmailController(c *gin.Context, userService services.UserService) {
 	var req request.Email
 	var res response.Standard
@@ -177,7 +177,7 @@ func ChangeEmailController(c *gin.Context, userService services.UserService) {
 // @Success 200 {object} response.Standard "Avatar changed successfully"
 // @Failure 400 {object} response.Standard "Invalid request or missing fields"
 // @Failure 500 {object} response.Standard "Internal server error"
-// @Router /user-service/change-avatar [put]
+// @Router /user-service/v1/change-avatar [put]
 func ChangeUserAvatarController(c *gin.Context, userService services.UserService) {
 	var res response.Standard
 
