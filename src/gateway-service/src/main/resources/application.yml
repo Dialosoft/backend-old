@@ -134,6 +134,7 @@ spring:
           uri: ${app.uriServices.management-microservice}
           predicates:
             - Path=/dialosoft-api/management-service/categories/get-all-categories, /dialosoft-api/management-service/categories/get-category-id/**, /dialosoft-api/management-service/forums/get-all-forums, /dialosoft-api/management-service/forums/get-forum-id/**
+            - Method=GET
           filters:
             - AddRequestHeader=X-Request-Service, management-microservice
             - StripPrefix=1

@@ -1,5 +1,5 @@
 
-# README 'temporally' DialoSoft Backend WIP
+# README DialoSoft Backend
 
 
 
