@@ -6,9 +6,10 @@ import (
 )
 
 type RoleService interface {
-	GetRole(id uuid.UUID) (*entities.Role, error)
-	GetAllRoles() error
-	CreateRole(role entities.Role) error
+	GetAllRoles() ([]*entities.Role, error)
+	GetRoleByID(id uuid.UUID) (*entities.Role, error)
+	GetRoleByType(roleType string) (*entities.Role, error)
+	CreateRole(roleType string, permission int, adminRole bool, modRole bool) error
 	UpdateRole(id uuid.UUID) error
 	DeleteRole(id uuid.UUID) error
 	RestoreRole(id uuid.UUID) error
