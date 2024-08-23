@@ -91,6 +91,16 @@ func (impl *roleServiceImpl) UpdateRole(id uuid.UUID) error {
 	return nil
 }
 
+func (impl *roleServiceImpl) ChangeUserRole(roleID uuid.UUID, userID uuid.UUID) error {
+
+	err := impl.roleRepo.UpdateUserRole(userID, roleID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func NewRoleService(roleRepo repositories.RoleRepository) RoleService {
 	return &roleServiceImpl{roleRepo: roleRepo}
 }
