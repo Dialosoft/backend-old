@@ -11,6 +11,7 @@ type RoleRepository interface {
 	FindByType(roleType string) (*entities.Role, error)
 	Create(role *entities.Role) error
 	Update(id uuid.UUID, role *entities.Role) error
+	UpdateUserRole(userId uuid.UUID, roleId uuid.UUID) error
 	Delete(id uuid.UUID) error
 	Restore(id uuid.UUID) error
 }

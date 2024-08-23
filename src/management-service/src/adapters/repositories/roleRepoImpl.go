@@ -10,6 +10,27 @@ type roleRepositoryImpl struct {
 	db *gorm.DB
 }
 
+// UpdateUserRole implements RoleRepository.
+func (repo *roleRepositoryImpl) UpdateUserRole(userId uuid.UUID, roleId uuid.UUID) error {
+	var user entities.User
+	var role entities.Role
+
+	resultUser := repo.db.Find(&user, "id = ?", userId)
+	if resultUser.Error != nil {
+		return resultUser.Error
+	}
+
+	resultRole := repo.db.Find(&role, "id = ?", roleId)
+	if resultRole.Error != nil {
+		return resultRole.Error
+	}
+
+	user.RoleID = role.ID.String()
+	user.Role = role
+
+	return repo.db.Save(user).Error
+}
+
 // FindAll implements RoleRepository.
 func (repo *roleRepositoryImpl) FindAll() ([]*entities.Role, error) {
 	var roles []*entities.Role
