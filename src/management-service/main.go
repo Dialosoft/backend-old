@@ -27,7 +27,7 @@ func main() {
 	hostname := "management-microservice"
 	ipAddr := getoutBoundIp().String()
 	port := 8087
-		
+
 	time.Sleep(time.Second * 5)
 
 	for {
@@ -73,12 +73,13 @@ func main() {
 	roleRouter := routers.NewRoleRouter(roleService)
 
 	management := router.Group("/management-service")
+	v1 := management.Group("/v1")
 
 	// Setup routes in Engine
 	{
-		forumRouter.SetupForumRoutes(management)
-		categoryRouter.SetupCategoryRoutes(management)
-		roleRouter.SetupRolesRoutes(management)
+		forumRouter.SetupForumRoutes(v1)
+		categoryRouter.SetupCategoryRoutes(v1)
+		roleRouter.SetupRolesRoutes(v1)
 	}
 
 	docs.SwaggerInfo.BasePath = "/swagger"

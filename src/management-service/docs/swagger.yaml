@@ -67,7 +67,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /change-user-role:
+  /management-service/v1/change-user-role:
     put:
       consumes:
       - application/json
@@ -101,7 +101,7 @@ paths:
       summary: Change a user's role
       tags:
       - roles
-  /create-category:
+  /management-service/v1/create-category:
     post:
       consumes:
       - application/json
@@ -135,7 +135,7 @@ paths:
       summary: Create a new category
       tags:
       - categories
-  /create-forum:
+  /management-service/v1/create-forum:
     post:
       consumes:
       - application/json
@@ -173,7 +173,7 @@ paths:
       summary: Create a new forum
       tags:
       - forums
-  /create-role:
+  /management-service/v1/create-role:
     post:
       consumes:
       - application/json
@@ -207,7 +207,7 @@ paths:
       summary: Create a new role
       tags:
       - roles
-  /delete-category/{id}:
+  /management-service/v1/delete-category/{id}:
     delete:
       description: Soft delete a category by its UUID
       parameters:
@@ -238,7 +238,7 @@ paths:
       summary: Delete a category by ID
       tags:
       - categories
-  /delete-forum/{id}:
+  /management-service/v1/delete-forum/{id}:
     delete:
       description: Soft delete a forum by its UUID
       parameters:
@@ -269,7 +269,7 @@ paths:
       summary: Delete a forum
       tags:
       - forums
-  /delete-role/{id}:
+  /management-service/v1/delete-role/{id}:
     delete:
       description: Delete an existing role by its UUID
       parameters:
@@ -300,7 +300,7 @@ paths:
       summary: Delete a role
       tags:
       - roles
-  /get-all-categories:
+  /management-service/v1/get-all-categories:
     get:
       description: Get a list of all categories
       produces:
@@ -321,7 +321,7 @@ paths:
       summary: Get all categories
       tags:
       - categories
-  /get-all-forums:
+  /management-service/v1/get-all-forums:
     get:
       description: Get a list of all forums
       produces:
@@ -342,7 +342,7 @@ paths:
       summary: Get all forums
       tags:
       - forums
-  /get-all-roles:
+  /management-service/v1/get-all-roles:
     get:
       description: Get all the roles available in the system
       produces:
@@ -363,7 +363,7 @@ paths:
       summary: Get all roles
       tags:
       - roles
-  /get-category-id/{id}:
+  /management-service/v1/get-category-id/{id}:
     get:
       description: Get a single category by its UUID
       parameters:
@@ -394,7 +394,7 @@ paths:
       summary: Get category by ID
       tags:
       - categories
-  /get-forum-id/{id}:
+  /management-service/v1/get-forum-id/{id}:
     get:
       description: Get a single forum by its UUID
       parameters:
@@ -425,7 +425,7 @@ paths:
       summary: Get forum by ID
       tags:
       - forums
-  /get-role-by-id/{id}:
+  /management-service/v1/get-role-by-id/{id}:
     get:
       description: Get details of a role using its UUID
       parameters:
@@ -456,7 +456,7 @@ paths:
       summary: Get a role by ID
       tags:
       - roles
-  /get-role-by-type/{roleType}:
+  /management-service/v1/get-role-by-type/{roleType}:
     get:
       description: Get details of a role by its type (e.g., admin, user)
       parameters:
@@ -483,7 +483,7 @@ paths:
       summary: Get a role by type
       tags:
       - roles
-  /restore-category/{id}:
+  /management-service/v1/restore-category/{id}:
     post:
       description: Restore a category that was previously soft deleted by its UUID
       parameters:
@@ -514,7 +514,7 @@ paths:
       summary: Restore a soft deleted category by ID
       tags:
       - categories
-  /restore-forum/{id}:
+  /management-service/v1/restore-forum/{id}:
     post:
       description: Restore a forum that was previously soft deleted by its UUID
       parameters:
@@ -545,7 +545,7 @@ paths:
       summary: Restore a soft deleted forum
       tags:
       - forums
-  /restore-role/{id}:
+  /management-service/v1/restore-role/{id}:
     post:
       description: Restore a previously deleted role by its UUID
       parameters:
@@ -576,7 +576,7 @@ paths:
       summary: Restore a deleted role
       tags:
       - roles
-  /update-category/{id}:
+  /management-service/v1/update-category/{id}:
     put:
       consumes:
       - application/json
@@ -615,7 +615,7 @@ paths:
       summary: Update a category by ID
       tags:
       - categories
-  /update-forum-category:
+  /management-service/v1/update-forum-category:
     put:
       consumes:
       - application/json
@@ -649,7 +649,7 @@ paths:
       summary: Update the category owner of a forum
       tags:
       - forums
-  /update-forum-description:
+  /management-service/v1/update-forum-description:
     put:
       consumes:
       - application/json
@@ -683,7 +683,7 @@ paths:
       summary: Update the description of a forum
       tags:
       - forums
-  /update-forum-name:
+  /management-service/v1/update-forum-name:
     put:
       consumes:
       - application/json
@@ -717,7 +717,7 @@ paths:
       summary: Update the name of a forum
       tags:
       - forums
-  /update-role:
+  /management-service/v1/update-role:
     put:
       consumes:
       - application/json

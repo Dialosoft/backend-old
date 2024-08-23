@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/change-user-role": {
+        "/management-service/v1/change-user-role": {
             "put": {
                 "description": "Change the role of a specific user",
                 "consumes": [
@@ -67,7 +67,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/create-category": {
+        "/management-service/v1/create-category": {
             "post": {
                 "description": "Create a new category with a name and description",
                 "consumes": [
@@ -119,7 +119,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/create-forum": {
+        "/management-service/v1/create-forum": {
             "post": {
                 "description": "Create a new forum with a name, description, and category ID",
                 "consumes": [
@@ -177,7 +177,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/create-role": {
+        "/management-service/v1/create-role": {
             "post": {
                 "description": "Create a new role with the specified permissions",
                 "consumes": [
@@ -229,7 +229,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/delete-category/{id}": {
+        "/management-service/v1/delete-category/{id}": {
             "delete": {
                 "description": "Soft delete a category by its UUID",
                 "produces": [
@@ -276,7 +276,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/delete-forum/{id}": {
+        "/management-service/v1/delete-forum/{id}": {
             "delete": {
                 "description": "Soft delete a forum by its UUID",
                 "produces": [
@@ -323,7 +323,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/delete-role/{id}": {
+        "/management-service/v1/delete-role/{id}": {
             "delete": {
                 "description": "Delete an existing role by its UUID",
                 "produces": [
@@ -370,7 +370,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-all-categories": {
+        "/management-service/v1/get-all-categories": {
             "get": {
                 "description": "Get a list of all categories",
                 "produces": [
@@ -402,7 +402,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-all-forums": {
+        "/management-service/v1/get-all-forums": {
             "get": {
                 "description": "Get a list of all forums",
                 "produces": [
@@ -434,7 +434,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-all-roles": {
+        "/management-service/v1/get-all-roles": {
             "get": {
                 "description": "Get all the roles available in the system",
                 "produces": [
@@ -466,7 +466,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-category-id/{id}": {
+        "/management-service/v1/get-category-id/{id}": {
             "get": {
                 "description": "Get a single category by its UUID",
                 "produces": [
@@ -513,7 +513,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-forum-id/{id}": {
+        "/management-service/v1/get-forum-id/{id}": {
             "get": {
                 "description": "Get a single forum by its UUID",
                 "produces": [
@@ -560,7 +560,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-role-by-id/{id}": {
+        "/management-service/v1/get-role-by-id/{id}": {
             "get": {
                 "description": "Get details of a role using its UUID",
                 "produces": [
@@ -607,7 +607,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-role-by-type/{roleType}": {
+        "/management-service/v1/get-role-by-type/{roleType}": {
             "get": {
                 "description": "Get details of a role by its type (e.g., admin, user)",
                 "produces": [
@@ -648,7 +648,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/restore-category/{id}": {
+        "/management-service/v1/restore-category/{id}": {
             "post": {
                 "description": "Restore a category that was previously soft deleted by its UUID",
                 "produces": [
@@ -695,7 +695,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/restore-forum/{id}": {
+        "/management-service/v1/restore-forum/{id}": {
             "post": {
                 "description": "Restore a forum that was previously soft deleted by its UUID",
                 "produces": [
@@ -742,7 +742,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/restore-role/{id}": {
+        "/management-service/v1/restore-role/{id}": {
             "post": {
                 "description": "Restore a previously deleted role by its UUID",
                 "produces": [
@@ -789,7 +789,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/update-category/{id}": {
+        "/management-service/v1/update-category/{id}": {
             "put": {
                 "description": "Update a category's name and description by its UUID",
                 "consumes": [
@@ -848,7 +848,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/update-forum-category": {
+        "/management-service/v1/update-forum-category": {
             "put": {
                 "description": "Update the category of a forum by its UUID and new category ID",
                 "consumes": [
@@ -900,7 +900,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/update-forum-description": {
+        "/management-service/v1/update-forum-description": {
             "put": {
                 "description": "Update the description of a forum by its UUID",
                 "consumes": [
@@ -952,7 +952,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/update-forum-name": {
+        "/management-service/v1/update-forum-name": {
             "put": {
                 "description": "Update the name of a forum by its UUID",
                 "consumes": [
@@ -1004,7 +1004,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/update-role": {
+        "/management-service/v1/update-role": {
             "put": {
                 "description": "Update an existing role by its UUID",
                 "consumes": [
