@@ -4,14 +4,17 @@ import com.dialosoft.auth.persistence.entity.SeedPhraseEntity;
 import com.dialosoft.auth.persistence.entity.UserEntity;
 import com.dialosoft.auth.persistence.repository.SeedPhraseRepository;
 import com.dialosoft.auth.persistence.repository.UserRepository;
-import com.dialosoft.auth.web.dto.response.RecoverTokenResponse;
-import com.dialosoft.auth.web.dto.response.ResponseBody;
-import com.dialosoft.auth.web.dto.request.RecoverChangePasswordRequest;
-import com.dialosoft.auth.web.dto.request.RecoverRequest;
 import com.dialosoft.auth.web.config.error.exception.CustomTemplateException;
 import com.dialosoft.auth.web.config.jwt.JwtUtil;
+import com.dialosoft.auth.web.dto.request.ChangePasswordRequest;
+import com.dialosoft.auth.web.dto.request.RecoverChangePasswordRequest;
+import com.dialosoft.auth.web.dto.request.RecoverRequest;
+import com.dialosoft.auth.web.dto.response.RecoverTokenResponse;
+import com.dialosoft.auth.web.dto.response.ResponseBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,6 +62,7 @@ public class RecoverService {
     public Boolean compareHash(List<String> seedPhrase, String savedSeedPhrase) {
 
         String combinedPhrase = String.join(";", seedPhrase);
+        // bcrypt.matches() already encode combinedPhrase to compare with savedSeedPhrase
         return bcrypt.matches(combinedPhrase, savedSeedPhrase);
     }
 
@@ -78,7 +82,7 @@ public class RecoverService {
 
         if (!compareHash(request.seedPhrase, seedPhraseEntity.getHashPhrase())) {
 
-            throw new CustomTemplateException("Recover password failed", null, HttpStatus.UNAUTHORIZED);
+            throw new CustomTemplateException("Recover password failed, incorrect seed phrase", null, HttpStatus.UNAUTHORIZED);
         }
 
         return ResponseBody.<RecoverTokenResponse>builder()
@@ -123,6 +127,48 @@ public class RecoverService {
 
         } catch (Exception e) {
             throw new CustomTemplateException("Recover password failed", e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseBody<?> applyAuthenticatedChangePassword(ChangePasswordRequest request) {
+
+        try {
+
+            // Obtener la autenticación actual
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null && authentication.isAuthenticated()) {
+                // Obtener el nombre de usuario
+                String username = authentication.getName();
+
+                UserEntity userEntity = userRepository.findByUsername(username)
+                        .orElseThrow(() -> new CustomTemplateException(String.format("User not found with this username: %s", username), null, HttpStatus.NOT_FOUND));
+
+                SeedPhraseEntity seedPhraseEntity = seedPhraseRepository.findSeedPhraseEntityByUserId(userEntity.getId())
+                        .orElseThrow(() -> new CustomTemplateException(String.format("Seed phrase not found for this user: %s", username), null, HttpStatus.NOT_FOUND));
+
+                if (!compareHash(request.seedPhrase, seedPhraseEntity.getHashPhrase())) {
+
+                    throw new CustomTemplateException("Recover password failed, incorrect seed phrase", null, HttpStatus.UNAUTHORIZED);
+                }
+
+                String passwordHashed = bcrypt.encode(request.getNewPassword());
+                userEntity.setPassword(passwordHashed);
+
+                userRepository.save(userEntity);
+
+                return ResponseBody.builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("password changed successfully")
+                        .data(null)
+                        .build();
+
+            } else {
+                throw new CustomTemplateException("User from accessToken is not authenticated", null, HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (Exception e) {
+            throw new CustomTemplateException("Change password failed", e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
