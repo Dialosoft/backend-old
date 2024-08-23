@@ -9,9 +9,10 @@ import (
 
 type Forum struct {
 	ID          uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
-	Name        string         `gorm:"type:varchar(30);unique;not null" json:"name"`
+	Name        string         `gorm:"type:varchar(100);unique;not null" json:"name"`
 	Description string         `gorm:"type:varchar(255)" json:"description"`
 	IsActive    bool           `gorm:"default:true" json:"is_active"`
+	Type        string         `gorm:"type:varchar(255);not null" json:"type"`
 	PostCount   uint32         `gorm:"default:0" json:"post_count"`
 	CategoryID  string         `gorm:"not null" json:"category_id"`
 	Category    Category       `gorm:"foreignKey:CategoryID;references:ID" json:"category"`
