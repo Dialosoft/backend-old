@@ -12,4 +12,5 @@ public class BasicCommonAttributes {
     String id;
     String username;
     String content;
+    String title;
 }
