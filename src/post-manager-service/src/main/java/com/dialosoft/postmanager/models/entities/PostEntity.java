@@ -23,7 +23,7 @@ public class PostEntity {
      @Column()
      String username;
      String forumId;
-     @Column()
+     @Column(length = 2500)
      String content;
      @Column()
      String title;
