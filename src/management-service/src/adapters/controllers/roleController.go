@@ -21,7 +21,7 @@ import (
 // @Success 200 {object} response.Standard
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
-// @Router /roles [get]
+// @Router /management-service/v1/get-all-roles [get]
 func GetAllRoles(c *gin.Context, service services.RoleService) {
 	var res response.Standard
 
@@ -52,7 +52,7 @@ func GetAllRoles(c *gin.Context, service services.RoleService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
-// @Router /roles/{id} [get]
+// @Router /management-service/v1/get-role-by-id/{id} [get]
 func GetRoleByID(c *gin.Context, service services.RoleService) {
 	var res response.Standard
 	id := c.Param("id")
@@ -86,10 +86,10 @@ func GetRoleByID(c *gin.Context, service services.RoleService) {
 // @Tags roles
 // @Param roleType path string true "Role Type"
 // @Produce json
-// @Success 200 {object} response.Standard{}
+// @Success 200 {object} response.Standard
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
-// @Router /roles/type/{roleType} [get]
+// @Router /management-service/v1/get-role-by-type/{roleType} [get]
 func GetRoleByType(c *gin.Context, service services.RoleService) {
 	var res response.Standard
 	roleType := c.Param("roleType")
@@ -122,7 +122,7 @@ func GetRoleByType(c *gin.Context, service services.RoleService) {
 // @Failure 400 {object} response.Standard "Invalid request body"
 // @Failure 409 {object} response.Standard "Duplicate role"
 // @Failure 500 {object} response.Standard
-// @Router /roles [post]
+// @Router /management-service/v1/create-role [post]
 func CreateRole(c *gin.Context, service services.RoleService) {
 	var res response.Standard
 	var req request.CreateRoleRequest
@@ -156,7 +156,7 @@ func CreateRole(c *gin.Context, service services.RoleService) {
 // @Accept json
 // @Produce json
 // @Success 501 {object} response.Standard "Not implemented"
-// @Router /roles/{id} [put]
+// @Router /management-service/v1/update-role [put]
 func UpdateRole(c *gin.Context, service services.RoleService) {
 	c.JSON(http.StatusNotImplemented, nil)
 }
@@ -171,7 +171,7 @@ func UpdateRole(c *gin.Context, service services.RoleService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
-// @Router /roles/{id} [delete]
+// @Router /management-service/v1/delete-role/{id} [delete]
 func DeleteRole(c *gin.Context, service services.RoleService) {
 	var res response.Standard
 	id := c.Param("id")
@@ -208,7 +208,7 @@ func DeleteRole(c *gin.Context, service services.RoleService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
-// @Router /roles/{id}/restore [post]
+// @Router /management-service/v1/restore-role/{id} [post]
 func RestoreRole(c *gin.Context, service services.RoleService) {
 	var res response.Standard
 	id := c.Param("id")
@@ -246,7 +246,7 @@ func RestoreRole(c *gin.Context, service services.RoleService) {
 // @Failure 400 {object} response.Standard "Invalid request body or UUID"
 // @Failure 404 {object} response.Standard
 // @Failure 500 {object} response.Standard
-// @Router /users/change-role [post]
+// @Router /management-service/v1/change-user-role [put]
 func ChangeUserRole(c *gin.Context, service services.RoleService) {
 	var res response.Standard
 	var req request.ChangeUserRole

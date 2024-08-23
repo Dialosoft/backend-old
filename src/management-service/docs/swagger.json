@@ -4,7 +4,59 @@
         "contact": {}
     },
     "paths": {
-        "/create-category": {
+        "/management-service/v1/change-user-role": {
+            "put": {
+                "description": "Change the role of a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Change a user's role",
+                "parameters": [
+                    {
+                        "description": "User and Role data",
+                        "name": "userRole",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ChangeUserRole"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/create-category": {
             "post": {
                 "description": "Create a new category with a name and description",
                 "consumes": [
@@ -56,7 +108,7 @@
                 }
             }
         },
-        "/create-forum": {
+        "/management-service/v1/create-forum": {
             "post": {
                 "description": "Create a new forum with a name, description, and category ID",
                 "consumes": [
@@ -114,383 +166,7 @@
                 }
             }
         },
-        "/delete-category/{id}": {
-            "delete": {
-                "description": "Soft delete a category by its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Delete a category by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Category ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Category Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/delete-forum/{id}": {
-            "delete": {
-                "description": "Soft delete a forum by its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "forums"
-                ],
-                "summary": "Delete a forum",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Forum ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Forum Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-all-categories": {
-            "get": {
-                "description": "Get a list of all categories",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Get all categories",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-all-forums": {
-            "get": {
-                "description": "Get a list of all forums",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "forums"
-                ],
-                "summary": "Get all forums",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-category-id/{id}": {
-            "get": {
-                "description": "Get a single category by its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Get category by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Category ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-forum-id/{id}": {
-            "get": {
-                "description": "Get a single forum by its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "forums"
-                ],
-                "summary": "Get forum by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Forum ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/restore-category/{id}": {
-            "post": {
-                "description": "Restore a category that was previously soft deleted by its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "categories"
-                ],
-                "summary": "Restore a soft deleted category by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Category ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Category Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/restore-forum/{id}": {
-            "post": {
-                "description": "Restore a forum that was previously soft deleted by its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "forums"
-                ],
-                "summary": "Restore a soft deleted forum",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Forum ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Forum Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/roles": {
-            "get": {
-                "description": "Get all the roles available in the system",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Get all roles",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            },
+        "/management-service/v1/create-role": {
             "post": {
                 "description": "Create a new role with the specified permissions",
                 "consumes": [
@@ -542,61 +218,20 @@
                 }
             }
         },
-        "/roles/type/{roleType}": {
-            "get": {
-                "description": "Get details of a role by its type (e.g., admin, user)",
+        "/management-service/v1/delete-category/{id}": {
+            "delete": {
+                "description": "Soft delete a category by its UUID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "roles"
+                    "categories"
                 ],
-                "summary": "Get a role by type",
+                "summary": "Delete a category by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Role Type",
-                        "name": "roleType",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    }
-                }
-            }
-        },
-        "/roles/{id}": {
-            "get": {
-                "description": "Get details of a role using its UUID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "roles"
-                ],
-                "summary": "Get a role by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Role UUID",
+                        "description": "Category ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -616,7 +251,7 @@
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Category Not Found",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
@@ -628,37 +263,56 @@
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Update an existing role by its UUID",
-                "consumes": [
-                    "application/json"
-                ],
+            }
+        },
+        "/management-service/v1/delete-forum/{id}": {
+            "delete": {
+                "description": "Soft delete a forum by its UUID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "roles"
+                    "forums"
                 ],
-                "summary": "Update a role",
+                "summary": "Delete a forum",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Role UUID",
+                        "description": "Forum ID",
                         "name": "id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "501": {
-                        "description": "Not implemented",
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Forum Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }
                     }
                 }
-            },
+            }
+        },
+        "/management-service/v1/delete-role/{id}": {
             "delete": {
                 "description": "Delete an existing role by its UUID",
                 "produces": [
@@ -705,7 +359,379 @@
                 }
             }
         },
-        "/roles/{id}/restore": {
+        "/management-service/v1/get-all-categories": {
+            "get": {
+                "description": "Get a list of all categories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get all categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/get-all-forums": {
+            "get": {
+                "description": "Get a list of all forums",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "forums"
+                ],
+                "summary": "Get all forums",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/get-all-roles": {
+            "get": {
+                "description": "Get all the roles available in the system",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get all roles",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/get-category-id/{id}": {
+            "get": {
+                "description": "Get a single category by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get category by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/get-forum-id/{id}": {
+            "get": {
+                "description": "Get a single forum by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "forums"
+                ],
+                "summary": "Get forum by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Forum ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/get-role-by-id/{id}": {
+            "get": {
+                "description": "Get details of a role using its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get a role by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Role UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/get-role-by-type/{roleType}": {
+            "get": {
+                "description": "Get details of a role by its type (e.g., admin, user)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get a role by type",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Role Type",
+                        "name": "roleType",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/restore-category/{id}": {
+            "post": {
+                "description": "Restore a category that was previously soft deleted by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Restore a soft deleted category by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Category Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/restore-forum/{id}": {
+            "post": {
+                "description": "Restore a forum that was previously soft deleted by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "forums"
+                ],
+                "summary": "Restore a soft deleted forum",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Forum ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "404": {
+                        "description": "Forum Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Standard"
+                        }
+                    }
+                }
+            }
+        },
+        "/management-service/v1/restore-role/{id}": {
             "post": {
                 "description": "Restore a previously deleted role by its UUID",
                 "produces": [
@@ -752,7 +778,7 @@
                 }
             }
         },
-        "/update-category/{id}": {
+        "/management-service/v1/update-category/{id}": {
             "put": {
                 "description": "Update a category's name and description by its UUID",
                 "consumes": [
@@ -811,7 +837,7 @@
                 }
             }
         },
-        "/update-forum-category": {
+        "/management-service/v1/update-forum-category": {
             "put": {
                 "description": "Update the category of a forum by its UUID and new category ID",
                 "consumes": [
@@ -863,7 +889,7 @@
                 }
             }
         },
-        "/update-forum-description": {
+        "/management-service/v1/update-forum-description": {
             "put": {
                 "description": "Update the description of a forum by its UUID",
                 "consumes": [
@@ -915,7 +941,7 @@
                 }
             }
         },
-        "/update-forum-name": {
+        "/management-service/v1/update-forum-name": {
             "put": {
                 "description": "Update the name of a forum by its UUID",
                 "consumes": [
@@ -967,9 +993,9 @@
                 }
             }
         },
-        "/users/change-role": {
-            "post": {
-                "description": "Change the role of a specific user",
+        "/management-service/v1/update-role": {
+            "put": {
+                "description": "Update an existing role by its UUID",
                 "consumes": [
                     "application/json"
                 ],
@@ -979,39 +1005,19 @@
                 "tags": [
                     "roles"
                 ],
-                "summary": "Change a user's role",
+                "summary": "Update a role",
                 "parameters": [
                     {
-                        "description": "User and Role data",
-                        "name": "userRole",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.ChangeUserRole"
-                        }
+                        "type": "string",
+                        "description": "Role UUID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request body or UUID",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Standard"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "501": {
+                        "description": "Not implemented",
                         "schema": {
                             "$ref": "#/definitions/response.Standard"
                         }

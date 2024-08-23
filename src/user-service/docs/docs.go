@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/user-service/change-avatar": {
+        "/user-service/v1/change-avatar": {
             "put": {
                 "description": "Change the avatar of a user by passing the user ID and an image file",
                 "consumes": [
@@ -66,7 +66,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user-service/change-email": {
+        "/user-service/v1/change-email": {
             "put": {
                 "description": "Change the email address of a user",
                 "consumes": [
@@ -118,7 +118,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user-service/get-simpleuser-info": {
+        "/user-service/v1/get-simpleuser-info": {
             "get": {
                 "description": "Get basic information about a user by passing the \"X-Auth-Username\" header",
                 "consumes": [
@@ -168,7 +168,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user-service/get-user-info": {
+        "/user-service/v1/get-user-info": {
             "get": {
                 "description": "Get detailed information about a user by passing the \"X-Auth-Username\" header",
                 "consumes": [

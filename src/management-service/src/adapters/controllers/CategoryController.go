@@ -21,7 +21,7 @@ import (
 // @Success 200 {object} response.Standard
 // @Failure 404 {object} response.Standard "Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /get-all-categories [get]
+// @Router /management-service/v1/get-all-categories [get]
 func GetAllCategories(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 
@@ -52,7 +52,7 @@ func GetAllCategories(c *gin.Context, service services.CategoryService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /get-category-id/{id} [get]
+// @Router /management-service/v1/get-category-id/{id} [get]
 func GetCategoryByID(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	id := c.Param("id")
@@ -91,7 +91,7 @@ func GetCategoryByID(c *gin.Context, service services.CategoryService) {
 // @Failure 400 {object} response.Standard "Bad Request"
 // @Failure 409 {object} response.Standard "Conflict (Duplicate Category)"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /create-category [post]
+// @Router /management-service/v1/create-category [post]
 func CreateCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	var req request.CreateCategoryRequest
@@ -129,7 +129,7 @@ func CreateCategory(c *gin.Context, service services.CategoryService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Category Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /update-category/{id} [put]
+// @Router /management-service/v1/update-category/{id} [put]
 func UpdateCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	var req request.CreateCategoryRequest
@@ -177,7 +177,7 @@ func UpdateCategory(c *gin.Context, service services.CategoryService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Category Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /delete-category/{id} [delete]
+// @Router /management-service/v1/delete-category/{id} [delete]
 func DeleteCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	id := c.Param("id")
@@ -214,7 +214,7 @@ func DeleteCategory(c *gin.Context, service services.CategoryService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Category Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /restore-category/{id} [post]
+// @Router /management-service/v1/restore-category/{id} [post]
 func RestoreCategory(c *gin.Context, service services.CategoryService) {
 	var res response.Standard
 	id := c.Param("id")

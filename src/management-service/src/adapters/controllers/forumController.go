@@ -21,7 +21,7 @@ import (
 // @Success 200 {object} response.Standard
 // @Failure 404 {object} response.Standard "Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /get-all-forums [get]
+// @Router /management-service/v1/get-all-forums [get]
 func GetAllForums(c *gin.Context, service services.ForumService) {
 	forums, err := service.GetAllForums()
 	if err != nil {
@@ -52,7 +52,7 @@ func GetAllForums(c *gin.Context, service services.ForumService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /get-forum-id/{id} [get]
+// @Router /management-service/v1/get-forum-id/{id} [get]
 func GetForumByID(c *gin.Context, service services.ForumService) {
 	id := c.Param("id")
 
@@ -94,7 +94,7 @@ func GetForumByID(c *gin.Context, service services.ForumService) {
 // @Failure 404 {object} response.Standard "Category Not Found"
 // @Failure 409 {object} response.Standard "Conflict (Duplicate Forum)"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /create-forum [post]
+// @Router /management-service/v1/create-forum [post]
 func CreateForum(c *gin.Context, service services.ForumService) {
 	var req request.CreateForum
 
@@ -148,7 +148,7 @@ func CreateForum(c *gin.Context, service services.ForumService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Forum or Category Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /update-forum-category [put]
+// @Router /management-service/v1/update-forum-category [put]
 func UpdateForumCategoryOwner(c *gin.Context, service services.ForumService) {
 	var req request.ForumUpdateCategoryOwner
 	if err := c.BindJSON(&req); err != nil {
@@ -199,7 +199,7 @@ func UpdateForumCategoryOwner(c *gin.Context, service services.ForumService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Forum Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /update-forum-name [put]
+// @Router /management-service/v1/update-forum-name [put]
 func UpdateForumName(c *gin.Context, service services.ForumService) {
 	var req request.ForumUpdateName
 	if err := c.BindJSON(&req); err != nil {
@@ -241,7 +241,7 @@ func UpdateForumName(c *gin.Context, service services.ForumService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Forum Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /update-forum-description [put]
+// @Router /management-service/v1/update-forum-description [put]
 func UpdateForumDescription(c *gin.Context, service services.ForumService) {
 	var req request.ForumUpdateDescription
 	if err := c.BindJSON(&req); err != nil {
@@ -282,7 +282,7 @@ func UpdateForumDescription(c *gin.Context, service services.ForumService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Forum Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /delete-forum/{id} [delete]
+// @Router /management-service/v1/delete-forum/{id} [delete]
 func DeleteForum(c *gin.Context, service services.ForumService) {
 	id := c.Param("id")
 
@@ -321,7 +321,7 @@ func DeleteForum(c *gin.Context, service services.ForumService) {
 // @Failure 400 {object} response.Standard "Invalid UUID"
 // @Failure 404 {object} response.Standard "Forum Not Found"
 // @Failure 500 {object} response.Standard "Internal Server Error"
-// @Router /restore-forum/{id} [post]
+// @Router /management-service/v1/restore-forum/{id} [post]
 func RestoreForum(c *gin.Context, service services.ForumService) {
 	id := c.Param("id")
 
